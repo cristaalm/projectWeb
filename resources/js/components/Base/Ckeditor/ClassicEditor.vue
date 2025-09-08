@@ -1,0 +1,85 @@
+<script setup lang="ts">
+import "@/assets/css/vendors/ckeditor.css";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { inject, onMounted, ref } from "vue";
+import { type CkeditorElement, init } from "./ckeditor";
+
+export type ProvideClassicEditor = (el: CkeditorElement) => void;
+
+interface CkeditorProps {
+  modelValue: string;
+  config?: any;
+  as?: string | object;
+  disabled?: boolean;
+  refKey?: string;
+}
+
+interface CkeditorEmit {
+  (e: "update:modelValue", value: string): void;
+  (e: "focus", value: string, editor: any): void;
+  (e: "blur", value: string, editor: any): void;
+  (e: "ready", editor: string): void;
+}
+
+const props = withDefaults(defineProps<CkeditorProps>(), {
+  as: "div",
+  config: {
+  toolbar: [
+  'bold', 'italic', '|',
+  'bulletedList', 'numberedList', '|',
+  'undo', 'redo',
+  ],
+  placeholder: 'Escribe aquí tu contenido...',
+  language: 'es',
+  heading: {
+    options: [
+      { model: 'paragraph', title: 'Párrafo', class: 'ck-heading_paragraph' },
+      { model: 'heading1', title: 'Encabezado 1', class: 'ck-heading_heading1' },
+      { model: 'heading2', title: 'Encabezado 2', class: 'ck-heading_heading2' },
+    ]
+  },
+  image: {
+    toolbar: ['imageTextAlternative', 'imageStyle:full', 'imageStyle:side'],
+    styles: ['full', 'side']
+  },
+  table: {
+    contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells']
+  },
+  removePlugins: ['MediaEmbed', 'ImageUpload', 'EasyImage']
+},
+});
+
+const emit = defineEmits<CkeditorEmit>();
+const editorRef = ref<CkeditorElement>();
+const cacheData = ref("");
+
+const bindInstance = (el: CkeditorElement) => {
+  if (props.refKey) {
+    const bind = inject<ProvideClassicEditor>(`bind[${props.refKey}]`);
+    if (bind) {
+      bind(el);
+    }
+  }
+};
+
+const vEditorDirective = {
+  mounted(el: CkeditorElement) {
+    init(el, ClassicEditor, { props, emit, cacheData });
+  },
+};
+
+onMounted(() => {
+  if (editorRef.value) {
+    bindInstance(editorRef.value);
+  }
+});
+</script>
+
+<template>
+  <component
+    :is="props.as"
+    ref="editorRef"
+    v-editor-directive
+    class="select"
+  ></component>
+</template>

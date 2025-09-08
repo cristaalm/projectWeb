@@ -1,0 +1,11 @@
+html {
+    body {
+        letter-spacing: theme("letterSpacing.wide");
+        font-size: theme("fontSize.sm");
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        font-family: theme("fontFamily.public-sans");
+        color: theme("colors.slate.600");
+        line-height: theme("lineHeight.5");
+    }
+}

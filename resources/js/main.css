@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .image-fit {
+    position: relative;
+
+    & > img {
+      position: absolute;
+      block-size: 100%;
+      inline-size: 100%;
+      inset-block-start: 0;
+      object-fit: cover;
+    }
+  }
+}

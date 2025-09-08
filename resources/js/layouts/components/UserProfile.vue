@@ -1,23 +1,26 @@
 <script setup>
-import avatar1 from '@images/avatars/avatar-1.png'
+import LoadingIcon from '@/components/Base/LoadingIcon/LoadingIcon.vue'
+import useLogout from '@/hooks/Auth/useLogout'
+import { useThemeSwitcher } from '@/hooks/layout/useThemeSwitcher'
+import { useAuthStore } from '@/store/auth'
+
+const { themeName, changeTheme, logoutMode } = useThemeSwitcher()
+const { loadingLogout, logoutUser } = useLogout()
+const user = useAuthStore().getUser()
 </script>
 
 <template>
-  <VBadge
-    dot
-    location="bottom right"
-    offset-x="3"
-    offset-y="3"
-    color="success"
-    bordered
-  >
+  <div class="relative">
     <VAvatar
-      class="cursor-pointer"
-      color="primary"
+      class="cursor-pointer !bg-primary/50"
       variant="tonal"
     >
-      <VImg :src="avatar1" />
-
+      <!-- <VImg :src="user.avatar" /> -->
+      <VIcon
+        icon="bx-user"
+        class="dark:text-white"
+      />
+  
       <!-- SECTION Menu -->
       <VMenu
         activator="parent"
@@ -41,89 +44,63 @@ import avatar1 from '@images/avatars/avatar-1.png'
                     color="primary"
                     variant="tonal"
                   >
-                    <VImg :src="avatar1" />
+                    <!-- <VImg :src="user.avatar" /> -->
+                    <VIcon
+                      icon="bx-user"
+                      class="dark:text-white"
+                    />
                   </VAvatar>
                 </VBadge>
               </VListItemAction>
             </template>
-
+  
             <VListItemTitle class="font-weight-semibold">
-              John Doe
+              {{ user.name }} {{ user.last_name }}
             </VListItemTitle>
-            <VListItemSubtitle>Admin</VListItemSubtitle>
+            <VListItemSubtitle v-if="user.role">
+              {{ user.role.name }}
+            </VListItemSubtitle>
           </VListItem>
           <VDivider class="my-2" />
-
-          <!-- 👉 Profile -->
-          <VListItem link>
+          <!-- 👉 Modo oscuro / claro -->
+          <VListItem
+            link
+            @click="changeTheme"
+          >
             <template #prepend>
               <VIcon
                 class="me-2"
-                icon="bx-user"
+                :icon="themeName === 'dark' ? 'bx-sun' : 'bx-moon'"
                 size="22"
               />
             </template>
-
-            <VListItemTitle>Profile</VListItemTitle>
+            <VListItemTitle>Modo {{ themeName === 'dark' ? 'claro' : 'oscuro' }}</VListItemTitle>
           </VListItem>
-
-          <!-- 👉 Settings -->
-          <VListItem link>
-            <template #prepend>
-              <VIcon
-                class="me-2"
-                icon="bx-cog"
-                size="22"
-              />
-            </template>
-
-            <VListItemTitle>Settings</VListItemTitle>
-          </VListItem>
-
-          <!-- 👉 Pricing -->
-          <VListItem link>
-            <template #prepend>
-              <VIcon
-                class="me-2"
-                icon="bx-dollar"
-                size="22"
-              />
-            </template>
-
-            <VListItemTitle>Pricing</VListItemTitle>
-          </VListItem>
-
-          <!-- 👉 FAQ -->
-          <VListItem link>
-            <template #prepend>
-              <VIcon
-                class="me-2"
-                icon="bx-help-circle"
-                size="22"
-              />
-            </template>
-
-            <VListItemTitle>FAQ</VListItemTitle>
-          </VListItem>
-
-          <!-- Divider -->
+  
           <VDivider class="my-2" />
-
+  
           <!-- 👉 Logout -->
-          <VListItem to="/login">
+          <VListItem @click.prevent="()=>{logoutUser(logoutMode)}">
             <template #prepend>
               <VIcon
+                v-if="!loadingLogout"
                 class="me-2"
                 icon="bx-log-out"
                 size="22"
               />
+              <LoadingIcon
+                v-else
+                icon="tail-spin"
+                class="mr-5"
+              />
             </template>
-
-            <VListItemTitle>Logout</VListItemTitle>
+            <VListItemTitle>
+              Logout
+            </VListItemTitle>
           </VListItem>
         </VList>
       </VMenu>
       <!-- !SECTION -->
     </VAvatar>
-  </VBadge>
+  </div>
 </template>
