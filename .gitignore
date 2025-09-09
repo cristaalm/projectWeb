@@ -73,3 +73,5 @@ vendor
 # BRISA, no subas esta carpeta
 .vscode 
 # ============================
+
+pids
