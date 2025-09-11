@@ -37,10 +37,46 @@ class AuthController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Hash generado correctamente"
+     *         description="Hash generado correctamente",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Hash generado correctamente."),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="hashed_password", type="string", example="$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi")
+     *             ),
+     *             @OA\Property(property="errors", type="null", example=null),
+     *             @OA\Property(property="status", type="integer", example=200)
+     *         )
      *     ),
-     *     @OA\Response(response=422, description="Datos inválidos"),
-     *     @OA\Response(response=500, description="Error inesperado")
+     *     @OA\Response(
+     *         response=422,
+     *         description="Datos inválidos",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Datos inválidos para generar hash."),
+     *             @OA\Property(property="data", type="null", example=null),
+     *             @OA\Property(property="errors", type="object",
+     *                 @OA\Property(property="pass", type="array",
+     *                     @OA\Items(type="string", example="The pass field is required.")
+     *                 )
+     *             ),
+     *             @OA\Property(property="status", type="integer", example=422)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error inesperado",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Ocurrió un error inesperado al generar el hash."),
+     *             @OA\Property(property="data", type="null", example=null),
+     *             @OA\Property(property="errors", type="string", example="Error interno del servidor."),
+     *             @OA\Property(property="status", type="integer", example=500)
+     *         )
+     *     )
      * )
      */
     public function passHash(Request $request)
@@ -70,9 +106,28 @@ class AuthController extends Controller
      *     security={{"bearerAuth":{}}},
      *     @OA\Response(
      *         response=200,
-     *         description="Sesión cerrada correctamente"
+     *         description="Sesión cerrada correctamente",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Sesión cerrada correctamente."),
+     *             @OA\Property(property="data", type="null", example=null),
+     *             @OA\Property(property="errors", type="null", example=null),
+     *             @OA\Property(property="status", type="integer", example=200)
+     *         )
      *     ),
-     *     @OA\Response(response=401, description="Token inválido o no proporcionado")
+     *     @OA\Response(
+     *         response=401,
+     *         description="Token inválido o no proporcionado",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Token de autenticación no proporcionado."),
+     *             @OA\Property(property="data", type="null", example=null),
+     *             @OA\Property(property="errors", type="null", example=null),
+     *             @OA\Property(property="status", type="integer", example=401)
+     *         )
+     *     )
      * )
      */
     public function logout(Request $request)
@@ -109,12 +164,90 @@ class AuthController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Inicio de sesión exitoso"
+     *         description="Inicio de sesión exitoso",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Inicio de sesión exitoso."),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="access_token", type="string", example="1|abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"),
+     *                 @OA\Property(property="token_type", type="string", example="Bearer"),
+     *                 @OA\Property(property="expires_at", type="string", format="date-time", example="2025-12-31T23:59:59.000000Z"),
+     *                 @OA\Property(property="user", type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="Usuario"),
+     *                     @OA\Property(property="last_name", type="string", example="de prueba"),
+     *                     @OA\Property(property="phone", type="string", example="123456789"),
+     *                     @OA\Property(property="email", type="string", example="test@example.com"),
+     *                     @OA\Property(property="status", type="integer", example=1),
+     *                     @OA\Property(property="verification_status", type="integer", example=1),
+     *                     @OA\Property(property="total_points", type="integer", example=100),
+     *                     @OA\Property(property="role", type="object",
+     *                         @OA\Property(property="id", type="integer", example=2),
+     *                         @OA\Property(property="display_name", type="string", example="Administrador"),
+     *                         @OA\Property(property="name", type="string", example="admin"),
+     *                         @OA\Property(property="is_active", type="boolean", example=true)
+     *                     ),
+     *                     @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-31T23:59:59.000000Z"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-12-31T23:59:59.000000Z")
+     *                 )
+     *             ),
+     *             @OA\Property(property="errors", type="null", example=null),
+     *             @OA\Property(property="status", type="integer", example=200)
+     *         )
      *     ),
-     *     @OA\Response(response=401, description="Credenciales inválidas"),
-     *     @OA\Response(response=403, description="Cuenta desactivada o sin permisos"),
-     *     @OA\Response(response=422, description="Error de validación"),
-     *     @OA\Response(response=500, description="Error inesperado")
+     *     @OA\Response(
+     *         response=401,
+     *         description="Credenciales inválidas",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Correo electrónico o contraseña incorrectos."),
+     *             @OA\Property(property="data", type="null", example=null),
+     *             @OA\Property(property="errors", type="null", example=null),
+     *             @OA\Property(property="status", type="integer", example=401)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Cuenta desactivada o sin permisos",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Tu cuenta ha sido desactivada por un administrador."),
+     *             @OA\Property(property="data", type="null", example=null),
+     *             @OA\Property(property="errors", type="null", example=null),
+     *             @OA\Property(property="status", type="integer", example=403)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Error de validación",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Correo electrónico o contraseña incorrectos."),
+     *             @OA\Property(property="data", type="null", example=null),
+     *             @OA\Property(property="errors", type="object",
+     *                 @OA\Property(property="email", type="array",
+     *                     @OA\Items(type="string", example="The selected email is invalid.")
+     *                 )
+     *             ),
+     *             @OA\Property(property="status", type="integer", example=422)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error inesperado",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Ocurrió un error inesperado al intentar iniciar sesión."),
+     *             @OA\Property(property="data", type="null", example=null),
+     *             @OA\Property(property="errors", type="string", example="Error interno del servidor."),
+     *             @OA\Property(property="status", type="integer", example=500)
+     *         )
+     *     )
      * )
      */
     public function login(Request $request)
@@ -186,11 +319,72 @@ class AuthController extends Controller
      *     security={{"bearerAuth":{}}},
      *     @OA\Response(
      *         response=200,
-     *         description="Sesión válida"
+     *         description="Sesión válida",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Su sesión es válida."),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="user", type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="Usuario"),
+     *                     @OA\Property(property="last_name", type="string", example="de prueba"),
+     *                     @OA\Property(property="phone", type="string", example="123456789"),
+     *                     @OA\Property(property="email", type="string", example="test@example.com"),
+     *                     @OA\Property(property="status", type="integer", example=1),
+     *                     @OA\Property(property="verification_status", type="integer", example=1),
+     *                     @OA\Property(property="total_points", type="integer", example=100),
+     *                     @OA\Property(property="role", type="object",
+     *                         @OA\Property(property="id", type="integer", example=2),
+     *                         @OA\Property(property="display_name", type="string", example="Administrador"),
+     *                         @OA\Property(property="name", type="string", example="admin"),
+     *                         @OA\Property(property="is_active", type="boolean", example=true)
+     *                     ),
+     *                     @OA\Property(property="created_at", type="string", format="date-time", example="2025-12-31T23:59:59.000000Z"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-12-31T23:59:59.000000Z")
+     *                 ),
+     *                 @OA\Property(property="expires_at", type="string", format="date-time", example="2025-12-31T23:59:59.000000Z")
+     *             ),
+     *             @OA\Property(property="errors", type="null", example=null),
+     *             @OA\Property(property="status", type="integer", example=200)
+     *         )
      *     ),
-     *     @OA\Response(response=401, description="Token inválido o expirado"),
-     *     @OA\Response(response=403, description="Cuenta desactivada"),
-     *     @OA\Response(response=500, description="Error inesperado")
+     *     @OA\Response(
+     *         response=401,
+     *         description="Token inválido o expirado",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Su sesión es inválida."),
+     *             @OA\Property(property="data", type="null", example=null),
+     *             @OA\Property(property="errors", type="string", example="Token expirado."),
+     *             @OA\Property(property="status", type="integer", example=401)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Cuenta desactivada",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Tu cuenta no está activa."),
+     *             @OA\Property(property="data", type="null", example=null),
+     *             @OA\Property(property="errors", type="string", example="Cuenta desactivada."),
+     *             @OA\Property(property="status", type="integer", example=403)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error inesperado",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Error al validar su sesión."),
+     *             @OA\Property(property="data", type="null", example=null),
+     *             @OA\Property(property="errors", type="string", example="Error interno del servidor."),
+     *             @OA\Property(property="status", type="integer", example=500)
+     *         )
+     *     )
      * )
      */
     public function validateToken(Request $request)
@@ -258,11 +452,56 @@ class AuthController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Enlace de restablecimiento enviado"
+     *         description="Enlace de restablecimiento enviado",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Enlace de restablecimiento de contraseña enviado correctamente."),
+     *             @OA\Property(property="data", type="null", example=null),
+     *             @OA\Property(property="errors", type="null", example=null),
+     *             @OA\Property(property="status", type="integer", example=200)
+     *         )
      *     ),
-     *     @OA\Response(response=404, description="Correo no registrado"),
-     *     @OA\Response(response=422, description="Error de validación"),
-     *     @OA\Response(response=500, description="Error inesperado")
+     *     @OA\Response(
+     *         response=404,
+     *         description="Correo no registrado",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="El correo electrónico no está registrado en el sistema."),
+     *             @OA\Property(property="data", type="null", example=null),
+     *             @OA\Property(property="errors", type="null", example=null),
+     *             @OA\Property(property="status", type="integer", example=404)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Error de validación",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Correo electrónico inválido o no registrado."),
+     *             @OA\Property(property="data", type="null", example=null),
+     *             @OA\Property(property="errors", type="object",
+     *                 @OA\Property(property="email", type="array",
+     *                     @OA\Items(type="string", example="We can't find a user with that email address.")
+     *                 )
+     *             ),
+     *             @OA\Property(property="status", type="integer", example=422)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error inesperado",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Ocurrió un error inesperado al enviar el enlace de restablecimiento."),
+     *             @OA\Property(property="data", type="null", example=null),
+     *             @OA\Property(property="errors", type="string", example="Error interno del servidor."),
+     *             @OA\Property(property="status", type="integer", example=500)
+     *         )
+     *     )
      * )
      */
     public function forgotPassword(Request $request)
@@ -299,7 +538,7 @@ class AuthController extends Controller
      * @OA\Post(
      *     path="/api/auth/reset-password",
      *     tags={"Autenticación"},
-     *     summary="Restablecer contraseña con token",
+     *     summary="Restablecer contraseña con token generado por el sistema",
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -307,15 +546,55 @@ class AuthController extends Controller
      *             @OA\Property(property="email", type="string", example="test@example.com"),
      *             @OA\Property(property="password", type="string", example="newpassword123"),
      *             @OA\Property(property="password_confirmation", type="string", example="newpassword123"),
-     *             @OA\Property(property="token", type="string", example="eyJhbGciOiJIUzI1NiIsInR...")
+     *             @OA\Property(property="token", type="string", example="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
      *         )
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Contraseña restablecida correctamente"
+     *         description="Contraseña restablecida correctamente",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Contraseña restablecida correctamente."),
+     *             @OA\Property(property="data", type="null", example=null),
+     *             @OA\Property(property="errors", type="null", example=null),
+     *             @OA\Property(property="status", type="integer", example=200)
+     *         )
      *     ),
-     *     @OA\Response(response=422, description="Error de validación"),
-     *     @OA\Response(response=500, description="Error inesperado")
+     *     @OA\Response(
+     *         response=422,
+     *         description="Error de validación",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Datos inválidos para restablecer la contraseña."),
+     *             @OA\Property(property="data", type="null", example=null),
+     *             @OA\Property(property="errors", type="object",
+     *                 @OA\Property(property="email", type="array",
+     *                     @OA\Items(type="string", example="We can't find a user with that email address.")
+     *                 ),
+     *                 @OA\Property(property="password", type="array",
+     *                     @OA\Items(type="string", example="The password must be at least 8 characters.")
+     *                 ),
+     *                 @OA\Property(property="token", type="array",
+     *                     @OA\Items(type="string", example="This password reset token is invalid.")
+     *                 )
+     *             ),
+     *             @OA\Property(property="status", type="integer", example=422)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error inesperado",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Ocurrió un error inesperado al restablecer la contraseña."),
+     *             @OA\Property(property="data", type="null", example=null),
+     *             @OA\Property(property="errors", type="string", example="Error interno del servidor."),
+     *             @OA\Property(property="status", type="integer", example=500)
+     *         )
+     *     )
      * )
      */
     public function resetPassword(Request $request)
