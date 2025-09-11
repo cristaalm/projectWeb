@@ -22,7 +22,7 @@
                     "Autenticación"
                 ],
                 "summary": "Generar hash de una contraseña",
-                "operationId": "63dba4f936d7a22e9506125de970a38e",
+                "operationId": "85c593718e5e1e576b0653c9fc43ebf2",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -161,7 +161,7 @@
                     "Autenticación"
                 ],
                 "summary": "Cerrar sesión y revocar token",
-                "operationId": "46f8a14c8083abb69eed72768aa08629",
+                "operationId": "9b9ad3d4cb58748827c813caa73224b9",
                 "responses": {
                     "200": {
                         "description": "Sesión cerrada correctamente",
@@ -230,7 +230,10 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "securityScheme": "bearerAuth",
+                        "type": "http",
+                        "bearerFormat": "JWT",
+                        "scheme": "bearer"
                     }
                 ]
             }
@@ -241,7 +244,7 @@
                     "Autenticación"
                 ],
                 "summary": "Iniciar sesión",
-                "operationId": "535ffeda4b78916efd658b2844ea897a",
+                "operationId": "7bc5be4fbe8961e851b89bf718c66217",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -530,7 +533,7 @@
                     "Autenticación"
                 ],
                 "summary": "Validar token de sesión",
-                "operationId": "71dde988a26d7fa589aa91e3f6da0642",
+                "operationId": "5094462e772e18bf22e25147b24d7279",
                 "responses": {
                     "200": {
                         "description": "Sesión válida",
@@ -748,7 +751,7 @@
                     "Autenticación"
                 ],
                 "summary": "Solicitar enlace de restablecimiento de contraseña",
-                "operationId": "a170cc694fe243a798c6038c995d26b4",
+                "operationId": "61a4611cb045b05360b14cab4e334ea7",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -914,7 +917,7 @@
                     "Autenticación"
                 ],
                 "summary": "Restablecer contraseña con token generado por el sistema",
-                "operationId": "030dad9d9c157fa5e60a3264f7e0de3e",
+                "operationId": "1da411d03fbdb5a99bbadca53b6e409f",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1084,7 +1087,7 @@
     "tags": [
         {
             "name": "Autenticación",
-            "description": "Autenticación"
+            "description": "Endpoints para gestión de autenticación y tokens"
         }
     ]
 }
