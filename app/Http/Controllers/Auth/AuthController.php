@@ -23,7 +23,26 @@ use App\Enums\VerificationStatus;
 
 class AuthController extends Controller
 {
-
+    /**
+     * @OA\Post(
+     *     path="/api/auth/passHash",
+     *     tags={"Autenticación"},
+     *     summary="Generar hash de una contraseña",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"pass"},
+     *             @OA\Property(property="pass", type="string", example="12345678")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Hash generado correctamente"
+     *     ),
+     *     @OA\Response(response=422, description="Datos inválidos"),
+     *     @OA\Response(response=500, description="Error inesperado")
+     * )
+     */
     public function passHash(Request $request)
     {
         try {
@@ -43,6 +62,19 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/auth/logout",
+     *     tags={"Autenticación"},
+     *     summary="Cerrar sesión y revocar token",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Sesión cerrada correctamente"
+     *     ),
+     *     @OA\Response(response=401, description="Token inválido o no proporcionado")
+     * )
+     */
     public function logout(Request $request)
     {
         $token = $request->bearerToken();
@@ -61,6 +93,30 @@ class AuthController extends Controller
         return $this->apiResponse(true, 'Sesión cerrada correctamente.', null, null, 200);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/auth/login",
+     *     tags={"Autenticación"},
+     *     summary="Iniciar sesión",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", example="test@example.com"),
+     *             @OA\Property(property="password", type="string", example="12345678"),
+     *             @OA\Property(property="remember_me", type="boolean", example=true)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Inicio de sesión exitoso"
+     *     ),
+     *     @OA\Response(response=401, description="Credenciales inválidas"),
+     *     @OA\Response(response=403, description="Cuenta desactivada o sin permisos"),
+     *     @OA\Response(response=422, description="Error de validación"),
+     *     @OA\Response(response=500, description="Error inesperado")
+     * )
+     */
     public function login(Request $request)
     {
         try {
@@ -122,6 +178,21 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/auth/validateToken",
+     *     tags={"Autenticación"},
+     *     summary="Validar token de sesión",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Sesión válida"
+     *     ),
+     *     @OA\Response(response=401, description="Token inválido o expirado"),
+     *     @OA\Response(response=403, description="Cuenta desactivada"),
+     *     @OA\Response(response=500, description="Error inesperado")
+     * )
+     */
     public function validateToken(Request $request)
     {
         try {
@@ -173,6 +244,27 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/auth/forgot-password",
+     *     tags={"Autenticación"},
+     *     summary="Solicitar enlace de restablecimiento de contraseña",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email"},
+     *             @OA\Property(property="email", type="string", example="test@example.com")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Enlace de restablecimiento enviado"
+     *     ),
+     *     @OA\Response(response=404, description="Correo no registrado"),
+     *     @OA\Response(response=422, description="Error de validación"),
+     *     @OA\Response(response=500, description="Error inesperado")
+     * )
+     */
     public function forgotPassword(Request $request)
     {
         try {
@@ -203,6 +295,29 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/auth/reset-password",
+     *     tags={"Autenticación"},
+     *     summary="Restablecer contraseña con token",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password","password_confirmation","token"},
+     *             @OA\Property(property="email", type="string", example="test@example.com"),
+     *             @OA\Property(property="password", type="string", example="newpassword123"),
+     *             @OA\Property(property="password_confirmation", type="string", example="newpassword123"),
+     *             @OA\Property(property="token", type="string", example="eyJhbGciOiJIUzI1NiIsInR...")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Contraseña restablecida correctamente"
+     *     ),
+     *     @OA\Response(response=422, description="Error de validación"),
+     *     @OA\Response(response=500, description="Error inesperado")
+     * )
+     */
     public function resetPassword(Request $request)
     {
         try {
