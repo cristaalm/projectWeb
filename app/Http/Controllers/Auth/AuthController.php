@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
 
 
 use App\Models\User;
+use App\Notifications\ResetPasswordNotification;
 use App\Models\IdentityVerification;
 use App\Http\Resources\UserResource;
 use App\Enums\UserStatus;
@@ -60,9 +61,6 @@ class AuthController extends Controller
         return $this->apiResponse(true, 'Sesión cerrada correctamente.', null, null, 200);
     }
 
-    /**
-     * Iniciar sesión y generar token con expiración condicional (remember_me)
-     */
     public function login(Request $request)
     {
         try {
@@ -124,11 +122,6 @@ class AuthController extends Controller
         }
     }
 
-    /*
-    * Función para validar un token desde el encabezado de autenticación
-    * @param Request $request
-    * @return \Illuminate\Http\JsonResponse
-    */
     public function validateToken(Request $request)
     {
         try {
@@ -180,66 +173,69 @@ class AuthController extends Controller
         }
     }
 
-    // public function forgotPassword(Request $request)
-    // {
-    //     try {
-    //         $request->validate([
-    //             'email' => 'required|email',
-    //         ]);
+    public function forgotPassword(Request $request)
+    {
+        try {
+            $request->validate([
+                'email' => 'required|email',
+            ]);
 
-    //         $user = User::where('email', $request->email)->first();
-    //         if (!$user) {
-    //             return $this->apiResponse(false, 'El correo electrónico no está registrado en el sistema.', null, null, 404);
-    //         }
+            $user = User::where('email', $request->email)->first();
+            if (!$user) {
+                return $this->apiResponse(false, 'El correo electrónico no está registrado en el sistema.', null, null, 404);
+            }
 
-    //         $status = Password::sendResetLink(
-    //             $request->only('email')
-    //         );
+            $status = Password::sendResetLink(
+                $request->only('email')
+            );
 
-    //         if ($status === Password::RESET_LINK_SENT) {
-    //             return $this->apiResponse(true, 'Enlace de restablecimiento de contraseña enviado correctamente.', null, null, 200);
-    //         }
+            if ($status === Password::RESET_LINK_SENT) {
+                return $this->apiResponse(true, 'Enlace de restablecimiento de contraseña enviado correctamente.', null, null, 200);
+            }
 
-    //         throw ValidationException::withMessages([
-    //             'email' => [__($status)],
-    //         ]);
-    //     } catch (ValidationException $e) {
-    //         return $this->apiResponse(false, 'Correo electrónico inválido o no registrado.', null, $e->errors(), 422);
-    //     } catch (Exception $e) {
-    //         return $this->apiResponse(false, 'Ocurrió un error inesperado al enviar el enlace de restablecimiento.', null, $e->getMessage(), 500);
-    //     }
-    // }
+            throw ValidationException::withMessages([
+                'email' => [__($status)],
+            ]);
+        } catch (ValidationException $e) {
+            return $this->apiResponse(false, 'Correo electrónico inválido o no registrado.', null, $e->errors(), 422);
+        } catch (Exception $e) {
+            return $this->apiResponse(false, 'Ocurrió un error inesperado al enviar el enlace de restablecimiento.', null, $e->getMessage(), 500);
+        }
+    }
 
-    // public function resetPassword(Request $request)
-    // {
-    //     try {
-    //         $request->validate([
-    //             'email' => 'required|email',
-    //             'password' => 'required|min:8|confirmed',
-    //             'token' => 'required',
-    //         ]);
+    public function resetPassword(Request $request)
+    {
+        try {
+            $request->validate([
+                'email' => 'required|email',
+                'password' => 'required|min:8|confirmed',
+                'token' => 'required',
+            ]);
 
-    //         $status = Password::reset(
-    //             $request->only('email', 'password', 'password_confirmation', 'token'),
-    //             function ($user, $password) {
-    //                 $user->password = Hash::make($password);
-    //                 $user->save();
-    //             }
-    //         );
+            $status = Password::reset(
+                $request->only('email', 'password', 'password_confirmation', 'token'),
+                function ($user, $password) {
+                    $user->password = Hash::make($password);
+                    $user->save();
 
-    //         if ($status === Password::PASSWORD_RESET) {
-    //             return $this->apiResponse(true, 'Contraseña restablecida correctamente.', null, null, 200);
-    //         }
+                    // Enviar correo de restablecimiento de contraseña
+                    $user->notify(new ResetPasswordNotification());
+                }
+            );
 
-    //         throw ValidationException::withMessages([
-    //             'email' => [__($status)],
-    //         ]);
-    //     } catch (ValidationException $e) {
-    //         return $this->apiResponse(false, 'Datos inválidos para restablecer la contraseña.', null, $e->errors(), 422);
-    //     } catch (Exception $e) {
-    //         return $this->apiResponse(false, 'Ocurrió un error inesperado al restablecer la contraseña.', null, $e->getMessage(), 500);
-    //     }
-    // }
+            if ($status === Password::PASSWORD_RESET) {
+                return $this->apiResponse(true, 'Contraseña restablecida correctamente.', null, null, 200);
+            }
+
+            throw ValidationException::withMessages([
+                'email' => [__($status)],
+            ]);
+        } catch (ValidationException $e) {
+            return $this->apiResponse(false, 'Datos inválidos para restablecer la contraseña.', null, $e->errors(), 422);
+        } catch (Exception $e) {
+            return $this->apiResponse(false, 'Ocurrió un error inesperado al restablecer la contraseña.', null, $e->getMessage(), 500);
+        }
+    }
 
     // public function verifyEmail(Request $request)
     // {

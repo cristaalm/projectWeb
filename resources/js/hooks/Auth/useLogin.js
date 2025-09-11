@@ -47,7 +47,7 @@ export default function useLogin() {
     loading.value = true
     
     try {
-      const response = await requestPost({ url: 'auth/login', data: { email, password: pass, remember_me: remember } })
+      const response = await requestPost({ url: 'auth/login', data: { email, password: pass, remember_me: remember }, auth: false })
 
       if (!response.success) {
         error.value = true

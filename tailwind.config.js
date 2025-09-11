@@ -82,6 +82,7 @@ module.exports = {
       fontFamily: {
         'public-sans': ['Public Sans'],
         'dm-sans': ['DM Sans'],
+        'poppins': ['Poppins', 'sans-serif'],
       },
     },
   },

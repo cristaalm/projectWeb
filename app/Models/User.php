@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Sanctum\HasApiTokens;
 
+use App\Notifications\CustomResetPassword;
+
 // ENUMS
 use App\Enums\UserStatus;
 use App\Enums\VerificationStatus;
@@ -68,4 +70,10 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Notification::class);
     }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new CustomResetPassword($token, $this->email));
+    }
+
 }

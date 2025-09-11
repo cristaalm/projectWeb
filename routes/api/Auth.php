@@ -8,5 +8,7 @@ Route::prefix('auth')->group(function () {
     Route::post('passHash', [AuthController::class, 'passHash']); // path: /api/auth/passHash
     Route::post('validateToken', [AuthController::class, 'validateToken']); // path: /api/auth/validateToken
     Route::post('logout', [AuthController::class, 'logout']); // path: /api/auth/logout
+    Route::post('forgot-password', [AuthController::class, 'forgotPassword']); // path: /api/auth/forgot-password
+    Route::post('reset-password', [AuthController::class, 'resetPassword']); // path: /api/auth/reset-password
 });
 

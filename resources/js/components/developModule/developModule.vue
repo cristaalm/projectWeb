@@ -3,7 +3,7 @@
     <!-- Nubes decorativas SOLO en modo claro -->
     <div class="absolute inset-0 z-0 pointer-events-none dark:hidden">
       <svg
-        v-for="n in 8"
+        v-for="n in 20"
         :key="n"
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 512 512"
@@ -40,7 +40,7 @@
     <!-- Contenido principal -->
     <div class="flex z-10 flex-col col-span-12 justify-center items-center text-center">
       <h1 class="mb-4 text-4xl font-extrabold text-blue-800 dark:text-slate-500">
-        🚧 Módulo <span class="text-amber-500 dark:text-slate-200">{{ props.title }}</span> Está en Desarrollo 🚧
+        🚧 Módulo <span class="text-amber-500 dark:!text-secondary">{{ props.title }}</span> Está en Desarrollo 🚧
       </h1>
       <p class="text-lg text-gray-700 dark:text-slate-300">
         Estamos trabajando arduamente para traerte una experiencia increíble. ¡Vuelve pronto!

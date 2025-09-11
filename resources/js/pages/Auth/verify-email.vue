@@ -38,8 +38,8 @@ const goToHome = () => {
           >
             <div class="d-flex">
               <img
-                src="/logo.png"
-                alt="UNIAMA"
+                src="/images/LogoLetra.png"
+                alt="RENOVA"
                 class="w-[200px] mr-2"  
               >
             </div>

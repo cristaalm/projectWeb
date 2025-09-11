@@ -67,10 +67,10 @@ const goToHome = () => {
         </VCardItem>
 
         <VCardText>
-          <h4 class="relative mb-1 text-h4">
+          <h4 class="font-poppins relative mb-1 text-h4">
             ¡Bienvenido a RENOVA! <span class="absolute -top-2 ml-2 text-4xl transition-all duration-200 transform animate-wave">👋🏻</span>
           </h4>
-          <p class="mb-0">
+          <p class="mb-0 font-poppins">
             Inicie sesión en su cuenta y comience con su día.
           </p>
         </VCardText>
@@ -86,6 +86,7 @@ const goToHome = () => {
                   label="Correo Electrónico"
                   type="email"
                   placeholder="johndoe@email.com"
+                  class="font-poppins"
                   :error="error"
                   @input="error = false"
                 />
@@ -101,6 +102,7 @@ const goToHome = () => {
                   :error="error"
                   autocomplete="password"
                   :append-inner-icon="isPasswordVisible ? 'bx-hide' : 'bx-show'"
+                  class="font-poppins"
                   @input="error = false"
                   @click:append-inner="isPasswordVisible = !isPasswordVisible"
                 />
@@ -109,11 +111,12 @@ const goToHome = () => {
                 <div class="flex-wrap my-6 d-flex align-center justify-space-between">
                   <VCheckbox
                     v-model="form.remember"
+                    class="font-poppins"
                     label="Mantener sesión"
                   />
 
                   <a
-                    class="text-primary"
+                    class="text-primary font-poppins"
                     href="./forgot-password"
                     @click.prevent="router.push('/forgot-password')"
                   >
@@ -125,7 +128,7 @@ const goToHome = () => {
                 <VBtn
                   block
                   type="submit"
-                  class="hover:!bg-[#08b662]"
+                  class="hover:!bg-[#08b662] font-poppins"
                   :disabled="loading || !form.email || !form.pass || success || error"
                   @click="loginUser(form)"
                 >

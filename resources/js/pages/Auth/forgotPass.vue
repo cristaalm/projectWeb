@@ -53,10 +53,10 @@ const goToHome = () => {
         </VCardItem>
 
         <VCardText>
-          <h4 class="relative mb-1 text-h4">
+          <h4 class="font-poppins relative mb-1 text-h4">
             ¿Olvidaste tu contraseña? <span class="absolute -top-2 ml-2 text-4xl transition-all duration-200 transform animate-wave">🔒</span>
           </h4>
-          <p class="mb-0">
+          <p class="mb-0 font-poppins">
             Ingresa tu correo electrónico para solicitar un cambio de contraseña.
           </p>
         </VCardText>
@@ -82,6 +82,7 @@ const goToHome = () => {
                   block
                   type="button"
                   :disabled="loading || !form.email || success || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)"
+                  class="font-poppins"
                   @click.prevent="sendEmail(form)"
                 >
                   <span v-if="loading">
@@ -96,7 +97,7 @@ const goToHome = () => {
                   type="button"
                   variant="text"
                   :disabled="loading"
-                  class="mt-4"
+                  class="mt-4 font-poppins"
                   @click="router.push('/')"
                 >
                   Regresar
@@ -123,11 +124,11 @@ const goToHome = () => {
             />
           </VAvatar>
         
-          <h2 class="mb-2 !text-3xl !font-bold text-h5">
+          <h2 class="mb-2 !text-3xl !font-bold text-h5 font-poppins">
             ¡Solicitud enviada con éxito!
           </h2>
         
-          <p class="mb-6 text-body-1 !text-xl">
+          <p class="mb-6 text-body-1 !text-xl font-poppins">
             Hemos enviado un enlace de recuperación de contraseña a tu correo electrónico.
             <br>
             Por favor, revisa tu bandeja de entrada y sigue las instrucciones.
@@ -137,7 +138,7 @@ const goToHome = () => {
             block
             type="button"
             color="primary"
-            class="mt-4"
+            class="mt-4 font-poppins"
             @click="router.push('/')"
           >
             Regresar al inicio

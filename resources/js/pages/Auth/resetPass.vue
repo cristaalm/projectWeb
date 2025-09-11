@@ -50,7 +50,7 @@ const goToHome = () => {
 </script>
 
 <template>
-  <div class="justify-center auth-wrapper d-flex align-center pa-4 bg-[url('/images/background.jpg')] bg-cover ">
+  <div class="justify-center lg:bg-gradient-to-b bg-gradient-to-r  from-[#CFFFE0] to-[#8BE6AE] auth-wrapper d-flex align-center pa-4">
     <div class="position-relative my-sm-16">
       <!-- 👉 Top shape -->
       <VImg
@@ -68,7 +68,7 @@ const goToHome = () => {
 
       <!-- 👉 Auth Card -->
       <VCard
-        class="auth-card"
+        class="auth-card !bg-white/30 !shadow-2xl"
         :class="[success ? 'animate-scaleDown mt-[120px]' : 'animate-scaleUp', $vuetify.display.smAndUp ? 'pa-6' : 'pa-0']"
         max-width="460"
       >
@@ -79,8 +79,8 @@ const goToHome = () => {
           >
             <div class="d-flex">
               <img
-                src="/logo.png"
-                alt="UNIAMA"
+                src="/images/LogoLetra.png"
+                alt="RENOVA"
                 class="w-[200px] mr-2"  
               >
             </div>
@@ -88,10 +88,10 @@ const goToHome = () => {
         </VCardItem>
 
         <VCardText>
-          <h4 class="relative mb-1 text-h4">
+          <h4 class="font-poppins relative mb-1 text-h4">
             Restablecer Contraseña <span class="absolute -top-2 ml-2 text-4xl transition-all duration-200 transform animate-wave">🔐</span>
           </h4>
-          <p class="mb-0">
+          <p class="mb-0 font-poppins">
             Ingresa tu nueva contraseña para restablecer el acceso a tu cuenta.
           </p>
         </VCardText>
@@ -131,6 +131,7 @@ const goToHome = () => {
                   block
                   type="submit"
                   :disabled="loading || !form.newPassword || !form.confirmPassword || success"
+                  class="font-poppins"
                   @click="resetPassword(form)"
                 >
                   <span v-if="loading">
@@ -145,7 +146,7 @@ const goToHome = () => {
                   type="button"
                   variant="text"
                   :disabled="loading"
-                  class="mt-4"
+                  class="mt-4 font-poppins"
                   @click="router.push({ name: 'login' })"
                 >
                   Regresar
@@ -156,7 +157,7 @@ const goToHome = () => {
         </VCardText>
       </VCard>
       <VCard
-        class="auth-card"
+        class="auth-card !bg-white/30 !shadow-2xl"
         :class="[success ? 'animate-scaleUp' : '!hidden', $vuetify.display.smAndUp ? 'pa-6' : 'pa-0']"
         max-width="460"
       >
@@ -172,11 +173,11 @@ const goToHome = () => {
             />
           </VAvatar>
         
-          <h2 class="mb-2 !text-3xl !font-bold text-h5">
+          <h2 class="mb-2 !text-3xl !font-bold text-h5 font-poppins">
             ¡Contraseña Restablecida!
           </h2>
         
-          <p class="mb-6 text-body-1 !text-xl">
+          <p class="mb-6 text-body-1 !text-xl font-poppins">
             Tu contraseña ha sido restablecida con éxito.
             <br>
             Ahora puedes iniciar sesión con tu nueva contraseña.
@@ -185,6 +186,7 @@ const goToHome = () => {
           <VBtn
             block
             color="primary"
+            class="font-poppins"
             @click="router.push('/')"
           >
             Ir al Inicio
