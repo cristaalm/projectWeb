@@ -1,12 +1,11 @@
+import { router } from '@/plugins/router'
 import { requestPost } from '@/services/requests'
 import { useAuthStore } from '@/store/auth'
 import { useToastStore } from '@/store/useToastStore'
 import { messageError } from '@/utils/constants'
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 
 export default function useLogout() {
-  const router = useRouter()
   const successLogout = ref(false)
   const errorLogout = ref(false)
   const loadingLogout = ref(false)
@@ -44,6 +43,8 @@ export default function useLogout() {
       errorLogout.value = true
       toast.showToast({ message: 'No tiene una sesión activa', tipo: 'error' })
       nextLogout(logoutMode)
+
+      return
     }
 
     try {
@@ -56,9 +57,13 @@ export default function useLogout() {
       successLogout.value = true
       toast.showToast({ message: 'Sesión cerrada correctamente', tipo: 'success' })
       nextLogout(logoutMode)
+
+      return
     } catch (error) {
       errorLogout.value = true
       toast.showToast({ message: messageError, tipo: 'error' })
+
+      return
     } finally {
       loadingLogout.value = false
     }

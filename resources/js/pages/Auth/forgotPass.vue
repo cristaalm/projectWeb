@@ -1,6 +1,8 @@
 <script setup>
 import LoadingIcon from '@/components/Base/LoadingIcon/'
 import useForgotPass from '@/hooks/Auth/useForgotPass'
+import authV1BottomShape from '@images/svg/auth-v1-bottom-shape.svg?url'
+import authV1TopShape from '@images/svg/auth-v1-top-shape.svg?url'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()

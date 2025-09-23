@@ -9,4 +9,5 @@ const router = createRouter({
 export default function (app) {
   app.use(router)
 }
+
 export { router }

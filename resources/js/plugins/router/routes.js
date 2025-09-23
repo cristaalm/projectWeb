@@ -88,6 +88,8 @@ export const routes = [
         flagAuth.value = false
         useAuthStore().logout()
         next()
+
+        return
       }
   
       const { authToken } = useAuthToken()

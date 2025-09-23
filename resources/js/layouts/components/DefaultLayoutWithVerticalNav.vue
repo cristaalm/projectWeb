@@ -35,9 +35,9 @@ const goToHome = () => {
 
         <!-- texto decorativo de bienvenida junto con el nombre -->
         <span class="text-xl font-bold text-capitalize">
-          Bienvenido {{ authStore.user.name }}
+          Bienvenido {{ authStore.user?.name ?? '' }}
           <span class="hidden md:inline">
-            {{ authStore.user.last_name }}
+            {{ authStore.user?.last_name ?? '' }}
           </span>
         </span>
 
