@@ -29,7 +29,7 @@ class ScanController extends Controller
             $user = User::findOrFail($validatedData['user_id']);
 
             if ($user->status == 0) {
-                return $this->apiResponse(false, 'Error al escanear.', null, 'El usuario no esta activo.', 500);
+                return $this->apiResponse(false, 'Error de validación.', null, 'El usuario no esta activo.', 422);
             }
     
             // $image = $request->file('image');
@@ -55,13 +55,13 @@ class ScanController extends Controller
             $iaResult = json_decode(file_get_contents($iaApiUrl), true);
 
             if (!$iaResult['success']) {
-                return $this->apiResponse(false, 'Error al escanear.', null, 'La IA no pudo procesar la imagen correctamente.', 500);
+                return $this->apiResponse(false, 'Error al escanear.', null, 'La IA no pudo procesar la imagen correctamente.', 422);
             }
 
             $validMaterialType = MaterialType::where('id', $iaResult['tipo'])->first();
             
             if (!$validMaterialType) {
-                return $this->apiResponse(false, 'Error al escanear.', $iaResult, 'El tipo de material no es válido.', 500);
+                return $this->apiResponse(false, 'Error al escanear.', $iaResult, 'El tipo de material no es válido.', 422);
             }
 
             $points =  $validMaterialType->points;

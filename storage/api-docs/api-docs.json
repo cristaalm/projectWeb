@@ -1978,6 +1978,156 @@
                     }
                 }
             }
+        },
+        "/api/scans/scan": {
+            "post": {
+                "tags": [
+                    "Escaneos"
+                ],
+                "summary": "Analiza una imagen mediante un modelo de IA, registra y retorna el resultado.",
+                "description": "Analiza una imagen mediante un modelo de IA, registra y retorna el resultado.",
+                "operationId": "72fca2c50e3ccf8e36be35d98e8e2d9a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "image",
+                                    "container_id",
+                                    "user_id"
+                                ],
+                                "properties": {
+                                    "image": {
+                                        "description": "Archivo de imagen a escanear",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "container_id": {
+                                        "description": "ID del contenedor donde se realiza el escaneo",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "user_id": {
+                                        "description": "ID del usuario que realiza el escaneo",
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Escaneo exitoso.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Escaneo exitoso."
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación o procesamiento",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al escanear."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "oneOf": [
+                                                {
+                                                    "type": "string",
+                                                    "example": "El usuario no está activo."
+                                                },
+                                                {
+                                                    "type": "string",
+                                                    "example": "La IA no pudo procesar la imagen correctamente."
+                                                },
+                                                {
+                                                    "type": "string",
+                                                    "example": "El tipo de material no es válido."
+                                                }
+                                            ]
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error al escanear",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al escanear."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -2035,6 +2185,99 @@
                     }
                 },
                 "type": "object"
+            },
+            "IAResponse": {
+                "title": "IAResponse",
+                "description": "Representa la respuesta de la IA",
+                "properties": {
+                    "tipo_espanol": {
+                        "type": "string",
+                        "example": "Botella de Plástico"
+                    },
+                    "reciclable": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "tipo": {
+                        "type": "string",
+                        "example": "Plástico"
+                    },
+                    "titulo": {
+                        "type": "string",
+                        "example": "Botella Aplastada"
+                    },
+                    "aplastado": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "confianza": {
+                        "type": "integer",
+                        "example": 95
+                    },
+                    "detalle": {
+                        "type": "string",
+                        "example": "Una mano sostiene una botella de plástico transparente aplastada."
+                    },
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-04-01T10:00:00.000000Z"
+                    }
+                },
+                "type": "object"
+            },
+            "Scans": {
+                "title": "Scans",
+                "description": "Representa un escaneo registrado en el sistema",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "container_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "material_type_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "image": {
+                        "type": "string",
+                        "example": "image.jpg"
+                    },
+                    "scan_status": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "is_valid": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "points_awarded": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-04-01T10:00:00.000000Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-04-01T10:00:00.000000Z"
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
@@ -2053,6 +2296,10 @@
         {
             "name": "Autenticación",
             "description": "Endpoints para gestión de autenticación y tokens"
+        },
+        {
+            "name": "Escaneos",
+            "description": "Endpoints para gestión de escaneos"
         }
     ]
 }
