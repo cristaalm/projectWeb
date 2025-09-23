@@ -32,9 +32,9 @@ RUN pnpm run build
 FROM php:8.2-apache
 WORKDIR /var/www/html
 
-# Instala extensiones necesarias
+# Instala extensiones necesarias + cron y supervisor
 RUN apt-get update \
-    && apt-get install -y libpq-dev zip unzip git \
+    && apt-get install -y libpq-dev zip unzip git cron supervisor \
     && docker-php-ext-install pdo pdo_pgsql bcmath \
     && a2enmod rewrite headers negotiation \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -58,6 +58,7 @@ COPY --from=nodebuild /app/bootstrap ./bootstrap
 COPY --from=nodebuild /app/config ./config
 COPY --from=nodebuild /app/database ./database
 COPY --from=nodebuild /app/artisan ./artisan
+COPY --from=nodebuild /app/tests ./tests
 COPY --from=nodebuild /app/composer.json ./composer.json
 COPY --from=nodebuild /app/composer.lock ./composer.lock
 
@@ -76,8 +77,21 @@ RUN php artisan storage:link
 RUN chmod -R 777 /var/www/html \
     && chown -R www-data:www-data /var/www/html
 
+# --- CONFIGURACIÓN DE SUPERVISOR Y CRON ---
+
+# Crea el archivo de configuración de supervisor
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Crea el archivo de cron (ejecuta schedule:run cada minuto)
+RUN echo "* * * * * cd /var/www/html && php artisan schedule:run >> /var/log/cron.log 2>&1" > /etc/cron.d/laravel-schedule
+RUN chmod 0644 /etc/cron.d/laravel-schedule
+RUN touch /var/log/cron.log
+
+# Asegúrate de que cron se inicie con el usuario correcto
+RUN crontab /etc/cron.d/laravel-schedule
+
 # Expone el puerto que Render usará
 EXPOSE 8080
 
 # Comando de inicio
-CMD ["apache2-foreground"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]   
