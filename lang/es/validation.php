@@ -293,5 +293,7 @@ return [
         'work'                     => 'trabajo',
         'year'                     => 'año',
         'zip_code'                 => 'Código postal',
+        'contact_name'             => 'nombre de contacto',
+        'contact_email'            => 'correo de contacto',
     ],
 ];

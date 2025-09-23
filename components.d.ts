@@ -46,6 +46,7 @@ declare module 'vue' {
     Lucide: typeof import('./resources/js/components/Base/Lucide/Lucide.vue')['default']
     Menu: typeof import('./resources/js/components/Base/Headless/Menu/Menu.vue')['default']
     MoreBtn: typeof import('./resources/js/@core/components/MoreBtn.vue')['default']
+    Ordertable: typeof import('./resources/js/components/orderTable/Ordertable.vue')['default']
     Panel: typeof import('./resources/js/components/Base/Headless/Dialog/Panel.vue')['default']
     Panels: typeof import('./resources/js/components/Base/Headless/Tab/Panels.vue')['default']
     Popover: typeof import('./resources/js/components/Base/Headless/Popover/Popover.vue')['default']

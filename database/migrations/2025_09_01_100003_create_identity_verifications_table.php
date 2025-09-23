@@ -13,7 +13,6 @@ return new class extends Migration
             $table->bigInteger('user_id')->unsigned();
             $table->string('ine_front_url', 255);
             $table->string('ine_back_url', 255);
-            $table->string('selfie_url', 255);
             $table->string('document_number', 50);
             $table->tinyInteger('status')->default(0); // 0: pendiente, 1: aprobado, 2: rechazado, 3: corregir
             $table->text('rejection_reason')->nullable();

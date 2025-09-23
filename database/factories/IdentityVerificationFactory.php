@@ -27,7 +27,6 @@ class IdentityVerificationFactory extends Factory
 
             'ine_front_url' => 'ine_front/' . Str::random(10) . '.jpg',
             'ine_back_url' => 'ine_back/' . Str::random(10) . '.jpg',
-            'selfie_url' => 'selfie/' . Str::random(10) . '.jpg',
             'document_number' => $this->faker->unique()->numerify('##########'),
             'status' => $this->faker->randomElement(IndentifyVerificationStatus::cases())->value,
             'rejection_reason' => $this->faker->optional()->sentence(),

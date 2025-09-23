@@ -13,16 +13,18 @@ class Alliance extends Model
 
     protected $fillable = [
         'name',
-        'logo_url',
         'contact_name',
         'contact_email',
         'phone',
         'address',
+        'logo',
+        'ext',
         'status',
     ];
 
     protected $casts = [
         'status' => AllianceStatus::class,
+        'logo' => 'boolean',
     ];
 
     public function rewards(): HasMany

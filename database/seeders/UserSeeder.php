@@ -7,6 +7,7 @@ use App\Models\Role;
 use App\Enums\UserStatus;
 use App\Enums\VerificationStatus;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
@@ -23,9 +24,10 @@ class UserSeeder extends Seeder
 
         // Admin
         User::factory()->create([
-            'name' => 'Admin',
-            'last_name' => 'Global',
-            'email' => 'admin@example.com',
+            'name' => 'Renova',
+            'last_name' => 'app',
+            'email' => 'soyrenovaapp@gmail.com',
+            'password' => Hash::make('admin123'),
             'role_id' => $adminRole->id,
             'email_verified_at' => now(),
             'verification_status' => VerificationStatus::APPROVED->value,

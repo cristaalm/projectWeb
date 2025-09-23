@@ -16,7 +16,8 @@ class AllianceFactory extends Factory
     {
         return [
             'name' => $this->faker->company(),
-            'logo_url' => 'logos/' . Str::random(10) . '.png',
+            'logo' => false,
+            'ext' => null,
             'contact_name' => $this->faker->name(),
             'contact_email' => $this->faker->email(),
             'phone' => $this->faker->phoneNumber(),

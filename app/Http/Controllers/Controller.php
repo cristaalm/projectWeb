@@ -29,4 +29,20 @@ abstract class Controller
             'code' => $code,
         ], $code);
     }
+
+    protected function unsetDataPagination($dataPaginate)
+    {
+        $data = $dataPaginate->toArray();
+        unset($data['links']);
+        unset($data['first_page_url']);
+        unset($data['last_page_url']);
+        unset($data['prev_page_url']);
+        unset($data['next_page_url']);
+        unset($data['path']);
+        unset($data['current_page']);
+        unset($data['per_page']);
+        unset($data['from']);
+        unset($data['to']);
+        return $data;
+    }
 }
