@@ -17,11 +17,11 @@ class Scan extends Model
         'user_id',
         'container_id',
         'material_type_id',
-        'image_url',
+        'image',
         'is_valid',
-        'points_awarded',
+        'points_awarded', // copia de material_type.points, para evitar problemas de integridad
         'scan_status',
-        'rejection_reason',
+        'description',
         'scanned_at',
     ];
 

@@ -28,11 +28,11 @@ class ScanFactory extends Factory
             'material_type_id' => fn() => MaterialType::inRandomOrder()->first()?->id ??
                        MaterialType::factory()->create()->id,
                        
-            'image_url' => 'scans/' . Str::random(15) . '.jpg',
+            'image' => '' . Str::random(15) . '.jpg',
             'scan_status' => $status->value,
             'is_valid' => $status === ScanStatus::SUCCESS,
             'points_awarded' => $status === ScanStatus::SUCCESS ? $this->faker->numberBetween(5, 15) : 0,
-            'rejection_reason' => $status === ScanStatus::FAILED
+            'description' => $status === ScanStatus::FAILED
                 ? $this->faker->randomElement([
                     'Material no reconocido',
                     'Imagen borrosa',
@@ -40,7 +40,7 @@ class ScanFactory extends Factory
                     'Luz insuficiente',
                     'Material contaminado',
                   ])
-                : null,
+                : $this->faker->sentence(),
             'scanned_at' => $this->faker->dateTimeThisMonth(),
         ];
     }

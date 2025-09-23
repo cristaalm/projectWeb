@@ -11,11 +11,11 @@ class MaterialTypeFactory extends Factory
 
     public function definition(): array
     {
-        $names = ['Plástico', 'Vidrio', 'Lata', 'Cartón', 'Basura'];
-        $slugs = ['plastic', 'glass', 'can', 'cardboard', 'garbage'];
-        $points = [10, 15, 5, 8, 0];
+        $names = ['Plástico', 'Aluminio', 'Otros'];
+        $slugs = ['plastic', 'aluminum', 'other'];
+        $points = [15, 35, 0];
 
-        $index = $this->faker->numberBetween(0, 4);
+        $index = $this->faker->numberBetween(0, 2);
 
         return [
             'name' => $names[$index],

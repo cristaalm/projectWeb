@@ -1,0 +1,11 @@
+{
+    "tipo_espanol": "Botella de Plástico",
+    "reciclable": true,
+    "tipo": 1,
+    "titulo": "Botella Aplastada",
+    "aplastado": true,
+    "confianza": 95,
+    "detalle": "Una mano sostiene una botella de plástico transparente aplastada.",
+    "success": true,
+    "timestamp": "2025-09-20T08:07:06.000-06:00"
+}
