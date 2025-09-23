@@ -50,7 +50,7 @@ const goToHome = () => {
       <VCard
         class="auth-card !bg-white/30 !shadow-2xl"
         :class="[success ? 'animate-scaleDown mt-[120px]' : 'animate-scaleUp', $vuetify.display.smAndUp ? 'pa-6' : 'pa-0']"
-        max-width="460"
+        max-width="480"
       >
         <VCardItem class="justify-center">
           <span
@@ -70,7 +70,7 @@ const goToHome = () => {
 
         <VCardText>
           <h4 class="font-poppins relative mb-1 text-h4">
-            ¡Bienvenido a RENOVA! <span class="absolute -top-2 ml-2 text-4xl transition-all duration-200 transform animate-wave">👋🏻</span>
+            ¡RENOVA le da la bienvenida! <span class="absolute -top-2 ml-2 text-4xl transition-all duration-200 transform animate-wave">👋🏻</span>
           </h4>
           <p class="mb-0 font-poppins">
             Inicie sesión en su cuenta y comience con su día.

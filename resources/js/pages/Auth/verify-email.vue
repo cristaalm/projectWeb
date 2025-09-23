@@ -29,7 +29,7 @@ const goToHome = () => {
       <VCard
         class="auth-card animate-scaleUp"
         :class="$vuetify.display.smAndUp ? 'pa-6' : 'pa-0'"
-        max-width="460"
+        max-width="480"
       >
         <VCardItem class="justify-center">
           <span
