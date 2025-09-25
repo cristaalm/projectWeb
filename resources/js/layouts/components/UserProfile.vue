@@ -1,12 +1,11 @@
 <script setup>
-import LoadingIcon from '@/components/Base/LoadingIcon/LoadingIcon.vue'
-import useLogout from '@/hooks/Auth/useLogout'
 import { useThemeSwitcher } from '@/hooks/layout/useThemeSwitcher'
 import { useAuthStore } from '@/store/auth'
+import { useRouter } from 'vue-router'
 
-const { themeName, changeTheme, logoutMode } = useThemeSwitcher()
-const { loadingLogout, logoutUser } = useLogout()
+const { themeName, changeTheme } = useThemeSwitcher()
 const user = useAuthStore().getUser()
+const router = useRouter()
 </script>
 
 <template>
@@ -80,18 +79,12 @@ const user = useAuthStore().getUser()
           <VDivider class="my-2" />
   
           <!-- 👉 Logout -->
-          <VListItem @click.prevent="()=>{logoutUser(logoutMode)}">
+          <VListItem @click.prevent="router.push({ name: 'logout' })">
             <template #prepend>
               <VIcon
-                v-if="!loadingLogout"
                 class="me-2"
                 icon="bx-log-out"
                 size="22"
-              />
-              <LoadingIcon
-                v-else
-                icon="tail-spin"
-                class="mr-5"
               />
             </template>
             <VListItemTitle>

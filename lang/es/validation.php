@@ -283,6 +283,7 @@ return [
         'text'                     => 'texto',
         'time'                     => 'hora',
         'title'                    => 'título',
+        'token2FA'                 => 'codigo de verificación',
         'type'                     => 'tipo',
         'updated_at'               => 'actualizado el',
         'user'                     => 'usuario',

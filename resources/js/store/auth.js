@@ -29,6 +29,11 @@ export const useAuthStore = defineStore('auth', {
       return this.expiresAt
     },
     logout() {
+      const htmlElement = document.documentElement
+
+      htmlElement.classList.remove('dark')
+
+      localStorage.setItem('darkMode', false)
       this.user = null
       this.expiresAt = null
       this.accessToken = null

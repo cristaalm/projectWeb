@@ -27,6 +27,8 @@ namespace App\Swagger\Documentation;
 
 use OpenApi\Attributes as OA;
 
+use App\Swagger\Schemas\UserSchema;
+
 #[OA\Tag(name: 'Autenticación', description: 'Endpoints para gestión de autenticación y tokens')]
 class AuthDocumentation
 {
@@ -98,14 +100,14 @@ class AuthDocumentation
         path: "/api/auth/logout",
         tags: ["Autenticación"],
         summary: "Cerrar sesión y revocar token",
-        security: [
-            new OA\SecurityScheme(
-                securityScheme: "bearerAuth",
-                type: "http",
-                scheme: "bearer",
-                bearerFormat: "JWT"
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: "token", type: "string", example: "your_token_here"),
+                ]
             )
-        ],
+        ),
         responses: [
             new OA\Response(
                 response: 200,
@@ -167,24 +169,7 @@ class AuthDocumentation
                             new OA\Property(property: "access_token", type: "string", example: "1|abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"),
                             new OA\Property(property: "token_type", type: "string", example: "Bearer"),
                             new OA\Property(property: "expires_at", type: "string", format: "date-time", example: "2025-12-31T23:59:59.000000Z"),
-                            new OA\Property(property: "user", properties: [
-                                new OA\Property(property: "id", type: "integer", example: 1),
-                                new OA\Property(property: "name", type: "string", example: "Usuario"),
-                                new OA\Property(property: "last_name", type: "string", example: "de prueba"),
-                                new OA\Property(property: "phone", type: "string", example: "123456789"),
-                                new OA\Property(property: "email", type: "string", example: "test@example.com"),
-                                new OA\Property(property: "status", type: "integer", example: 1),
-                                new OA\Property(property: "verification_status", type: "integer", example: 1),
-                                new OA\Property(property: "total_points", type: "integer", example: 100),
-                                new OA\Property(property: "role", properties: [
-                                    new OA\Property(property: "id", type: "integer", example: 2),
-                                    new OA\Property(property: "display_name", type: "string", example: "Administrador"),
-                                    new OA\Property(property: "name", type: "string", example: "admin"),
-                                    new OA\Property(property: "is_active", type: "boolean", example: true),
-                                ]),
-                                new OA\Property(property: "created_at", type: "string", format: "date-time", example: "2025-12-31T23:59:59.000000Z"),
-                                new OA\Property(property: "updated_at", type: "string", format: "date-time", example: "2025-12-31T23:59:59.000000Z"),
-                            ]),
+                            new OA\Property(property: "user", type: "array", items: new OA\Items(ref: "#/components/schemas/User")),
                         ]),
                         new OA\Property(property: "errors", type: "null", example: null),
                         new OA\Property(property: "status", type: "integer", example: 200),
@@ -268,24 +253,8 @@ class AuthDocumentation
                         new OA\Property(property: "success", type: "boolean", example: true),
                         new OA\Property(property: "message", type: "string", example: "Su sesión es válida."),
                         new OA\Property(property: "data", properties: [
-                            new OA\Property(property: "user", properties: [
-                                new OA\Property(property: "id", type: "integer", example: 1),
-                                new OA\Property(property: "name", type: "string", example: "Usuario"),
-                                new OA\Property(property: "last_name", type: "string", example: "de prueba"),
-                                new OA\Property(property: "phone", type: "string", example: "123456789"),
-                                new OA\Property(property: "email", type: "string", example: "test@example.com"),
-                                new OA\Property(property: "status", type: "integer", example: 1),
-                                new OA\Property(property: "verification_status", type: "integer", example: 1),
-                                new OA\Property(property: "total_points", type: "integer", example: 100),
-                                new OA\Property(property: "role", properties: [
-                                    new OA\Property(property: "id", type: "integer", example: 2),
-                                    new OA\Property(property: "display_name", type: "string", example: "Administrador"),
-                                    new OA\Property(property: "name", type: "string", example: "admin"),
-                                    new OA\Property(property: "is_active", type: "boolean", example: true),
-                                ]),
-                                new OA\Property(property: "created_at", type: "string", format: "date-time", example: "2025-12-31T23:59:59.000000Z"),
-                                new OA\Property(property: "updated_at", type: "string", format: "date-time", example: "2025-12-31T23:59:59.000000Z"),
-                            ]),
+                            new OA\Property(property: "user", ref: "#/components/schemas/User"),
+                            new OA\Property(property: "abilities", type: "array", items: new OA\Items(type: "string", example: "two_factor")),
                             new OA\Property(property: "expires_at", type: "string", format: "date-time", example: "2025-12-31T23:59:59.000000Z"),
                         ]),
                         new OA\Property(property: "errors", type: "null", example: null),
@@ -295,14 +264,19 @@ class AuthDocumentation
             ),
             new OA\Response(
                 response: 401,
-                description: "Token inválido o expirado",
+                description: "Token inválido, expirado o requiere 2FA",
                 content: new OA\JsonContent(
                     type: "object",
                     properties: [
-                        new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Su sesión es inválida."),
-                        new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", type: "string", example: "Token expirado."),
+                        new OA\Property(property: "success", type: "boolean", example: true), // Nota: éxito parcial
+                        new OA\Property(property: "message", type: "string", example: "Verifique su sesión"),
+                        new OA\Property(property: "data", properties: [
+                            new OA\Property(property: "two_factor", type: "boolean", example: true),
+                            new OA\Property(property: "user", ref: "#/components/schemas/User"),
+                            new OA\Property(property: "abilities", type: "array", items: new OA\Items(type: "string")),
+                            new OA\Property(property: "expires_at", type: "string", format: "date-time", example: "2025-12-31T23:59:59.000000Z"),
+                        ]),
+                        new OA\Property(property: "errors", type: "string", example: "Se requiere verificar su sesión"),
                         new OA\Property(property: "status", type: "integer", example: 401),
                     ]
                 )
@@ -481,4 +455,226 @@ class AuthDocumentation
         ]
     )]
     public function resetPassword() {}
+
+    #[OA\Get(
+        path: "/api/auth/generateQR2FA",
+        tags: ["Autenticación"],
+        summary: "Generar QR y secreto para configurar 2FA",
+        description: "Genera un código QR y un secreto para que el usuario configure la autenticación de dos factores en su app (Google Authenticator, Authy, etc.).",
+        security: [["bearerAuth" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "QR generado correctamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "QR code generado correctamente."),
+                        new OA\Property(property: "data", properties: [
+                            new OA\Property(property: "two_factor_status", type: "boolean", example: false),
+                            new OA\Property(property: "qr_code_url", type: "string", example: "otpauth://totp/AppName:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=AppName"),
+                            new OA\Property(property: "secret", type: "string", example: "JBSWY3DPEHPK3PXP"),
+                        ]),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 409,
+                description: "2FA ya está habilitada",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "La autenticación de dos factores ya está habilitada."),
+                        new OA\Property(property: "data", properties: [
+                            new OA\Property(property: "two_factor_status", type: "boolean", example: true),
+                        ]),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 409),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Ocurrió un error inesperado al generar el QR code."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function generateQR2FA(Request $request) {}
+    
+    #[OA\Post(
+        path: "/api/auth/enable-2fa",
+        tags: ["Autenticación"],
+        summary: "Habilitar autenticación de dos factores",
+        description: "Habilita la autenticación de dos factores para el usuario, verificando un token TOTP válido.",
+        security: [["bearerAuth" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["token2FA"],
+                properties: [
+                    new OA\Property(property: "token2FA", type: "string", example: "123456", description: "Código de 6 dígitos de la app de autenticación"),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "2FA habilitada correctamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Autenticación de dos factores habilitada correctamente."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 403,
+                description: "Token inválido",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Código de autenticación inválido."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 403),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Ocurrió un error inesperado al verificar la autenticación de dos factores."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function enable2FA(Request $request) {}
+    
+    #[OA\Post(
+        path: "/api/auth/verify-2fa",
+        tags: ["Autenticación"],
+        summary: "Verificar token de 2FA (usado en login)",
+        description: "Verifica un token TOTP durante el proceso de inicio de sesión para completar la autenticación de dos factores.",
+        security: [["bearerAuth" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["token2FA"],
+                properties: [
+                    new OA\Property(property: "token2FA", type: "string", example: "654321", description: "Código de 6 dígitos de la app de autenticación"),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Token válido",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Código de autenticación válido."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 403,
+                description: "Token inválido",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Código de autenticación inválido."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 403),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Ocurrió un error inesperado al verificar la autenticación de dos factores."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function verify2FA(Request $request) {}
+    
+    #[OA\Post(
+        path: "/api/auth/disable-2fa",
+        tags: ["Autenticación"],
+        summary: "Deshabilitar autenticación de dos factores",
+        description: "Deshabilita la autenticación de dos factores para el usuario y elimina el secreto.",
+        security: [["bearerAuth" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "2FA deshabilitada correctamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Autenticación de dos factores deshabilitada correctamente."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Ocurrió un error inesperado al deshabilitar la autenticación de dos factores."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function disable2FA(Request $request) {}
 }

@@ -7,11 +7,13 @@ export default function useAuthToken() {
   const success = ref(false)
   const error = ref(false)
   const loading = ref(false)
+  const twoFactor = ref(false)
     
   const resetState = () => {
     success.value = false
     error.value = null
     loading.value = false
+    twoFactor.value = false
   }
 
   const authToken = async () => {
@@ -22,6 +24,8 @@ export default function useAuthToken() {
     
     try {
       const response = await requestPost({ url: 'auth/validateToken', token, auth: false })
+
+      if (typeof response.data === 'object' && 'two_factor' in response.data) twoFactor.value = response.data.two_factor
 
       if (!response.success) {
         error.value = true
@@ -40,7 +44,7 @@ export default function useAuthToken() {
 
     } catch (error) {
       error.value = true
-      console.log(error)
+      console.error(error)
     } finally {
       loading.value = false
     }
@@ -54,5 +58,6 @@ export default function useAuthToken() {
     error,
     loading,
     authToken,
+    twoFactor,
   }
 }

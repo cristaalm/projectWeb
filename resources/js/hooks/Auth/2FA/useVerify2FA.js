@@ -1,26 +1,24 @@
+import { router } from '@/plugins/router'
 import { requestPost } from '@/services/requests'
 import { useAuthStore } from '@/store/auth'
 import { useToastStore } from '@/store/useToastStore'
 import { messageError } from '@/utils/constants'
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 
-export default function useLogin() {
-  const router = useRouter()
-  const user = ref(null)
-  const success = ref(false)
+export function useVerify2FA() {
   const error = ref(false)
   const loading = ref(false)
+  const validate2FA = ref(false)
   const toast = useToastStore()
     
   const resetState = () => {
-    success.value = false
+    validate2FA.value = false
     error.value = null
     loading.value = false
   }
 
-  const validate = ({ email, pass }) => {
-    if (!email || !pass) {
+  const validate = ({ token2FA }) => {
+    if (!token2FA) {
       error.value = true
       toast.showToast({ message: 'Por favor, complete los campos', tipo: 'warning' })
       
@@ -30,14 +28,14 @@ export default function useLogin() {
     return true
   }
 
-  const loginUser = async form => {
-    const { email, pass, remember } = form
-    if (!validate({ email, pass })) return
+  const verify2FA = async form => {
+    const { token2FA } = form
+    if (!validate({ token2FA })) return
     resetState()
     loading.value = true
     
     try {
-      const response = await requestPost({ url: 'auth/login', data: { email, password: pass, remember_me: remember }, auth: false })
+      const response = await requestPost({ url: 'auth/verify-2fa', data: { token2FA }, token: useAuthStore().accessToken })
 
       if (!response.success) {
         error.value = true
@@ -45,25 +43,8 @@ export default function useLogin() {
         
         return
       }
-
-      const data = response.data
-
-      user.value = data.user
-      useAuthStore().setUser(data.user)
-      useAuthStore().setExpiresAt(data.expires_at)
-      useAuthStore().setAccessToken(data.access_token)
-
-      if (data.user.two_factor_status) {
-        router.push({ name: 'verify2FA' })
-        
-        return
-      }
-
-      success.value = true
-
-      setTimeout(() => {
-        router.push('/panel')
-      }, 1000)
+      validate2FA.value = true
+      router.push({ name: 'panel' })
 
     } catch (error) {
       error.value = true
@@ -74,10 +55,9 @@ export default function useLogin() {
   }
 
   return {
-    user,
-    success,
+    validate2FA,
     error,
     loading,
-    loginUser,
+    verify2FA,
   }
 }

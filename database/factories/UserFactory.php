@@ -9,6 +9,7 @@ use App\Enums\VerificationStatus;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use PragmaRX\Google2FA\Google2FA;
 
 class UserFactory extends Factory
 {
@@ -26,6 +27,8 @@ class UserFactory extends Factory
             'total_points' => $this->faker->numberBetween(0, 500),
             'verification_status' => $this->faker->randomElement(VerificationStatus::cases())->value,
             'status' => UserStatus::ACTIVE->value,
+            'two_factor_status' => 0,
+            'google2fa_secret' => (new Google2FA())->generateSecretKey(),
             'role_id' => function (array $attributes) {
                 return Role::firstWhere('name', 'user')?->id ??
                        Role::factory()->create(['name' => 'user', 'display_name' => 'Usuario solicitante'])->id;

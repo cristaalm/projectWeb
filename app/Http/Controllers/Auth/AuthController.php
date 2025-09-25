@@ -12,7 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Password;
 use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Support\Facades\Storage;
-
+use PragmaRX\Google2FA\Google2FA;
 
 use App\Models\User;
 use App\Notifications\ResetPasswordNotification;
@@ -44,7 +44,11 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $token = $request->bearerToken();
+        $validatedData = $request->validate([
+            'token' => 'required|string',
+        ]);
+
+        $token = $validatedData['token'];
 
         if (!$token) {
             return $this->apiResponse(false, 'Token de autenticación no proporcionado.', null, null, 401);
@@ -69,8 +73,6 @@ class AuthController extends Controller
                 'password' => 'required|string',
                 'remember_me' => 'boolean',
             ]);
-
-            // debug
             
             // Buscar usuario
             $user = User::where('email', $request->email)->first();
@@ -91,8 +93,8 @@ class AuthController extends Controller
             }
 
             // Configurar expiración según remember_me
-            $defaultMinutes = config('auth.tokens.default_expiration', 60);      // 1 hora
-            $rememberMinutes = config('auth.tokens.remember_expiration', 10080); // 7 días
+            $defaultMinutes = config('auth.tokens.default_expiration', 720);      // 1 hora
+            $rememberMinutes = config('auth.tokens.remember_expiration', 525600); // 30 días
 
             $expiresAt = $request->remember_me
                 ? Carbon::now()->addMinutes($rememberMinutes)
@@ -156,6 +158,21 @@ class AuthController extends Controller
                 return $this->apiResponse(false, 'Tu cuenta no está activa.', null, 'Cuenta desactivada.', 403);
             }
 
+            $two_factor_status = $user->two_factor_status;
+
+
+            // si la sesión actual no tiene verificado el doble factor de autenticación y el usuario tiene habilitado el doble factor de autenticación
+            if ($two_factor_status && !(is_array($accessToken->abilities) && in_array('two_factor', $accessToken->abilities))) {
+
+                // two_factor => true // redirigir a la pantalla de doble factor de autenticación
+                return $this->apiResponse(true, 'Verifique su sesión', [
+                    'two_factor' => true,
+                    'user' => new UserResource($user),
+                    'abilities' => $accessToken->abilities,
+                    'expires_at' => $accessToken->expires_at,
+                ], 'Se requiere verificar su sesión', 401);
+            }
+
             // Cargar relaciones
             $user->load('role');
 
@@ -164,6 +181,7 @@ class AuthController extends Controller
 
             return $this->apiResponse(true, 'Su sesión es válida.', [
                 'user' => new UserResource($user),
+                'abilities' => $accessToken->abilities,
                 'expires_at' => $accessToken->expires_at,
             ], null, 200);
 
@@ -233,6 +251,108 @@ class AuthController extends Controller
             return $this->apiResponse(false, 'Datos inválidos para restablecer la contraseña.', null, $e->errors(), 422);
         } catch (Exception $e) {
             return $this->apiResponse(false, 'Ocurrió un error inesperado al restablecer la contraseña.', null, $e->getMessage(), 500);
+        }
+    }
+
+    public function generateQR2FA(Request $request)
+    {
+        try {
+            $user = $request->user();
+            $app_name = env('APP_NAME');
+            $status2FA = $user->two_factor_status;
+
+            if ($status2FA) {
+                return $this->apiResponse(true, 'La autenticación de dos factores ya está habilitada.', ['two_factor_status' => $status2FA], null, 409);
+            }
+
+            $secret = $user->google2fa_secret;
+
+            $google2fa = app(Google2FA::class);
+
+            if (!$secret) {
+                $secret = $google2fa->generateSecretKey();
+                $user->google2fa_secret = $secret;
+                $user->save();
+            }
+
+            $qrCodeUrl = $google2fa->getQRCodeUrl($app_name, $user->email, $secret);
+            return $this->apiResponse(true, 'QR code generado correctamente.', ['two_factor_status' => $status2FA, 'qr_code_url' => $qrCodeUrl, 'secret' => $secret], null, 200);
+        } catch (Exception $e) {
+            return $this->apiResponse(false, 'Ocurrió un error inesperado al generar el QR code.', null, $e->getMessage(), 500);
+        }
+    }
+
+    public function enable2FA(Request $request)
+    {
+        try {
+
+            $validatedData = $request->validate([
+                'token2FA' => 'required|string|max:6|min:6',
+            ]);
+
+            $user = $request->user();
+            $token = $validatedData['token2FA'];
+            $bearerToken = $request->bearerToken();
+            
+            $google2fa = app(Google2FA::class);
+            $is2faValid = $google2fa->verifyKey($user->google2fa_secret, $token);
+            if (!$is2faValid) {
+                return $this->apiResponse(false, 'Código de autenticación inválido.', null, null, 403);
+            }
+
+            // verificamos el uso de la autenticación de dos factores en la sesión actual del usuario, para evitar que lo saque de su sesión
+            $accessToken = PersonalAccessToken::findToken($bearerToken);
+            $accessToken->abilities = ['two_factor'];
+            $accessToken->save();
+
+            // habilitamos la autenticación de dos factores para el usuario
+            $user->two_factor_status = 1;
+            $user->save();
+
+            return $this->apiResponse(true, 'Autenticación de dos factores habilitada correctamente.', null, null, 200);
+        } catch (Exception $e) {
+            return $this->apiResponse(false, 'Ocurrió un error inesperado al verificar la autenticación de dos factores.', null, $e->getMessage(), 500);
+        }
+    }
+
+    public function verify2FA(Request $request)
+    {
+        try {
+
+            $validatedData = $request->validate([
+                'token2FA' => 'required|string|max:6|min:6',
+            ]);
+
+            $user = $request->user();
+            $token = $validatedData['token2FA'];
+            $bearerToken = $request->bearerToken();
+            
+            $google2fa = app(Google2FA::class);
+            $is2faValid = $google2fa->verifyKey($user->google2fa_secret, $token);
+            if (!$is2faValid) {
+                return $this->apiResponse(false, 'Código de autenticación inválido.', null, null, 403);
+            }
+
+            $accessToken = PersonalAccessToken::findToken($bearerToken);
+            $accessToken->abilities = ['two_factor'];
+            $accessToken->save();
+
+            return $this->apiResponse(true, 'Código de autenticación válido.', null, null, 200);
+        } catch (Exception $e) {
+            return $this->apiResponse(false, 'Ocurrió un error inesperado al verificar la autenticación de dos factores.', null, $e->getMessage(), 500);
+        }
+    }
+
+    public function disable2FA(Request $request)
+    {
+        try {
+            $user = $request->user();
+            $user->two_factor_status = 0;
+            $user->google2fa_secret = null;
+            $user->save();
+            return $this->apiResponse(true, 'Autenticación de dos factores deshabilitada correctamente.', null, null, 200);
+        } catch (Exception $e) {
+            return $this->apiResponse(false, 'Ocurrió un error inesperado al deshabilitar la autenticación de dos factores.', null, $e->getMessage(), 500);
         }
     }
 

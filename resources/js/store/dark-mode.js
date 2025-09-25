@@ -46,6 +46,14 @@ export const useDarkModeStore = defineStore('darkMode', {
 })
 
 // Llamar a esta función para cargar el estado inicial cuando se inicie la aplicación
-const darkModeStore = useDarkModeStore()
+function loadDarkMode() {
+  try {
+    const darkModeStore = useDarkModeStore()
 
-darkModeStore.loadDarkMode()
+    darkModeStore.loadDarkMode()
+  } catch (error) {
+    return
+  }
+}
+
+loadDarkMode()

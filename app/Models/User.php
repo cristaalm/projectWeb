@@ -29,21 +29,26 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at',
         'total_points',
         'verification_status',
+        'two_factor_status',
         'status',
+        'google2fa_secret',
         'role_id',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
+        'google2fa_secret',
     ];
 
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'verification_status' => VerificationStatus::class,
+        'two_factor_status' => 'boolean',
         'status' => UserStatus::class,
         'total_points' => 'integer',
+        'google2fa_secret' => 'string',
     ];
 
     public function role(): BelongsTo

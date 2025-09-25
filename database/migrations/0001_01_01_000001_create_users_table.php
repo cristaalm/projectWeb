@@ -21,6 +21,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable(); 
             $table->integer('total_points')->default(0); 
             $table->tinyInteger('verification_status')->default(0); 
+            $table->tinyInteger('two_factor_status')->default(0); 
+            $table->string('google2fa_secret', 100)->nullable();
             $table->tinyInteger('status')->default(1); 
             $table->bigInteger('role_id')->unsigned();
 

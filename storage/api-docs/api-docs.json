@@ -1067,6 +1067,22 @@
                 ],
                 "summary": "Cerrar sesión y revocar token",
                 "operationId": "9b9ad3d4cb58748827c813caa73224b9",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "token": {
+                                        "type": "string",
+                                        "example": "your_token_here"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Sesión cerrada correctamente",
@@ -1132,15 +1148,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "securityScheme": "bearerAuth",
-                        "type": "http",
-                        "bearerFormat": "JWT",
-                        "scheme": "bearer"
-                    }
-                ]
+                }
             }
         },
         "/api/auth/login": {
@@ -1209,72 +1217,10 @@
                                                     "example": "2025-12-31T23:59:59.000000Z"
                                                 },
                                                 "user": {
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "integer",
-                                                            "example": 1
-                                                        },
-                                                        "name": {
-                                                            "type": "string",
-                                                            "example": "Usuario"
-                                                        },
-                                                        "last_name": {
-                                                            "type": "string",
-                                                            "example": "de prueba"
-                                                        },
-                                                        "phone": {
-                                                            "type": "string",
-                                                            "example": "123456789"
-                                                        },
-                                                        "email": {
-                                                            "type": "string",
-                                                            "example": "test@example.com"
-                                                        },
-                                                        "status": {
-                                                            "type": "integer",
-                                                            "example": 1
-                                                        },
-                                                        "verification_status": {
-                                                            "type": "integer",
-                                                            "example": 1
-                                                        },
-                                                        "total_points": {
-                                                            "type": "integer",
-                                                            "example": 100
-                                                        },
-                                                        "role": {
-                                                            "properties": {
-                                                                "id": {
-                                                                    "type": "integer",
-                                                                    "example": 2
-                                                                },
-                                                                "display_name": {
-                                                                    "type": "string",
-                                                                    "example": "Administrador"
-                                                                },
-                                                                "name": {
-                                                                    "type": "string",
-                                                                    "example": "admin"
-                                                                },
-                                                                "is_active": {
-                                                                    "type": "boolean",
-                                                                    "example": true
-                                                                }
-                                                            },
-                                                            "type": "object"
-                                                        },
-                                                        "created_at": {
-                                                            "type": "string",
-                                                            "format": "date-time",
-                                                            "example": "2025-12-31T23:59:59.000000Z"
-                                                        },
-                                                        "updated_at": {
-                                                            "type": "string",
-                                                            "format": "date-time",
-                                                            "example": "2025-12-31T23:59:59.000000Z"
-                                                        }
-                                                    },
-                                                    "type": "object"
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/User"
+                                                    }
                                                 }
                                             },
                                             "type": "object"
@@ -1457,72 +1403,14 @@
                                         "data": {
                                             "properties": {
                                                 "user": {
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "integer",
-                                                            "example": 1
-                                                        },
-                                                        "name": {
-                                                            "type": "string",
-                                                            "example": "Usuario"
-                                                        },
-                                                        "last_name": {
-                                                            "type": "string",
-                                                            "example": "de prueba"
-                                                        },
-                                                        "phone": {
-                                                            "type": "string",
-                                                            "example": "123456789"
-                                                        },
-                                                        "email": {
-                                                            "type": "string",
-                                                            "example": "test@example.com"
-                                                        },
-                                                        "status": {
-                                                            "type": "integer",
-                                                            "example": 1
-                                                        },
-                                                        "verification_status": {
-                                                            "type": "integer",
-                                                            "example": 1
-                                                        },
-                                                        "total_points": {
-                                                            "type": "integer",
-                                                            "example": 100
-                                                        },
-                                                        "role": {
-                                                            "properties": {
-                                                                "id": {
-                                                                    "type": "integer",
-                                                                    "example": 2
-                                                                },
-                                                                "display_name": {
-                                                                    "type": "string",
-                                                                    "example": "Administrador"
-                                                                },
-                                                                "name": {
-                                                                    "type": "string",
-                                                                    "example": "admin"
-                                                                },
-                                                                "is_active": {
-                                                                    "type": "boolean",
-                                                                    "example": true
-                                                                }
-                                                            },
-                                                            "type": "object"
-                                                        },
-                                                        "created_at": {
-                                                            "type": "string",
-                                                            "format": "date-time",
-                                                            "example": "2025-12-31T23:59:59.000000Z"
-                                                        },
-                                                        "updated_at": {
-                                                            "type": "string",
-                                                            "format": "date-time",
-                                                            "example": "2025-12-31T23:59:59.000000Z"
-                                                        }
-                                                    },
-                                                    "type": "object"
+                                                    "$ref": "#/components/schemas/User"
+                                                },
+                                                "abilities": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "two_factor"
+                                                    }
                                                 },
                                                 "expires_at": {
                                                     "type": "string",
@@ -1547,26 +1435,45 @@
                         }
                     },
                     "401": {
-                        "description": "Token inválido o expirado",
+                        "description": "Token inválido, expirado o requiere 2FA",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
                                             "type": "boolean",
-                                            "example": false
+                                            "example": true
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Su sesión es inválida."
+                                            "example": "Verifique su sesión"
                                         },
                                         "data": {
-                                            "type": "null",
-                                            "example": null
+                                            "properties": {
+                                                "two_factor": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "user": {
+                                                    "$ref": "#/components/schemas/User"
+                                                },
+                                                "abilities": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "expires_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-12-31T23:59:59.000000Z"
+                                                }
+                                            },
+                                            "type": "object"
                                         },
                                         "errors": {
                                             "type": "string",
-                                            "example": "Token expirado."
+                                            "example": "Se requiere verificar su sesión"
                                         },
                                         "status": {
                                             "type": "integer",
@@ -1979,6 +1886,484 @@
                 }
             }
         },
+        "/api/auth/generateQR2FA": {
+            "get": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Generar QR y secreto para configurar 2FA",
+                "description": "Genera un código QR y un secreto para que el usuario configure la autenticación de dos factores en su app (Google Authenticator, Authy, etc.).",
+                "operationId": "c295dbc06a2eeeab0d76e7ce0bd11c6a",
+                "responses": {
+                    "200": {
+                        "description": "QR generado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "QR code generado correctamente."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "two_factor_status": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "qr_code_url": {
+                                                    "type": "string",
+                                                    "example": "otpauth://totp/AppName:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=AppName"
+                                                },
+                                                "secret": {
+                                                    "type": "string",
+                                                    "example": "JBSWY3DPEHPK3PXP"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "2FA ya está habilitada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "La autenticación de dos factores ya está habilitada."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "two_factor_status": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 409
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error inesperado al generar el QR code."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/enable-2fa": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Habilitar autenticación de dos factores",
+                "description": "Habilita la autenticación de dos factores para el usuario, verificando un token TOTP válido.",
+                "operationId": "44607aaebbf516c790a2d0223879ad0f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "token2FA"
+                                ],
+                                "properties": {
+                                    "token2FA": {
+                                        "description": "Código de 6 dígitos de la app de autenticación",
+                                        "type": "string",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "2FA habilitada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Autenticación de dos factores habilitada correctamente."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Token inválido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Código de autenticación inválido."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 403
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error inesperado al verificar la autenticación de dos factores."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/verify-2fa": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Verificar token de 2FA (usado en login)",
+                "description": "Verifica un token TOTP durante el proceso de inicio de sesión para completar la autenticación de dos factores.",
+                "operationId": "50a67c33fcf0b82c9daf5f4ec2923bf1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "token2FA"
+                                ],
+                                "properties": {
+                                    "token2FA": {
+                                        "description": "Código de 6 dígitos de la app de autenticación",
+                                        "type": "string",
+                                        "example": "654321"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Token válido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Código de autenticación válido."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Token inválido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Código de autenticación inválido."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 403
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error inesperado al verificar la autenticación de dos factores."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/disable-2fa": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Deshabilitar autenticación de dos factores",
+                "description": "Deshabilita la autenticación de dos factores para el usuario y elimina el secreto.",
+                "operationId": "af2c446b01d1fc8182aa965b5aad85fb",
+                "responses": {
+                    "200": {
+                        "description": "2FA deshabilitada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Autenticación de dos factores deshabilitada correctamente."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error inesperado al deshabilitar la autenticación de dos factores."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/scans/scan": {
             "post": {
                 "tags": [
@@ -2265,6 +2650,68 @@
                     "points_awarded": {
                         "type": "integer",
                         "example": 10
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-04-01T10:00:00.000000Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-04-01T10:00:00.000000Z"
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "title": "User",
+                "description": "Representa un usuario",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "john.doe@example.com"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "1234567890"
+                    },
+                    "email_verified_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-04-01T10:00:00.000000Z"
+                    },
+                    "role_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "total_points": {
+                        "type": "integer",
+                        "example": 95
+                    },
+                    "verification_status": {
+                        "type": "string",
+                        "example": "VERIFIED"
+                    },
+                    "two_factor_status": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "ACTIVE"
                     },
                     "created_at": {
                         "type": "string",

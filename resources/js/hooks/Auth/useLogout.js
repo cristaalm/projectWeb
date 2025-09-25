@@ -1,3 +1,4 @@
+import { useThemeSwitcher } from '@/hooks/layout/useThemeSwitcher'
 import { router } from '@/plugins/router'
 import { requestPost } from '@/services/requests'
 import { useAuthStore } from '@/store/auth'
@@ -16,22 +17,9 @@ export default function useLogout() {
     loadingLogout.value = false
   }
 
-  const nextLogout = (logoutMode = null) => {
-    
-    if (typeof logoutMode === 'function') {
-      logoutMode()
-    }
+  const logoutUser = async () => {
+    const { logoutMode } = useThemeSwitcher()
 
-    // verificamos si router.push esta disponible
-    if (router) {
-      router.push({ name: 'logout' })
-    } else {
-      // redirigimos a /
-      window.location.href = '/'
-    }
-  }
-
-  const logoutUser = async (logoutMode = null) => {
     resetState()
     loadingLogout.value = true
 
@@ -42,27 +30,36 @@ export default function useLogout() {
     if (!token) {
       errorLogout.value = true
       toast.showToast({ message: 'No tiene una sesión activa', tipo: 'error' })
-      nextLogout(logoutMode)
+
+      logoutMode()
+      router.push({ name: 'login' })
 
       return
     }
 
     try {
-      const response = await requestPost({ url: 'auth/logout', token })
+      const response = await requestPost({ url: 'auth/logout', data: { token } })
 
       if (!response.success) {
         errorLogout.value = true
+        console.error(response.error)
         toast.showToast({ message: response.message ?? messageError, tipo: 'error' })
+        router.go(-1)
+
+        return
       }
       successLogout.value = true
-      toast.showToast({ message: 'Sesión cerrada correctamente', tipo: 'success' })
-      nextLogout(logoutMode)
+      authStore.logout()
+      logoutMode()
+      router.push({ name: 'login' })
+
 
       return
     } catch (error) {
       errorLogout.value = true
       toast.showToast({ message: messageError, tipo: 'error' })
-
+      console.error(error)
+      
       return
     } finally {
       loadingLogout.value = false

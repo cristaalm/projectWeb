@@ -19,17 +19,12 @@ export function useThemeSwitcher() {
     localStorage.setItem('oldMode', globalTheme.name.value)
   }
 
-  async function logoutMode() {
+  function logoutMode() {
     // guardamos el ultimo thema que tubo en localStorage
     localStorage.setItem('oldMode', globalTheme.name.value)
 
-    return new Promise(resolve => {
-      setTimeout(() => {
-        globalTheme.name.value = 'light'
-        darkModeStore.setDarkMode(false)
-        resolve()
-      }, 0) // espera 1 segundo
-    })
+    globalTheme.name.value = 'light'
+    darkModeStore.setDarkMode(false)
   }
 
   const darkMode = computed({

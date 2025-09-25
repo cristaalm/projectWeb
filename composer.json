@@ -12,7 +12,8 @@
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
-        "maennchen/zipstream-php": "^3.1"
+        "maennchen/zipstream-php": "^3.1",
+        "pragmarx/google2fa-laravel": "^2.3"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

@@ -1,16 +1,13 @@
+import { router } from '@/plugins/router'
 import { useAuthStore } from '@/store/auth'
 import { useToastStore } from '@/store/useToastStore'
 import { apiURL } from "@/utils/constants"
 import { useDebounceFn } from '@vueuse/core'
 import { isRef, ref, unref, watch } from 'vue'
 
-import useLogout from '@/hooks/Auth/useLogout'
-
-const { logoutUser } = useLogout()
-
 async function checkAuth(response) {
-  if (response.status === 401) {
-    logoutUser()
+  if (response.status === 401 && 'authenticated' in response) {
+    router.push({ name: 'logout' })
   }
 }
 
