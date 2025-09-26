@@ -18,6 +18,7 @@ class Alliance extends Model
         'phone',
         'address',
         'logo',
+        'type_shop_id',
         'ext',
         'status',
     ];
@@ -30,5 +31,10 @@ class Alliance extends Model
     public function rewards(): HasMany
     {
         return $this->hasMany(Reward::class);
+    }
+
+    public function typeShop(): BelongsTo
+    {
+        return $this->belongsTo(TypeShop::class);
     }
 }
