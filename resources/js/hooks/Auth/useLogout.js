@@ -40,9 +40,9 @@ export default function useLogout() {
     try {
       const response = await requestPost({ url: 'auth/logout', data: { token } })
 
-      if (!response.success) {
+      if (!response.success && response.message !== "Token inválido o no encontrado.") {
         errorLogout.value = true
-        console.error(response.error)
+        console.error(response.errors)
         toast.showToast({ message: response.message ?? messageError, tipo: 'error' })
         router.go(-1)
 
