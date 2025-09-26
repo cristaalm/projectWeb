@@ -77,30 +77,6 @@ class TypeShopController extends Controller
         }
     }
 
-    public function update(Request $request, $id) {
-        try {
-            $validatedData = $request->validate([
-                'name' => 'required|string|max:255',
-            ]);
-
-            $typeShop = TypeShop::findOrFail($id);
-            
-            // validar que no exista otro registro con el mismo nombre
-            $typeShopExists = TypeShop::where('name', $validatedData['name'])->where('id', '!=', $id)->exists();
-            if ($typeShopExists) {
-                return $this->apiResponse(false, 'Ya existe una categoria con el mismo nombre.', null, null, 422);
-            }
-
-            $typeShop->update($validatedData);
-
-            return $this->apiResponse(true, 'Categoria actualizada exitosamente.', $typeShop, null, 200);
-        } catch (ValidationException $e) {
-            return $this->apiResponse(false, 'Error al actualizar la categoria.', null, $e->errors(), 422);
-        } catch (\Exception $e) {
-            return $this->apiResponse(false, 'Error al actualizar la categoria.', null, $e->getMessage(), 500);
-        }
-    }
-
     public function delete(Request $request, $id)
     {
         try {

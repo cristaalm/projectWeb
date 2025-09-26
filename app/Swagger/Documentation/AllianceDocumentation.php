@@ -148,6 +148,7 @@ class AllianceDocumentation
                     new OA\Property(property: "contact_email", type: "string", format: "email", example: "juan@example.com"),
                     new OA\Property(property: "phone", type: "string", example: "+57 300 1234567"),
                     new OA\Property(property: "address", type: "string", example: "Calle 123 #45-67, Bogotá, Colombia"),
+                    new OA\Property(property: "type_shop_id", type: "integer", example: 1),
                     new OA\Property(property: "status", type: "boolean", example: true, description: "true = Activo, false = Inactivo"),
                 ]
             )
@@ -234,6 +235,7 @@ class AllianceDocumentation
                     new OA\Property(property: "contact_email", type: "string", format: "email", example: "carlos@actualizado.com"),
                     new OA\Property(property: "phone", type: "string", example: "+57 310 9876543"),
                     new OA\Property(property: "address", type: "string", example: "Avenida Siempre Viva 742, Medellín, Colombia"),
+                    new OA\Property(property: "type_shop_id", type: "integer", example: 1),
                     new OA\Property(property: "status", type: "boolean", example: false, description: "true = Activo, false = Inactivo"),
                 ]
             )

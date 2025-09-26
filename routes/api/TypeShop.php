@@ -8,7 +8,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('getAll', [TypeShopController::class, 'getAll']);
         Route::get('catalog', [TypeShopController::class, 'catalog']);
         Route::post('create', [TypeShopController::class, 'create']);
-        Route::put('update/{id}', [TypeShopController::class, 'update']);
         Route::delete('delete/{id}', [TypeShopController::class, 'delete']);
     });
 });

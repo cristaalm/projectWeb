@@ -25,6 +25,9 @@ class AllianceSchema
     #[OA\Property(property: "address", type: "string", example: "Calle 123 #45-67, Bogotá, Colombia")]
     public string $address;
 
+    #[OA\Property(property: "type_shop_id", type: "integer", example: 1)]
+    public int $type_shop_id;
+
     #[OA\Property(property: "logo", type: "boolean", example: true)]
     public bool $logo;
 
