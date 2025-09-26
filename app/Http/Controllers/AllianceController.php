@@ -27,10 +27,13 @@ class AllianceController extends Controller
             if (!empty($query)) {
                 $allianceQuery->where(function ($q) use ($query) {
                     $q->where('name', 'like', '%' . $query . '%')
-                    ->orWhere('contact_name', 'like', '%' . $query . '%')
-                    ->orWhere('contact_email', 'like', '%' . $query . '%')
-                    ->orWhere('phone', 'like', '%' . $query . '%')
-                    ->orWhere('address', 'like', '%' . $query . '%');
+                      ->orWhere('contact_name', 'like', '%' . $query . '%')
+                      ->orWhere('contact_email', 'like', '%' . $query . '%')
+                      ->orWhere('phone', 'like', '%' . $query . '%')
+                      ->orWhere('address', 'like', '%' . $query . '%')
+                      ->orWhereHas('typeShop', function ($subQ) use ($query) {
+                          $subQ->where('name', 'like', '%' . $query . '%');
+                      });
                 });
             }
 
@@ -38,16 +41,23 @@ class AllianceController extends Controller
                 $allianceQuery->where('status', $status);
             }
 
-            $allowedKeys = ['name', 'status'];
+            $allowedKeys = ['name', 'contact_name', 'contact_email', 'phone', 'address', 'status', 'type_shop.name'];
+
             if (in_array($key, $allowedKeys) && in_array($order, ['asc', 'desc'])) {
-                $allianceQuery->orderBy($key, $order);
+                if ($key === 'type_shop.name') {
+                    // Hacemos join solo si se ordena por nombre de categoría
+                    $allianceQuery->join('type_shop', 'alliances.type_shop_id', '=', 'type_shop.id')
+                                  ->orderBy('type_shop.name', $order);
+                } else {
+                    $allianceQuery->orderBy($key, $order);
+                }
             }
 
-            $alliances = $allianceQuery->paginate($perPage);
+            $alliances = $allianceQuery->with('typeShop')->paginate($perPage);
             $data = $this->unsetDataPagination($alliances);
-            return $this->apiResponse(true, 'Alianzas obtenidas exitosamente.', $data, null, 200);
+            return $this->apiResponse(true, 'Comercios obtenidos exitosamente.', $data, null, 200);
         } catch (\Exception $e) {
-            return $this->apiResponse(false, 'Error al obtener las alianzas.', null, $e->getMessage(), 500);
+            return $this->apiResponse(false, 'Error al obtener los comercios.', null, $e->getMessage(), 500);
         }
     }
 
@@ -60,16 +70,17 @@ class AllianceController extends Controller
                 'contact_email' => 'required|email|max:255',
                 'phone' => 'required|string|max:255',
                 'address' => 'required|string|max:255',
+                'type_shop_id' => 'required|exists:type_shop,id',
                 'status' => 'required|boolean',
             ]);
 
             $alliance = Alliance::create($validatedData);
 
-            return $this->apiResponse(true, 'Alianza creada exitosamente.', $alliance, null, 201);
+            return $this->apiResponse(true, 'Comercio creado exitosamente.', $alliance, null, 201);
         } catch (ValidationException $e) {
-            return $this->apiResponse(false, 'Error al crear la alianza.', null, $e->errors(), 422);
+            return $this->apiResponse(false, 'Error al crear el comercio.', null, $e->errors(), 422);
         } catch (\Exception $e) {
-            return $this->apiResponse(false, 'Error al crear la alianza.', null, $e->getMessage(), 500);
+            return $this->apiResponse(false, 'Error al crear el comercio.', null, $e->getMessage(), 500);
         }
     }
 
@@ -81,17 +92,18 @@ class AllianceController extends Controller
                 'contact_email' => 'required|email|max:255',
                 'phone' => 'required|string|max:255',
                 'address' => 'required|string|max:255',
+                'type_shop_id' => 'required|exists:type_shop,id',
                 'status' => 'required|boolean',
             ]);
 
             $alliance = Alliance::findOrFail($id);
             $alliance->update($validatedData);
 
-            return $this->apiResponse(true, 'Alianza actualizada exitosamente.', $alliance, null, 200);
+            return $this->apiResponse(true, 'Comercio actualizado exitosamente.', $alliance, null, 200);
         } catch (ValidationException $e) {
-            return $this->apiResponse(false, 'Error al actualizar la alianza.', null, $e->errors(), 422);
+            return $this->apiResponse(false, 'Error al actualizar el comercio.', null, $e->errors(), 422);
         } catch (\Exception $e) {
-            return $this->apiResponse(false, 'Error al actualizar la alianza.', null, $e->getMessage(), 500);
+            return $this->apiResponse(false, 'Error al actualizar el comercio.', null, $e->getMessage(), 500);
         }
     }
 
@@ -102,7 +114,7 @@ class AllianceController extends Controller
             $alliance = Alliance::find($id);
 
             if (!$alliance) {
-                return $this->apiResponse(false, 'Alianza no encontrada.', null, null, 404);
+                return $this->apiResponse(false, 'Comercio no encontrado.', null, null, 404);
             }
 
             // guardamos una copia de la alianza

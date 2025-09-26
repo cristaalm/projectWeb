@@ -25,7 +25,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('type_shop_id');
-            $table->foreign('type_shop_id')->references('id')->on('type_shop')->onDelete('cascade');
+            $table->foreign('type_shop_id')->references('id')->on('type_shop')->onDelete('no action');
         });
 
         DB::commit();

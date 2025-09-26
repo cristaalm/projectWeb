@@ -11,6 +11,7 @@ export function useValidations({ shopData }) {
     contact_email: '',
     phone: '',
     address: '',
+    type_shop_id: '',
     status: '',
   }
 
@@ -22,6 +23,7 @@ export function useValidations({ shopData }) {
     contact_email: false,
     phone: false,
     address: false,
+    type_shop_id: false,
     status: false,
   })
   
@@ -62,6 +64,11 @@ export function useValidations({ shopData }) {
       if (value === null || value === '') return 'La direccion no puede estar vacia'
 
       if (value.length > 255) return 'La direccion debe tener menos de 255 caracteres'
+      
+      return ''
+    },
+    type_shop_id: value => {
+      if (value === null || value === '') return 'El tipo de comercio no puede estar vacio'
       
       return ''
     },

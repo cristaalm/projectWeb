@@ -1,7 +1,9 @@
 <script setup>
 import { useUpdateShop } from '@/hooks/Shops/useUpdateShop'
 import { useValidations } from '@/hooks/Shops/useValidations'
+import { useCatalogTypeShop } from '@/hooks/TypeShop/useCatalogTypeShop'
 import { useDarkModeStore } from '@/store/dark-mode'
+import { ModalViewTypeShop, useModalViewTypeShop } from '@/views/TypeShop/ModalView'
 import { ref, watch } from 'vue'
 
 
@@ -14,6 +16,7 @@ const emit = defineEmits(['update:modelValue', 'update'])
 
 const darkModeStore = useDarkModeStore()
 const { loading, updateShop, setNewData, isUnchanged, shopData } = useUpdateShop()
+const { loading: loadingTypeShop, loadCatalogTypeShop, typeShopData } = useCatalogTypeShop()
 const isOpen = ref(props.modelValue)
 
 const {
@@ -28,6 +31,7 @@ watch(() => props.modelValue, val => {
   isOpen.value = val
   if (val) {
     setNewData(props.data)
+    loadCatalogTypeShop()
   }
   resetValidations()
 })
@@ -58,9 +62,15 @@ function updatePhone(event) {
 
   shopData.value.phone = mask.value
 }
+const { showModalViewTypeShop, openModalViewTypeShop } = useModalViewTypeShop()
 </script>
 
 <template>
+  <ModalViewTypeShop
+    v-model="showModalViewTypeShop"
+    @change="loadCatalogTypeShop"
+  />
+
   <VDialog
     v-model="isOpen"
     max-width="800px"
@@ -143,6 +153,34 @@ function updatePhone(event) {
             @enter="handleSaveShop"
             @input="touchField('address')"
           />
+          <div class="flex flex-row items-center justify-center w-full">
+            <VSelect
+              v-model="shopData.type_shop_id"
+              :items="typeShopData"
+              item-title="name"
+              item-value="id"
+              label="Tipo de comercio"
+              placeholder="Tipo de comercio"
+              outlined
+              :color="darkModeStore.darkMode ? 'white' : 'primary'" 
+              :class="formErrors.type_shop_id ? '!max-h-[60px]' : '!max-h-[38px]'"
+              :loading="loadingTypeShop || loading"
+              :disabled="loadingTypeShop || loading"
+              :error="touchedFields.type_shop_id && !!formErrors.type_shop_id"
+              :error-messages="touchedFields.type_shop_id ? formErrors.type_shop_id : ''"
+              @input="touchField('type_shop_id')"
+            />
+            <VBtn
+              color="primary"
+              variant="flat"
+              :disabled="loadingTypeShop || loading"
+              :loading="loadingTypeShop || loading"
+              prepend-icon="bx-search"
+              @click="openModalViewTypeShop"
+            >
+              Consultar
+            </VBtn>
+          </div>
         </div>
 
         <!-- Estado del plan -->

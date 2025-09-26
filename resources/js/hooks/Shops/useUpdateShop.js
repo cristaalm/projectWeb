@@ -20,6 +20,7 @@ export function useUpdateShop() {
     contact_email: "",
     phone: "",
     address: "",
+    type_shop_id: null,
     status: true,
   })
 
@@ -49,6 +50,7 @@ export function useUpdateShop() {
         contact_email: shopData.value.contact_email,
         phone: shopData.value.phone.replace(/\D/g, ''),
         address: shopData.value.address,
+        type_shop_id: shopData.value.type_shop_id,
         status: shopData.value.status,
       }
 

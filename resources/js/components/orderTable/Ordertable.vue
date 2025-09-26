@@ -14,6 +14,11 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  viewPagination: {
+    required: false,
+    type: Boolean,
+    default: true,
+  },
   withoutSearch: {
     required: false,
     type: Boolean,
@@ -89,7 +94,10 @@ const goToLastPage = () => {
         />
       </template>
 
-      <template #bottom>
+      <template
+        v-if="viewPagination"
+        #bottom
+      >
         <div class="flex flex-wrap items-center justify-between gap-2 p-2 mt-4">
           <!-- Select de elementos por página -->
           <div class="flex items-center gap-2">

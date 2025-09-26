@@ -1,7 +1,9 @@
 <script setup>
 import { useCreateShop } from '@/hooks/Shops/useCreateShop'
 import { useValidations } from '@/hooks/Shops/useValidations'
+import { useCatalogTypeShop } from '@/hooks/TypeShop/useCatalogTypeShop'
 import { useDarkModeStore } from '@/store/dark-mode'
+import { ModalViewTypeShop, useModalViewTypeShop } from '@/views/TypeShop/ModalView'
 import { ref, watch } from 'vue'
 import { IMask } from 'vue-imask'
 
@@ -15,6 +17,7 @@ const emit = defineEmits(['update:modelValue', 'create'])
 const darkModeStore = useDarkModeStore()
 
 const { loading, createShop, shopData, resetShopData } = useCreateShop()
+const { loading: loadingTypeShop, loadCatalogTypeShop, typeShopData } = useCatalogTypeShop()
 const isOpen = ref(props.modelValue)
 
 const {
@@ -25,12 +28,10 @@ const {
   resetValidations,
 } = useValidations({ shopData })
 
-
-
-const handleSaveShop = () => {
+const handleSaveShop = async () => {
   if (!formValidate.value) return
 
-  const result = createShop()
+  const result = await createShop()
 
   if (!result) return
 
@@ -54,6 +55,9 @@ function updatePhone(event) {
 
 watch(() => props.modelValue, val => {
   isOpen.value = val
+  if (val) {
+    loadCatalogTypeShop()
+  }
   resetValidations()
 })
 
@@ -61,9 +65,16 @@ watch(isOpen, val => {
   emit('update:modelValue', val)
   resetShopData()
 })
+
+const { showModalViewTypeShop, openModalViewTypeShop } = useModalViewTypeShop()
 </script>
 
 <template>
+  <ModalViewTypeShop
+    v-model="showModalViewTypeShop"
+    @change="loadCatalogTypeShop"
+  />
+
   <VDialog
     v-model="isOpen"
     max-width="800px"
@@ -146,6 +157,34 @@ watch(isOpen, val => {
             @enter="handleSaveShop"
             @input="touchField('address')"
           />
+          <div class="flex flex-row items-center justify-center w-full">
+            <VSelect
+              v-model="shopData.type_shop_id"
+              :items="typeShopData"
+              item-title="name"
+              item-value="id"
+              label="Tipo de comercio"
+              placeholder="Tipo de comercio"
+              outlined
+              :color="darkModeStore.darkMode ? 'white' : 'primary'" 
+              :class="formErrors.type_shop_id ? '!max-h-[60px]' : '!max-h-[38px]'"
+              :loading="loadingTypeShop || loading"
+              :disabled="loadingTypeShop || loading"
+              :error="touchedFields.type_shop_id && !!formErrors.type_shop_id"
+              :error-messages="touchedFields.type_shop_id ? formErrors.type_shop_id : ''"
+              @input="touchField('type_shop_id')"
+            />
+            <VBtn
+              color="primary"
+              variant="flat"
+              :disabled="loadingTypeShop || loading"
+              :loading="loadingTypeShop || loading"
+              prepend-icon="bx-search"
+              @click="openModalViewTypeShop"
+            >
+              Consultar
+            </VBtn>
+          </div>
         </div>
 
         <!-- Estado del plan -->

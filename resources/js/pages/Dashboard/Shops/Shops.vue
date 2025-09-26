@@ -31,6 +31,7 @@ const headers = [
   { title: 'Contacto', align: 'start', key: 'contact_name' },
   { title: 'Télefono', align: 'start', key: 'phone', sortable: false },
   { title: 'Dirección', align: 'start', key: 'address' },
+  { title: 'Tipo', align: 'start', key: 'type_shop.name' },
   { title: 'Estado', key: 'status', align: 'center', sortable: false },
   { title: 'Registro', key: 'created_at', align: 'center', sortable: true },
   { title: '', key: 'actions', sortable: false, align: 'end' },
