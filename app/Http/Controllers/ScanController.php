@@ -32,31 +32,49 @@ class ScanController extends Controller
                 return $this->apiResponse(false, 'Error de validación.', null, 'El usuario no esta activo.', 422);
             }
     
-            // $image = $request->file('image');
-            // $imageName = time() . '_' . $image->getClientOriginalName();
-            // $imagePath = $image->storeAs('temp', $imageName, 'public'); 
+            $image = $request->file('image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $imagePath = $image->storeAs('temp', $imageName, 'public'); 
 
-            // $iaApiUrl = '';
+            $iaApiUrl = env('URL_IA', null);
+            $iaResult = null;
     
-            // $response = Http::attach(
-            //     'image', file_get_contents(storage_path('app/public/' . $imagePath)), $imageName
-            // )->post($iaApiUrl);
-            
-            // Storage::disk('public')->delete('temp/' . $imageName);
+            if ($iaApiUrl !== null){
+                $imagePath = storage_path('app/public/' . $imagePath);
+
+                $response = Http::withHeaders([
+                    'Content-Type' => 'application/octet-stream',
+                ])->withBody(
+                    file_get_contents($imagePath), 'application/octet-stream'
+                )->post($iaApiUrl);
+                
+                Storage::disk('public')->delete('temp/' . $imageName);
+        
+                if (!$response->successful()) {
+                    return $this->apiResponse(false, 'Error al procesar la imagen', null, 'La IA no respondió correctamente.', 500);
+                }
     
-            // if (!$response->successful()) {
-            //     return $this->apiResponse(false, 'Error al procesar la imagen', null, 'La IA no respondió correctamente.', 500);
-            // }
+                \Log::info('Respuesta IA:', ['body' => $response->body()]);
+        
+                $iaResult = $response->json();
+
+                \Log::info('Respuesta IA:', ['body' => $iaResult]);
     
-            // $iaResult = $response->json();
-
-
-            $iaApiUrl = base_path('tests/n8n.json');
-            $iaResult = json_decode(file_get_contents($iaApiUrl), true);
-
-            if (!$iaResult['success']) {
-                return $this->apiResponse(false, 'Error al escanear.', null, 'La IA no pudo procesar la imagen correctamente.', 422);
+                if (is_null($iaResult)) {
+                    return $this->apiResponse(false, 'Error al escanear.', null, 'La IA devolvió una respuesta vacía.', 500);
+                }
+            } else {
+                $iaApiUrl = base_path('tests/n8n.json');
+                $iaResult = json_decode(file_get_contents($iaApiUrl), true);
             }
+    
+            if (!isset($iaResult['success']) || $iaResult['success'] !== true) {
+                return $this->apiResponse(false, 'Error al escanear.', $iaResult, 'La IA no pudo procesar la imagen correctamente.', 422);
+            }
+            
+            if (!isset($iaResult['tipo'])) {
+                return $this->apiResponse(false, 'Error al escanear.', $iaResult, 'La respuesta de la IA no contiene el tipo de material.', 422);
+            }    
 
             $validMaterialType = MaterialType::where('id', $iaResult['tipo'])->first();
             
@@ -68,13 +86,12 @@ class ScanController extends Controller
             $points = $iaResult['aplastado'] ? $points + 5 : $points;
 
             $image = $request->file('image');
-            $path = 'scans/' . $validatedData['container_id'] . '/' . $validatedData['user_id'];
+            $path = 'scans/container_' . $validatedData['container_id'] . '/user_' . $validatedData['user_id'];
             $imageName = time() . '_' . $image->getClientOriginalName();
             $imagePath = $path . '/' . $imageName;
 
             Storage::disk('public')->putFileAs($path, $image, $imageName);
 
-            // commit transaction
             DB::beginTransaction();
 
             $user->total_points += $points;
