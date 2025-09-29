@@ -16,8 +16,9 @@ class Reward extends Model
         'name',
         'description',
         'points_required',
-        'image_url',
+        'image',
         'stock',
+        'code',
         'is_active',
         'expires_at',
     ];
@@ -25,7 +26,9 @@ class Reward extends Model
     protected $casts = [
         'is_active' => 'boolean',
         'points_required' => 'integer',
+        'image' => 'boolean',
         'stock' => 'integer',
+        'code' => 'string',
         'expires_at' => 'datetime',
     ];
 

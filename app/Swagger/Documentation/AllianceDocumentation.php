@@ -35,14 +35,7 @@ class AllianceDocumentation
         path: "/api/alianzas/getAll",
         tags: ["Alianzas"],
         summary: "Obtener lista paginada de alianzas",
-        security: [
-            new OA\SecurityScheme(
-                securityScheme: "bearerAuth",
-                type: "http",
-                scheme: "bearer",
-                bearerFormat: "JWT"
-            )
-        ],
+        security: [["bearerAuth" => []]],
         description: "Devuelve una lista paginada de alianzas con filtros y ordenamiento opcionales.",
         parameters: [
             new OA\Parameter(
@@ -129,14 +122,7 @@ class AllianceDocumentation
         path: "/api/alianzas/create",
         tags: ["Alianzas"],
         summary: "Crear una nueva alianza",
-        security: [
-            new OA\SecurityScheme(
-                securityScheme: "bearerAuth",
-                type: "http",
-                scheme: "bearer",
-                bearerFormat: "JWT"
-            )
-        ],
+        security: [["bearerAuth" => []]],
         description: "Registra una nueva alianza en el sistema con los datos proporcionados.",
         requestBody: new OA\RequestBody(
             required: true,
@@ -207,14 +193,7 @@ class AllianceDocumentation
         path: "/api/alianzas/update/{id}",
         tags: ["Alianzas"],
         summary: "Actualizar una alianza existente",
-        security: [
-            new OA\SecurityScheme(
-                securityScheme: "bearerAuth",
-                type: "http",
-                scheme: "bearer",
-                bearerFormat: "JWT"
-            )
-        ],
+        security: [["bearerAuth" => []]],
         description: "Actualiza completamente los datos de una alianza por su ID. Todos los campos son requeridos.",
         parameters: [
             new OA\Parameter(
@@ -308,14 +287,7 @@ class AllianceDocumentation
         path: "/api/alianzas/delete/{id}",
         tags: ["Alianzas"],
         summary: "Eliminar una alianza por su ID",
-        security: [
-            new OA\SecurityScheme(
-                securityScheme: "bearerAuth",
-                type: "http",
-                scheme: "bearer",
-                bearerFormat: "JWT"
-            )
-        ],
+        security: [["bearerAuth" => []]],
         description: "Elimina permanentemente una alianza. Falla si la alianza no existe o tiene relaciones activas (como recompensas asociadas).",
         parameters: [
             new OA\Parameter(
@@ -392,6 +364,7 @@ class AllianceDocumentation
         tags: ["Alianzas"],
         summary: "Actualizar o eliminar el logo de una alianza",
         description: "Sube un nuevo logo para la alianza. Si no se envía archivo, se elimina el logo actual.",
+        security: [["bearerAuth" => []]],
         parameters: [
             new OA\Parameter(
                 name: "id",

@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use App\Models\Alliance;
 use Illuminate\Http\JsonResponse;
-use App\Models\CatDepartments;
 use Illuminate\Support\Facades\Storage;
 use App\Models\TypeShop;
 

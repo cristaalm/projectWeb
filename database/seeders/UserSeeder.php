@@ -101,7 +101,7 @@ class UserSeeder extends Seeder
         }
 
         // Usuarios normales
-        User::factory(50)
+        User::factory(100)
             ->state([
                 'status' => UserStatus::ACTIVE->value,
                 'verification_status' => fake()->randomElement([

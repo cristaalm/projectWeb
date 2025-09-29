@@ -2,13 +2,13 @@
 
 namespace Database\Seeders;
 
-use App\Models\Notification;
+use App\Models\RewardsUser;
 use Illuminate\Database\Seeder;
 
-class NotificationSeeder extends Seeder
+class RewardsUserSeeder extends Seeder
 {
     public function run(): void
     {
-        Notification::factory(100)->create();
+        RewardsUser::factory(320)->create();
     }
 }

@@ -119,4 +119,60 @@ class ScansDocumentation
         ]
     )]
     public function scan(Request $request) {}
+
+    #[OA\Get(
+        path: "/api/scans/total-type-scans",
+        tags: ["Escaneos"],
+        summary: "Obtener el total de escaneos por tipo de material para el usuario autenticado",
+        description: "Devuelve el conteo total de escaneos exitosos agrupados por tipo de material (plástico y aluminio) del usuario actual.",
+        security: [["bearerAuth" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Totales obtenidos correctamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Total de escaneos de cada tipo"),
+                        new OA\Property(property: "data", properties: [
+                            new OA\Property(property: "plastic", type: "integer", example: 24, description: "Número total de escaneos de plástico (material_type_id = 1)"),
+                            new OA\Property(property: "aluminum", type: "integer", example: 18, description: "Número total de escaneos de aluminio (material_type_id = 2)"),
+                        ]),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: "Token de autenticación no válido o no proporcionado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Token de autenticación no proporcionado."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 401),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado al obtener los totales",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al obtener el total de escaneos de cada tipo"),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function totalTypeScans(Request $request) {}
 }

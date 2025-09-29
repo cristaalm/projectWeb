@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use App\Models\Alliance;
 use Illuminate\Http\JsonResponse;
-use App\Models\CatDepartments;
 use Illuminate\Support\Facades\Storage;
 
 class AllianceController extends Controller
@@ -192,6 +191,15 @@ class AllianceController extends Controller
     
         } catch (\Exception $e) {
             return $this->apiResponse(false, 'Error al actualizar el logo.', null, $e->getMessage(), 500);
+        }
+    }
+
+    public function catalog(Request $request) {
+        try {
+            $alliances = Alliance::select('id', 'name')->get();
+            return $this->apiResponse(true, 'Catalogo obtenido exitosamente.', $alliances, null, 200);
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al obtener el catalogo.', null, $e->getMessage(), 500);
         }
     }
 }

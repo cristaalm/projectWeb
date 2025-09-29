@@ -66,9 +66,9 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Scan::class);
     }
 
-    public function rewardRedemptions(): HasMany
+    public function rewards(): HasMany
     {
-        return $this->hasMany(RewardRedemption::class);
+        return $this->hasMany(RewardUser::class);
     }
 
     public function notifications(): HasMany

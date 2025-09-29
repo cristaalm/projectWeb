@@ -2,13 +2,13 @@
 
 namespace Database\Seeders;
 
-use App\Models\Reward;
+use App\Models\History;
 use Illuminate\Database\Seeder;
 
-class RewardSeeder extends Seeder
+class HistorySeeder extends Seeder
 {
     public function run(): void
     {
-        Reward::factory(100)->create();
+        History::factory(2500)->create();
     }
 }

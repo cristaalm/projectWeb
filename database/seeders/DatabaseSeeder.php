@@ -17,9 +17,9 @@ class DatabaseSeeder extends Seeder
             ContainerSeeder::class,
             ScanSeeder::class,
             RewardSeeder::class,
-            RewardRedemptionSeeder::class,
+            RewardsUserSeeder::class,
             IdentityVerificationSeeder::class,
-            NotificationSeeder::class,
+            HistorySeeder::class,
             EnvironmentalMetricSeeder::class,
         ]);
     }

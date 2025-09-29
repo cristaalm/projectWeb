@@ -10,6 +10,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('update/{id}', [AllianceController::class, 'update']);
         Route::delete('delete/{id}', [AllianceController::class, 'delete']);
         Route::post('logo/{id}', [AllianceController::class, 'updateLogo']);
+        Route::get('catalog', [AllianceController::class, 'catalog']);
     });
 });
 

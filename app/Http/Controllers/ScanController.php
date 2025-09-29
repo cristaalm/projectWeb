@@ -36,7 +36,7 @@ class ScanController extends Controller
             $imageName = time() . '_' . $image->getClientOriginalName();
             $imagePath = $image->storeAs('temp', $imageName, 'public'); 
 
-            $iaApiUrl = env('URL_IA', null);
+            $iaApiUrl = null;
             $iaResult = null;
     
             if ($iaApiUrl !== null){
@@ -109,6 +109,9 @@ class ScanController extends Controller
                 'scanned_at' => now(),
             ]);
 
+            $history = new HistoryController();
+            $history->logHistory($validatedData['user_id'], null, $iaResult['tipo'], 2, $points);
+
             DB::commit();
 
             $response = [
@@ -121,6 +124,26 @@ class ScanController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->apiResponse(false, 'Error al escanear.', null, $e->getMessage(), 500);
+        }
+    }
+
+    public function totalTypeScans(Request $request)
+    {
+        try {
+            $user = $request->user();
+
+            $scans = Scan::where('scan_status', 1)->where('user_id', $user->id)->get();
+
+            $plasticScans = $scans->where('material_type_id', 1)->count();
+            $aluminumScans = $scans->where('material_type_id', 2)->count();
+
+
+            return $this->apiResponse(true, 'Total de escaneos de cada tipo', [
+                'plastic' => $plasticScans,
+                'aluminum' => $aluminumScans,
+            ]);
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al obtener el total de escaneos de cada tipo', null, $e->getMessage(), 500);
         }
     }
 }
