@@ -36,7 +36,7 @@ class ScanController extends Controller
             $imageName = time() . '_' . $image->getClientOriginalName();
             $imagePath = $image->storeAs('temp', $imageName, 'public'); 
 
-            $iaApiUrl = null;
+            $iaApiUrl = env('URL_IA', null);
             $iaResult = null;
     
             if ($iaApiUrl !== null){
