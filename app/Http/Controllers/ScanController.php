@@ -21,7 +21,7 @@ class ScanController extends Controller
     {
         try {
             $validatedData = $request->validate([
-                'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+                'image' => 'required|image|mimes:jpeg,png,jpg|max:5120',
                 'container_id' => 'required|exists:containers,id',
                 'user_id' => 'required|exists:users,id',
             ]);
