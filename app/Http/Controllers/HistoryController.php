@@ -33,7 +33,7 @@ class HistoryController extends Controller
                 }
             }
 
-            $histories = $historyQuery->with('alliance')->with('materialType')->paginate($perPage);
+            $histories = $historyQuery->with('alliance')->with('materialTypes')->paginate($perPage);
             // $data = $this->unsetDataPagination($histories);
             return $this->apiResponse(true, 'Historial obtenido exitosamente.', $histories, null, 200);
         } catch (\Exception $e) {
