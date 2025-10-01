@@ -11,6 +11,11 @@ class Reward extends Model
 {
     use HasFactory;
 
+    protected $table = 'rewards';
+    protected $primaryKey = 'id';
+    protected $keyType = 'integer';
+    public $incrementing = true;
+
     protected $fillable = [
         'alliance_id',
         'name',

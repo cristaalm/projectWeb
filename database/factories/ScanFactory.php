@@ -5,7 +5,7 @@ namespace Database\Factories;
 use App\Models\Scan;
 use App\Models\User;
 use App\Models\Container;
-use App\Models\MaterialType;
+use App\Models\MaterialTypes;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Enums\ScanStatus;
 use Illuminate\Support\Str;
@@ -25,8 +25,8 @@ class ScanFactory extends Factory
             'container_id' => fn() => Container::inRandomOrder()->first()?->id ??
                        Container::factory()->create()->id,
 
-            'material_type_id' => fn() => MaterialType::inRandomOrder()->first()?->id ??
-                       MaterialType::factory()->create()->id,
+            'material_type_id' => fn() => MaterialTypes::inRandomOrder()->first()?->id ??
+                       MaterialTypes::factory()->create()->id,
                        
             'image' => '' . Str::random(15) . '.jpg',
             'scan_status' => $status->value,

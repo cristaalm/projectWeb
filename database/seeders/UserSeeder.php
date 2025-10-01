@@ -13,8 +13,10 @@ use PragmaRX\Google2FA\Google2FA;
 
 class UserSeeder extends Seeder
 {
-    public function run(): void
+    public function run()
     {
+
+        $users = [];
 
         $adminRole = Role::firstWhere('name', 'admin') ??
             Role::create([
@@ -25,7 +27,7 @@ class UserSeeder extends Seeder
             ]);
 
         // Admin
-        User::factory()->create([
+        $users[] = User::factory()->create([
             'name' => 'Renova',
             'last_name' => 'app',
             'email' => 'soyrenovaapp@gmail.com',
@@ -84,7 +86,7 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($usersData as $userData) {
-            User::factory()->create([
+            $users[] = User::factory()->create([
                 'name' => $userData['name'],
                 'last_name' => $userData['last_name'],
                 'email' => $userData['email'],
@@ -101,7 +103,7 @@ class UserSeeder extends Seeder
         }
 
         // Usuarios normales
-        User::factory(100)
+        $users[] = User::factory(100)
             ->state([
                 'status' => UserStatus::ACTIVE->value,
                 'verification_status' => fake()->randomElement([
@@ -111,5 +113,7 @@ class UserSeeder extends Seeder
                 ]),
             ])
             ->create();
+
+        return $users;
     }
 }

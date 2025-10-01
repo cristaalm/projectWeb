@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\MaterialType;
+use App\Models\MaterialTypes;
 use Illuminate\Database\Seeder;
 
 class MaterialTypeSeeder extends Seeder
@@ -16,7 +16,7 @@ class MaterialTypeSeeder extends Seeder
         ];
 
         foreach ($types as $type) {
-            MaterialType::firstOrCreate(['slug' => $type['slug']], $type);
+            MaterialTypes::firstOrCreate(['slug' => $type['slug']], $type);
         }
     }
 }

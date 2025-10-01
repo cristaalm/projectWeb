@@ -2,12 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Models\MaterialType;
+use App\Models\MaterialTypes;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class MaterialTypeFactory extends Factory
 {
-    protected $model = MaterialType::class;
+    protected $model = MaterialTypes::class;
 
     public function definition(): array
     {

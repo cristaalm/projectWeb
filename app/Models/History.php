@@ -16,6 +16,7 @@ class History extends Model
         'user_id',
         'type_history',
         'material_type_id',
+        'reward_id',
         'points',
         'alliance_id',
     ];
@@ -32,7 +33,12 @@ class History extends Model
 
     public function materialType(): BelongsTo
     {
-        return $this->belongsTo(MaterialType::class);
+        return $this->belongsTo(MaterialTypes::class);
+    }
+
+    public function reward(): BelongsTo
+    {
+        return $this->belongsTo(Reward::class);
     }
 
     public function alliance(): BelongsTo

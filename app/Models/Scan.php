@@ -44,6 +44,6 @@ class Scan extends Model
 
     public function materialType(): BelongsTo
     {
-        return $this->belongsTo(MaterialType::class);
+        return $this->belongsTo(MaterialTypes::class);
     }
 }

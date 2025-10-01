@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
 use App\Models\Scan;
-use App\Models\MaterialType;
+use App\Models\MaterialTypes;
 use App\Models\User;
 use App\Enums\ScanStatus;
 
@@ -76,7 +76,7 @@ class ScanController extends Controller
                 return $this->apiResponse(false, 'Error al escanear.', $iaResult, 'La respuesta de la IA no contiene el tipo de material.', 422);
             }    
 
-            $validMaterialType = MaterialType::where('id', $iaResult['tipo'])->first();
+            $validMaterialType = MaterialTypes::where('id', $iaResult['tipo'])->first();
             
             if (!$validMaterialType) {
                 return $this->apiResponse(false, 'Error al escanear.', $iaResult, 'El tipo de material no es válido.', 422);

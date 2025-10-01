@@ -18,36 +18,38 @@ class HistoryController extends Controller
             $perPage = max(1, min($perPage, 100));
             $key = $request->input('key');
             $order = strtolower($request->input('order', 'asc'));
-
+            $user_id = $request->user()->id;
+            
             $historyQuery = History::query();
-
-            $allowedKeys = ['material_type.name', 'created_at'];
-
+            
+            $allowedKeys = ['material_types.name', 'created_at'];
+            
             if (in_array($key, $allowedKeys) && in_array($order, ['asc', 'desc'])) {
-                if ($key === 'material_type.name') {
+                if ($key === 'material_types.name') {
                     // Hacemos join solo si se ordena por nombre de categoría
-                    $historyQuery->join('material_type', 'history.material_type_id', '=', 'material_type.id')
-                                  ->orderBy('material_type.name', $order);
+                    $historyQuery->join('material_types', 'history.material_type_id', '=', 'material_types.id')
+                                  ->orderBy('material_types.name', $order);
                 } else {
                     $historyQuery->orderBy($key, $order);
                 }
             }
 
-            $histories = $historyQuery->with('alliance')->with('materialTypes')->paginate($perPage);
+            $histories = $historyQuery->with('alliance')->with('materialType')->with('reward')->where('user_id', $user_id)->paginate($perPage);
             // $data = $this->unsetDataPagination($histories);
             return $this->apiResponse(true, 'Historial obtenido exitosamente.', $histories, null, 200);
         } catch (\Exception $e) {
-            return $this->apiResponse(false, 'Error al obtener el historial.', null, $e->getMessage(), 500);
+            return $this->apiResponse(false, 'Error al obtener el historial.', null, $e->getMessage() . ' ' . $e->getLine(), 500);
         }
     }
 
-    public function logHistory($user_id, $alliance_id, $material_type_id, $type_history, $points)
+    public function logHistory($user_id, $alliance_id, $material_type_id, $reward_id, $type_history, $points)
     {
 
         $request = new Request([
             'user_id' => $user_id,
             'alliance_id' => $alliance_id,
             'material_type_id' => $material_type_id,
+            'reward_id' => $reward_id,
             'type_history' => $type_history,
             'points' => $points,
         ]);
@@ -57,6 +59,7 @@ class HistoryController extends Controller
                 'user_id' => 'required|exists:users,id',
                 'alliance_id' => 'nullable|exists:alliances,id',
                 'material_type_id' => 'nullable|exists:material_types,id',
+                'reward_id' => 'nullable|exists:rewards,id',
                 'type_history' => 'required|in:1,2',
                 'points' => 'required|numeric',
             ]);
@@ -79,6 +82,7 @@ class HistoryController extends Controller
                 'user_id' => $request->user_id,
                 'alliance_id' => $request->type_history == 1 ? $request->alliance_id : null,
                 'material_type_id' => $request->type_history == 2 ? $request->material_type_id : null,
+                'reward_id' => $request->type_history == 2 ? $request->reward_id : null,
                 'type_history' => $request->type_history,
                 'points' => $request->points,
             ]);

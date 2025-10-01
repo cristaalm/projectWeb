@@ -9,6 +9,6 @@ class HistorySeeder extends Seeder
 {
     public function run(): void
     {
-        History::factory(2500)->create();
+        History::factory(400)->create();
     }
 }

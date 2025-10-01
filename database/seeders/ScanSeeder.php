@@ -10,6 +10,6 @@ class ScanSeeder extends Seeder
 {
     public function run(): void
     {
-        Scan::factory(2000)->create();
+        Scan::factory(350)->create();
     }
 }

@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class MaterialType extends Model
+class MaterialTypes extends Model
 {
     use HasFactory;
     
     protected $table = 'material_types';
-
+    
     protected $fillable = [
         'name',
         'slug',
