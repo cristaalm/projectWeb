@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class MaterialType extends Model
 {
     use HasFactory;
+    
+    protected $table = 'material_types';
 
     protected $fillable = [
         'name',
