@@ -21,6 +21,8 @@ export async function requireAuth(to, from, next, onSuccess) {
   if (twoFactor.value && to.name === 'verify2FA') return next()
   
   if (twoFactor.value) return next({ name: 'verify2FA' })
+
+  if (!to.meta.isDashboard) return next({ name: 'panel' })
   
   // ✅ Si se pasa onSuccess, lo ejecuta; si no, llama a next()
   if (typeof onSuccess === 'function') {
