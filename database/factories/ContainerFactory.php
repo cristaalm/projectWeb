@@ -14,6 +14,7 @@ class ContainerFactory extends Factory
     public function definition(): array
     {
         return [
+            'name' => $this->faker->name(),
             'serial_number' => 'SN-' . strtoupper(Str::random(12)),
             'location' => $this->faker->address(),
             'latitude' => $this->faker->latitude(),
@@ -22,7 +23,6 @@ class ContainerFactory extends Factory
                 ContainerStatus::ACTIVE,
                 ContainerStatus::INACTIVE,
             ]),
-            'last_maintenance' => $this->faker->optional()->dateTimeThisYear(),
         ];
     }
 }

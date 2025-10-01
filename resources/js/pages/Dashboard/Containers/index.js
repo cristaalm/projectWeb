@@ -1,3 +1,3 @@
-import Containers from './Containers.vue'
+import Shops from './Containers.vue'
 
-export default Containers
+export default Shops

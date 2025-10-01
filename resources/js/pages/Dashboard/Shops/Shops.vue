@@ -26,7 +26,7 @@ const {
 } = requestOrderTable({ url: 'alianzas/getAll' })
 
 const headers = [
-  { title: '', align: 'left', key: 'logo' },
+  { title: '', align: 'left', key: 'logo', sortable: false },
   { title: 'Nombre', align: 'left', key: 'name' },
   { title: 'Contacto', align: 'start', key: 'contact_name' },
   { title: 'Télefono', align: 'start', key: 'phone', sortable: false },

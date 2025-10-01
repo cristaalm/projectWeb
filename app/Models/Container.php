@@ -11,20 +11,21 @@ class Container extends Model
 {
     use HasFactory;
 
+    protected $table = 'containers';
+
     protected $fillable = [
+        'name',
         'serial_number',
         'location',
         'latitude',
         'longitude',
         'status',
-        'last_maintenance',
     ];
 
     protected $casts = [
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
         'status' => ContainerStatus::class,
-        'last_maintenance' => 'datetime',
     ];
 
     public function scans(): HasMany
