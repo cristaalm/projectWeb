@@ -2,15 +2,18 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Contraseña restablecida</title>
   </head>
 
   <body
     style="
-      font-family: Arial, sans-serif;
-      background-color: #f4f6f8;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9fafb;
       margin: 0;
       padding: 0;
+      line-height: 1.6;
+      color: #374151;
     "
   >
     <table width="100%" cellpadding="0" cellspacing="0" style="padding: 40px 0">
@@ -22,69 +25,82 @@
             cellspacing="0"
             style="
               background-color: #ffffff;
-              border-radius: 8px;
+              border-radius: 12px;
               overflow: hidden;
-              box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+              box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+              border: 1px solid #e5e7eb;
             "
           >
-            <tr style="background-color: #c3e3d8">
-              <td
-                style="
-                  padding: 20px;
-                  text-align: center;
-                  color: #ffffff;
-                  font-size: 24px;
-                  display: flex;
-                  justify-content: center;
-                  align-items: center;
-                "
-              >
+            <!-- Header con color #c3e3d8 -->
+            <tr>
+              <td style="background-color: #c3e3d8; padding: 24px 0; text-align: center">
                 <img
                   src="https://renova-3q4h.onrender.com/images/LogoLetra.png"
                   alt="RENOVA Logo"
-                  style="max-width: 180px"
+                  style="max-width: 180px; height: auto"
                 />
               </td>
             </tr>
+
+            <!-- Content -->
             <tr>
-              <td style="padding: 30px; color: #333">
-                <h2 style="margin-top: 0; color: #0b4d91">
-                  Contraseña restablecida
+              <td style="padding: 32px; color: #333">
+                <h2 style="margin-top: 0; font-size: 22px; color: #0b4d91">
+                  ¡Tu contraseña ha sido actualizada!
                 </h2>
-                <p>
-                  Hola {{ explode(' ', $user->name)[0] ?? 'usuario' }},
+
+                <p style="font-size: 16px; margin-bottom: 20px;">
+                  Hola, {{ explode(' ', $user->name)[0] ?? 'usuario' }} 👋
                 </p>
-                <p>
-                  Se ha completado un cambio de contraseña, puedes iniciar sesión con tu nueva contraseña.
+
+                <p style="font-size: 16px; margin-bottom: 20px;">
+                  Tu contraseña en <strong>RENOVA</strong> se ha restablecido correctamente.
+                  Ya puedes iniciar sesión con tu nueva contraseña.
                 </p>
-                <p>Si no fuiste tú, comunícate con el equipo de soporte, para proteger tu cuenta.</p>
-                <p style="text-align: center">
+
+                <p style="font-size: 16px; margin-bottom: 24px; color: #d97706;">
+                  <strong>¿No solicitaste este cambio?</strong><br />
+                  Por favor, contacta inmediatamente a nuestro equipo de soporte para proteger tu cuenta.
+                </p>
+
+                <div style="text-align: center; margin: 28px 0;">
                   <a
-                    href="{{ url('/login') }}"
+                    href="{{ config('app.url') }}/login"
                     style="
+                      display: inline-block;
                       background-color: #08a75f;
                       color: white;
-                      padding: 12px 20px;
                       text-decoration: none;
-                      border-radius: 4px;
+                      padding: 12px 28px;
+                      border-radius: 6px;
+                      font-weight: 600;
+                      font-size: 16px;
                     "
-                    >Iniciar sesión</a
                   >
+                    Iniciar sesión
+                  </a>
+                </div>
+
+                <p style="font-size: 16px; margin-bottom: 0;">
+                  Gracias por confiar en RENOVA. Estamos aquí para cuidar de ti.
                 </p>
-                <p>Gracias por formar parte de RENOVA.</p>
               </td>
             </tr>
+
+            <!-- Footer -->
             <tr>
               <td
                 style="
-                  background-color: #f1f1f1;
+                  background-color: #f9fafb;
                   padding: 20px;
                   text-align: center;
-                  font-size: 12px;
-                  color: #777;
+                  font-size: 13px;
+                  color: #6b7280;
+                  border-top: 1px solid #e5e7eb;
                 "
               >
-                © {{ date('Y') }} RENOVA. Todos los derechos reservados.
+                © {{ date('Y') }} RENOVA. Todos los derechos reservados.<br />
+                <span style="color: #9ca3af">Tu seguridad es nuestra prioridad.</span>
               </td>
             </tr>
           </table>

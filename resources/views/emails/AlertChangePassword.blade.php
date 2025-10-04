@@ -2,15 +2,18 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Contraseña cambiada</title>
   </head>
 
   <body
     style="
-      font-family: Arial, sans-serif;
-      background-color: #f4f6f8;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9fafb;
       margin: 0;
       padding: 0;
+      line-height: 1.6;
+      color: #374151;
     "
   >
     <table width="100%" cellpadding="0" cellspacing="0" style="padding: 40px 0">
@@ -22,69 +25,65 @@
             cellspacing="0"
             style="
               background-color: #ffffff;
-              border-radius: 8px;
+              border-radius: 12px;
               overflow: hidden;
-              box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+              box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+              border: 1px solid #e5e7eb;
             "
           >
-            <tr style="background-color: #c3e3d8">
-              <td
-                style="
-                  padding: 20px;
-                  text-align: center;
-                  color: #ffffff;
-                  font-size: 24px;
-                  display: flex;
-                  justify-content: center;
-                  align-items: center;
-                "
-              >
+            <!-- Header con color #c3e3d8 -->
+            <tr>
+              <td style="background-color: #c3e3d8; padding: 24px 0; text-align: center">
                 <img
                   src="https://renova-3q4h.onrender.com/images/LogoLetra.png"
                   alt="RENOVA Logo"
-                  style="max-width: 180px"
+                  style="max-width: 180px; height: auto"
                 />
               </td>
             </tr>
+
+            <!-- Content -->
             <tr>
-              <td style="padding: 30px; color: #333">
-                <h2 style="margin-top: 0; color: #d9534f">
+              <td style="padding: 32px; color: #333">
+                <h2 style="margin-top: 0; font-size: 22px; color: #d9534f">
                   ¡Tu contraseña ha sido cambiada!
                 </h2>
-                <p>Hola {{ explode(' ', $user->name)[0] ?? 'usuario' }},</p>
-                <p>
-                  Te notificamos que la contraseña de tu cuenta en RENOVA ha
-                  sido modificada recientemente.
+
+                <p style="font-size: 16px; margin-bottom: 20px;">
+                  Hola, {{ explode(' ', $user->name)[0] ?? 'usuario' }} 👋
                 </p>
-                <p
-                  style="
-                    background: #fff3cd;
-                    color: #856404;
-                    padding: 16px;
-                    border-radius: 4px;
-                    border: 1px solid #ffeeba;
-                  "
-                >
-                  Si <strong>NO</strong> realizaste este cambio, por favor
-                  contacta inmediatamente con nuestro equipo de soporte para
-                  proteger tu cuenta.
+
+                <p style="font-size: 16px; margin-bottom: 24px;">
+                  Te informamos que la contraseña de tu cuenta en <strong>RENOVA</strong> fue actualizada recientemente.
                 </p>
-                <p style="margin-bottom: 0">
-                  Saludos,<br />El equipo de RENOVA
+
+                <div style="background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 16px; border-radius: 0 6px 6px 0; margin: 24px 0;">
+                  <p style="margin: 0; font-size: 15px; color: #92400e;">
+                    <strong>¿No realizaste este cambio?</strong><br />
+                    Por favor, contacta inmediatamente a nuestro equipo de soporte para proteger tu cuenta.
+                  </p>
+                </div>
+
+                <p style="font-size: 16px; margin-bottom: 0;">
+                  Gracias por ayudarnos a mantener tu cuenta segura.
                 </p>
               </td>
             </tr>
+
+            <!-- Footer -->
             <tr>
               <td
                 style="
-                  background-color: #f1f1f1;
+                  background-color: #f9fafb;
                   padding: 20px;
                   text-align: center;
-                  font-size: 12px;
-                  color: #777;
+                  font-size: 13px;
+                  color: #6b7280;
+                  border-top: 1px solid #e5e7eb;
                 "
               >
-                © {{ date('Y') }} RENOVA. Todos los derechos reservados.
+                © {{ date('Y') }} RENOVA. Todos los derechos reservados.<br />
+                <span style="color: #9ca3af">Tu seguridad es lo primero.</span>
               </td>
             </tr>
           </table>

@@ -11,15 +11,22 @@ class RoleSeeder extends Seeder
     {
         Role::create([
             'name' => 'user',
-            'display_name' => 'Usuario solicitante',
+            'display_name' => 'Usuario',
             'description' => 'Usuario regular del sistema',
             'is_active' => true,
         ]);
 
         Role::create([
             'name' => 'admin',
-            'display_name' => 'Administrador general',
+            'display_name' => 'Administrador',
             'description' => 'Tiene acceso total al sistema',
+            'is_active' => true,
+        ]);
+
+        Role::create([
+            'name' => 'moderator',
+            'display_name' => 'Moderador',
+            'description' => 'Tiene acceso limitado al sistema',
             'is_active' => true,
         ]);
     }

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Restablece tu contraseña</title>
+    <title>Cuenta activada</title>
   </head>
 
   <body
@@ -31,7 +31,7 @@
               border: 1px solid #e5e7eb;
             "
           >
-            <!-- Header con color #c3e3d8 -->
+            <!-- Header -->
             <tr>
               <td style="background-color: #c3e3d8; padding: 24px 0; text-align: center">
                 <img
@@ -46,43 +46,38 @@
             <tr>
               <td style="padding: 32px; color: #333">
                 <h2 style="margin-top: 0; font-size: 22px; color: #1f2937">
-                  ¿Olvidaste tu contraseña?
+                  ¡Hola, {{ explode(' ', $user->name)[0] ?? 'usuario' }}! 👋
                 </h2>
 
                 <p style="font-size: 16px; margin-bottom: 20px;">
-                  Hola, {{ explode(' ', $user->name)[0] ?? 'usuario' }} 👋
+                  Tenemos una buena noticia: <strong>tu cuenta en RENOVA ha sido activada</strong>.
+                </p>
+
+                <p style="font-size: 16px; margin-bottom: 20px;">
+                  Ya puedes acceder a todas las funcionalidades de la plataforma y comenzar a disfrutar de nuestros servicios.
                 </p>
 
                 <p style="font-size: 16px; margin-bottom: 24px;">
-                  Recibimos una solicitud para restablecer la contraseña de tu cuenta en <strong>RENOVA</strong>.
-                  Si fuiste tú, haz clic en el botón de abajo para crear una nueva contraseña.
+                  Si tienes alguna duda o necesitas ayuda para empezar, nuestro equipo está listo para apoyarte.
                 </p>
 
-                <div style="text-align: center; margin: 28px 0;">
+                <div style="text-align: center; margin-top: 24px;">
                   <a
-                    href="{{ $url }}"
+                    href="{{ config('app.url') }}/login"
                     style="
                       display: inline-block;
-                      background-color: #08a75f;
+                      background-color: #10b981;
                       color: white;
                       text-decoration: none;
-                      padding: 12px 28px;
+                      padding: 10px 24px;
                       border-radius: 6px;
                       font-weight: 600;
                       font-size: 16px;
                     "
                   >
-                    Restablecer contraseña
+                    Iniciar sesión
                   </a>
                 </div>
-
-                <p style="font-size: 16px; margin-bottom: 20px; color: #6b7280;">
-                  Este enlace es válido por un tiempo limitado por razones de seguridad.
-                </p>
-
-                <p style="font-size: 16px; margin-bottom: 0;">
-                  Si no solicitaste este cambio, puedes ignorar este mensaje. Tu cuenta permanecerá segura.
-                </p>
               </td>
             </tr>
 
@@ -99,7 +94,7 @@
                 "
               >
                 © {{ date('Y') }} RENOVA. Todos los derechos reservados.<br />
-                <span style="color: #9ca3af">Cuidamos tu seguridad en cada paso.</span>
+                <span style="color: #9ca3af">¡Bienvenido(a) de nuevo!</span>
               </td>
             </tr>
           </table>

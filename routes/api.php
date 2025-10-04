@@ -9,6 +9,7 @@ require __DIR__ . '/api/Scan.php';
 require __DIR__ . '/api/Rewards.php';
 require __DIR__ . '/api/History.php';
 require __DIR__ . '/api/Containers.php';
+require __DIR__ . '/api/Users.php';
 
 Route::get('/health', function () {
     return response()->json(['status' => 'ok', 'time' => now()]);
