@@ -66,7 +66,7 @@ class RewardUserController extends Controller
 
 
             $history = new HistoryController();
-            $history->logHistory($validatedData['user_id'], $reward->alliance_id, null, 1, $reward->points_required);
+            $history->logHistory($validatedData['user_id'], $reward->alliance_id, null, $reward->id, 1, $reward->points_required);
             
             DB::commit();
             

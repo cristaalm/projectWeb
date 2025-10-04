@@ -110,7 +110,7 @@ class ScanController extends Controller
             ]);
 
             $history = new HistoryController();
-            $history->logHistory($validatedData['user_id'], null, $iaResult['tipo'], 2, $points);
+            $history->logHistory($validatedData['user_id'], null, $iaResult['tipo'], null, 2, $points);
 
             DB::commit();
 
