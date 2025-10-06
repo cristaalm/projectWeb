@@ -71,6 +71,7 @@ class UserController extends Controller
                 'last_name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255',
                 'phone' => 'required|string|max:255',
+                'curp' => 'required|string|max:20',
                 'password' => 'required|string|min:8|confirmed',
             ]);
 
@@ -82,6 +83,10 @@ class UserController extends Controller
                 return $this->apiResponse(false, 'El número de teléfono ya está en uso.', null, null, 422);
             }
 
+            if (User::where('curp', $validateData['curp'])->exists()) {
+                return $this->apiResponse(false, 'El CURP ya está en uso.', null, null, 422);
+            }
+
             DB::beginTransaction();
 
             $user = User::create([
@@ -89,6 +94,7 @@ class UserController extends Controller
                 'last_name' => $validateData['last_name'],
                 'email' => $validateData['email'],
                 'phone' => $validateData['phone'],
+                'curp' => $validateData['curp'],
                 'password' => Hash::make($validateData['password']),
                 'role_id' => Role::firstWhere('name', 'user')?->id,
                 'google2fa_secret' => (new Google2FA())->generateSecretKey(),
