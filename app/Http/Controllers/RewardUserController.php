@@ -19,6 +19,8 @@ class RewardUserController extends Controller
     public function claim(Request $request)
     {
         try {
+            $authUser = $request->user();
+
             $validatedData = $request->validate([
                 'user_id' => 'required|integer|exists:users,id',
                 'reward_id' => 'required|integer|exists:rewards,id',
@@ -67,6 +69,10 @@ class RewardUserController extends Controller
 
             $history = new HistoryController();
             $history->logHistory($validatedData['user_id'], $reward->alliance_id, null, $reward->id, 1, $reward->points_required);
+
+            if ($authUser->role_id === 4) {
+                $history->logHistory($authUser->id, $reward->alliance_id, null, $reward->id, 1, $reward->points_required);
+            }
             
             DB::commit();
             

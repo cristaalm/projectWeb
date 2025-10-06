@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use PragmaRX\Google2FA\Google2FA;
 use Illuminate\Support\Facades\DB;
 use App\Models\IdentityVerification;
+use Laravel\Sanctum\PersonalAccessToken;
 
 // notifications
 use App\Notifications\UserStatusAccountNotification;
@@ -138,6 +139,46 @@ class UserController extends Controller
             return $this->apiResponse(true, 'La cuenta de ' . $user->name . ' se ' . $description . ' exitosamente.', null, null, 200);
         } catch (\Exception $e) {
             return $this->apiResponse(false, 'Error al actualizar el estado de la cuenta.', null, $e->getMessage(), 500);
+        }
+    }
+
+    public function identityUser(Request $request)
+    {
+        try {
+            $authUser = $request->user();
+
+            // token del usuario
+            $validateData = $request->validate([
+                'token' => 'required|string',
+            ]);
+
+            // buscamos el token
+            $accessToken = PersonalAccessToken::findToken($validateData['token']);
+
+            if (!$accessToken) {
+                return $this->apiResponse(false, 'No se pudo identificar al usuario.', null, null, 404);
+            }
+
+            if ($accessToken->expires_at && $accessToken->expires_at->isPast()) {
+                $accessToken->delete();
+                return $this->apiResponse(false, 'No se pudo identificar al usuario.', null, 'Token expirado.', 401);
+            }
+
+            $user = $accessToken->tokenable;
+
+            if (! $user) {
+                return $this->apiResponse(false, 'No se pudo identificar al usuario.', null, 'Usuario no encontrado.', 401);
+            }
+
+            if ($user->status !== UserStatus::ACTIVE) {
+                return $this->apiResponse(false, 'La cuenta del usuario no está activa.', null, 'Cuenta desactivada.', 403);
+            }
+
+            return $this->apiResponse(true, 'Se identifico al usuario exitosamente.', [
+                'user' => new UserResource($user),
+            ], null, 200);
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al identificar al usuario.', null, $e->getMessage(), 500);
         }
     }
 }
