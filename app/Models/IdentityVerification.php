@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Enums\IndentifyVerificationStatus;
+use App\Enums\VerificationStatus;
 
 class IdentityVerification extends Model
 {
@@ -24,7 +24,7 @@ class IdentityVerification extends Model
     ];
 
     protected $casts = [
-        'status' => IndentifyVerificationStatus::class,
+        'status' => VerificationStatus::class,
         'verified_at' => 'datetime',
     ];
 

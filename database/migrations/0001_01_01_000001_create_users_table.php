@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('password'); 
             $table->timestamp('email_verified_at')->nullable(); 
             $table->integer('total_points')->default(0); 
-            $table->tinyInteger('verification_status')->default(0); 
+            $table->tinyInteger('verification_status')->default(3); 
             $table->tinyInteger('two_factor_status')->default(0); 
             $table->string('google2fa_secret', 100)->nullable();
             $table->tinyInteger('status')->default(1); 

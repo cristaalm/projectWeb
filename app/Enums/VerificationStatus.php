@@ -7,6 +7,7 @@ enum VerificationStatus: int
     case PENDING = 0;
     case APPROVED = 1;
     case REJECTED = 2;
+    case EMPTY = 3;
 
     public function label(): string
     {
@@ -14,6 +15,7 @@ enum VerificationStatus: int
             self::PENDING => 'Pendiente',
             self::APPROVED => 'Validado',
             self::REJECTED => 'Rechazado',
+            self::EMPTY => 'Vacio',
         };
     }
 }

@@ -29,5 +29,12 @@ class RoleSeeder extends Seeder
             'description' => 'Tiene acceso limitado al sistema',
             'is_active' => true,
         ]);
+
+        Role::create([
+            'name' => 'comerciante',
+            'display_name' => 'Comerciante',
+            'description' => 'Comerciante del sistema',
+            'is_active' => true,
+        ]);
     }
 }

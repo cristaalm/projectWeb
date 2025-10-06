@@ -11,11 +11,12 @@ class RoleFactory extends Factory
 
     public function definition(): array
     {
-        $names = ['user', 'admin', 'moderator'];
+        $names = ['user', 'admin', 'moderator', 'comerciante'];
         $displayNames = [
-            'user' => 'Usuario solicitante',
-            'admin' => 'Administrador general',
-            'moderator' => 'Moderador de contenido',
+            'user' => 'Usuario',
+            'admin' => 'Administrador',
+            'moderator' => 'Moderador',
+            'comerciante' => 'Comerciante',
         ];
 
         $name = $this->faker->unique()->randomElement($names);

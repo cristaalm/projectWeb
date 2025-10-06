@@ -1,12 +1,14 @@
 <script setup>
 import OrderTable from '@/components/orderTable/'
-import { ModalToggleStatus, useModalToggleStatus } from './modules/ModalToggleStatus'
-import { ModalResetPass, useModalResetPass } from './modules/ModalResetPass'
 import { requestOrderTable } from '@/services/requests'
 import { useDarkModeStore } from '@/store/dark-mode'
 import { storageURL } from '@/utils/constants'
 import { format } from 'date-fns'
 import { useAuthStore } from '@/store/auth'
+
+import { ModalToggleStatus, useModalToggleStatus } from './modules/ModalToggleStatus'
+import { ModalResetPass, useModalResetPass } from './modules/ModalResetPass'
+import { ModalVerifyDocs, useModalVerifyDocs } from './modules/ModalVerifyDocs'
 
 const authStore = useAuthStore()
 const darkModeStore = useDarkModeStore()
@@ -48,6 +50,7 @@ function formatPhone(phone) {
 
 const { showToggleStatusModal, openToggleStatusModal, selectedUserToToggleStatus } = useModalToggleStatus()
 const { showResetPassModal, openResetPassModal, selectedUserToResetPass } = useModalResetPass()
+const { showVerifyDocsModal, openVerifyDocsModal, selectedUserToVerifyDocs } = useModalVerifyDocs()
 </script>
 
 <template>
@@ -61,6 +64,12 @@ const { showResetPassModal, openResetPassModal, selectedUserToResetPass } = useM
     v-model="showResetPassModal"
     :data="selectedUserToResetPass"
     @reset-pass="loadData"
+  />
+
+  <ModalVerifyDocs
+    v-model="showVerifyDocsModal"
+    :data="selectedUserToVerifyDocs"
+    @verify-docs="loadData"
   />
 
   <div class="grid grid-cols-12 gap-6 p-0">
@@ -169,7 +178,7 @@ const { showResetPassModal, openResetPassModal, selectedUserToResetPass } = useM
 
       <template #item.verification_status="{ item }">
         <VChip :color="item.verification_status == 0 ? 'warning' : item.verification_status == 1 ? 'success' : item.verification_status == 2 ? 'error' : 'secondary'">
-          {{ item.verification_status == 0 ? 'Pendiente' : item.verification_status == 1 ? 'Verificado' : item.verification_status == 2 ? 'Rechazado' : 'Regresado' }}
+          {{ item.verification_status == 0 ? 'Pendiente' : item.verification_status == 1 ? 'Verificado' : item.verification_status == 2 ? 'Rechazado' : 'Sin documentos' }}
         </VChip>
       </template>
 
@@ -216,7 +225,10 @@ const { showResetPassModal, openResetPassModal, selectedUserToResetPass } = useM
               </VListItemTitle>
             </VListItem>
             <VDivider />
-            <VListItem v-if="item.verification_status == 0">
+            <VListItem 
+              v-if="item.verification_status == 0"
+              @click="openVerifyDocsModal(item)"
+            >
               <template #prepend>
                 <VIcon
                   icon="bx-user-check"

@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('ine_front_url', 255)->nullable();
             $table->string('ine_back_url', 255)->nullable();
             $table->string('selfie_url', 255)->nullable();
-            $table->tinyInteger('status')->default(0); // 0: pendiente, 1: aprobado, 2: rechazado, 3: corregir
+            $table->tinyInteger('status')->default(3); // 0: pendiente, 1: aprobado, 2: rechazado, 3: sin subir documentos
             $table->text('rejection_reason')->nullable();
             $table->bigInteger('verified_by')->unsigned()->nullable();
             $table->timestamp('verified_at')->nullable();

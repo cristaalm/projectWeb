@@ -26,6 +26,14 @@ class UserSeeder extends Seeder
                 'is_active' => true,
             ]);
 
+        $comercianteRole = Role::firstWhere('name', 'comerciante') ??
+            Role::create([
+                'name' => 'comerciante',
+                'display_name' => 'Comerciante',
+                'description' => 'Comerciante del sistema',
+                'is_active' => true,
+            ]);
+
         // Admin
         $users[] = User::factory()->create([
             'name' => 'Renova',
@@ -98,21 +106,49 @@ class UserSeeder extends Seeder
                 'verification_status' => VerificationStatus::APPROVED->value,
                 'status' => UserStatus::ACTIVE->value,
             ]);
-
-            $this->command->info("Usuario creado: {$userData['email']}");
         }
 
         // Usuarios normales
-        $users[] = User::factory(100)
+        $users[] = User::factory(25)
             ->state([
                 'status' => UserStatus::ACTIVE->value,
-                'verification_status' => fake()->randomElement([
-                    VerificationStatus::PENDING->value,
-                    VerificationStatus::APPROVED->value,
-                    VerificationStatus::REJECTED->value,
-                ]),
+                'verification_status' => VerificationStatus::PENDING->value,
             ])
             ->create();
+
+            $users[] = User::factory(25)
+            ->state([
+                'status' => UserStatus::ACTIVE->value,
+                'verification_status' => VerificationStatus::APPROVED->value,
+            ])
+            ->create();
+
+            $users[] = User::factory(25)
+            ->state([
+                'status' => UserStatus::ACTIVE->value,
+                'verification_status' => VerificationStatus::REJECTED->value,
+            ])
+            ->create();
+
+            $users[] = User::factory(25)
+            ->state([
+                'status' => UserStatus::ACTIVE->value,
+                'verification_status' => VerificationStatus::EMPTY->value,
+            ])
+            ->create();
+
+        $users[] = User::factory()->create([
+            'name' => 'Comerciante',
+            'last_name' => 'Comerciante',
+            'email' => 'comerciante@mail.com',
+            'password' => Hash::make('admin123'), // Contraseña común para todos (puedes cambiarla si lo deseas)
+            'role_id' => $comercianteRole->id,
+            'email_verified_at' => Carbon::now(),
+            'google2fa_secret' => '5T3O6QWXQ52B7A53',
+            'two_factor_status' => 0,
+            'verification_status' => VerificationStatus::APPROVED->value,
+            'status' => UserStatus::ACTIVE->value,
+        ]);
 
         return $users;
     }

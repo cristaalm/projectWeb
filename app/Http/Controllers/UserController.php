@@ -9,6 +9,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
+use PragmaRX\Google2FA\Google2FA;
+use Illuminate\Support\Facades\DB;
+use App\Models\IdentityVerification;
 
 // notifications
 use App\Notifications\UserStatusAccountNotification;
@@ -34,6 +37,7 @@ class UserController extends Controller
                       ->orWhere('email', 'like', '%' . $query . '%')
                       ->orWhere('phone', 'like', '%' . $query . '%')
                       ->orWhere('total_points', 'like', '%' . $query . '%')
+                      ->orWhere('id', 'like', '%' . $query . '%')
                       ->orWhereHas('role', function ($subQ) use ($query) {
                           $subQ->where('name', 'like', '%' . $query . '%');
                       });
@@ -55,6 +59,55 @@ class UserController extends Controller
             return $this->apiResponse(true, 'Usuarios obtenidos exitosamente.', $data, null, 200);
         } catch (\Exception $e) {
             return $this->apiResponse(false, 'Error al obtener los usuarios.', null, $e->getMessage(), 500);
+        }
+    }
+
+    public function registerUser(Request $request)
+    {
+        try {
+            $validateData = $request->validate([
+                'name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255',
+                'phone' => 'required|string|max:255',
+                'password' => 'required|string|min:8|confirmed',
+            ]);
+
+            if (User::where('email', $validateData['email'])->exists()) {
+                return $this->apiResponse(false, 'El correo electrónico ya está en uso.', null, null, 422);
+            }
+
+            if (User::where('phone', $validateData['phone'])->exists()) {
+                return $this->apiResponse(false, 'El número de teléfono ya está en uso.', null, null, 422);
+            }
+
+            DB::beginTransaction();
+
+            $user = User::create([
+                'name' => $validateData['name'],
+                'last_name' => $validateData['last_name'],
+                'email' => $validateData['email'],
+                'phone' => $validateData['phone'],
+                'password' => Hash::make($validateData['password']),
+                'role_id' => Role::firstWhere('name', 'user')?->id,
+                'google2fa_secret' => (new Google2FA())->generateSecretKey(),
+            ]);
+            $user->save();
+
+            IdentityVerification::create([
+                'user_id' => $user->id,
+                'status' => IndentifyVerificationStatus::EMPTY->value,
+            ]);
+
+            DB::commit();
+
+            return $this->apiResponse(true, 'Usuario registrado exitosamente.', $user, null, 200);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            return $this->apiResponse(false, 'Error al registrar el usuario.', null, $e->errors(), 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->apiResponse(false, 'Error al registrar el usuario.', null, $e->getMessage(), 500);
         }
     }
 

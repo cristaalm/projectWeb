@@ -27,6 +27,9 @@ namespace App\Swagger\Documentation;
 
 use OpenApi\Attributes as OA;
 
+use App\Swagger\Schemas\UserSchema;
+
+
 #[OA\Tag(name: 'Usuarios', description: 'Endpoints para gestión de usuarios')]
 class UsersDocumentation
 {
@@ -263,4 +266,80 @@ class UsersDocumentation
         ]
     )]
     public function toggleStatusAccount(Request $request) {}
+
+    #[OA\Post(
+        path: "/api/users/register",
+        tags: ["Usuarios"],
+        summary: "Registrar un nuevo usuario",
+        description: "Crea una nueva cuenta de usuario en el sistema. El correo electrónico y el número de teléfono deben ser únicos.",
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["name", "last_name", "email", "phone", "password", "password_confirmation"],
+                properties: [
+                    new OA\Property(property: "name", type: "string", example: "Juan", description: "Nombre del usuario"),
+                    new OA\Property(property: "last_name", type: "string", example: "Pérez", description: "Apellido del usuario"),
+                    new OA\Property(property: "email", type: "string", format: "email", example: "juan.perez@example.com", description: "Correo electrónico único"),
+                    new OA\Property(property: "phone", type: "string", example: "+57 300 1234567", description: "Número de teléfono único"),
+                    new OA\Property(property: "password", type: "string", example: "password123", description: "Contraseña (mínimo 8 caracteres)"),
+                    new OA\Property(property: "password_confirmation", type: "string", example: "password123", description: "Confirmación de la contraseña"),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Usuario registrado exitosamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Usuario registrado exitosamente."),
+                        new OA\Property(property: "data", ref: "#/components/schemas/User"),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: "Error de validación o datos duplicados",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al registrar el usuario."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", oneOf: [
+                            // Caso 1: Validación de campos
+                            new OA\Schema(type: "object", properties: [
+                                new OA\Property(property: "email", type: "array", items: new OA\Items(type: "string", example: "The email field is required.")),
+                                new OA\Property(property: "password", type: "array", items: new OA\Items(type: "string", example: "The password must be at least 8 characters.")),
+                            ]),
+                            // Caso 2: Email duplicado
+                            new OA\Schema(type: "null", example: null),
+                            // Caso 3: Teléfono duplicado
+                            new OA\Schema(type: "null", example: null),
+                        ], description: "Puede ser un objeto de errores de validación o null si el error es por duplicado"),
+                        new OA\Property(property: "status", type: "integer", example: 422),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado al registrar el usuario",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al registrar el usuario."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function registerUser(Request $request) {}
 }
