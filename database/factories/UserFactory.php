@@ -17,6 +17,10 @@ class UserFactory extends Factory
 
     public function definition(): array
     {
+
+        $digits12 = implode('', $this->faker->randomElements(range('0', '9'), 12, true));
+        $checkDigit = User::calculateEan13CheckDigit($digits12);
+
         return [
             'name' => $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),
@@ -30,6 +34,7 @@ class UserFactory extends Factory
             'status' => UserStatus::ACTIVE->value,
             'two_factor_status' => 0,
             'google2fa_secret' => (new Google2FA())->generateSecretKey(),
+            'code_identity'=> $digits12 . $checkDigit,
             'role_id' => function (array $attributes) {
                 return Role::firstWhere('name', 'user')?->id ??
                        Role::factory()->create(['name' => 'user', 'display_name' => 'Usuario solicitante'])->id;

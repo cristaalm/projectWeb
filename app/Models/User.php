@@ -32,6 +32,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'verification_status',
         'avatar',
         'two_factor_status',
+        'code_identity',
         'status',
         'google2fa_secret',
         'role_id',
@@ -84,4 +85,25 @@ class User extends Authenticatable implements MustVerifyEmail
         $this->notify(new CustomResetPassword($token, $this->email));
     }
 
+    public static function calculateEan13CheckDigit(string $digits12): string
+    {
+        if (strlen($digits12) !== 12 || !ctype_digit($digits12)) {
+            throw new \InvalidArgumentException('Se requieren 12 dígitos numéricos.');
+        }
+
+        $sum = 0;
+        for ($i = 0; $i < 12; $i++) {
+            $digit = (int) $digits12[$i];
+            // Posición 1 (índice 0) es impar → multiplicar por 1
+            // Posición 2 (índice 1) es par → multiplicar por 3
+            if ($i % 2 === 0) {
+                $sum += $digit;        // posiciones impares (1ª, 3ª, ...)
+            } else {
+                $sum += $digit * 3;    // posiciones pares (2ª, 4ª, ...)
+            }
+        }
+
+        $checksum = (10 - ($sum % 10)) % 10;
+        return (string) $checksum;
+    }
 }

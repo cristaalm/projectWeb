@@ -25,6 +25,7 @@ return new class extends Migration
             $table->tinyInteger('verification_status')->default(3); 
             $table->tinyInteger('two_factor_status')->default(0); 
             $table->string('google2fa_secret', 100)->nullable();
+            $table->string('code_identity', 30)->unique();
             $table->tinyInteger('status')->default(1); 
             $table->bigInteger('role_id')->unsigned();
 

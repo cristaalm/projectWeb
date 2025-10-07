@@ -31,11 +31,14 @@ class UserSchema
     #[OA\Property(property: "total_points", type: "integer", example: 95)]
     public int $total_points;
 
-    #[OA\Property(property: "verification_status", type: "string", example: "VERIFIED")]
-    public string $verification_status;
+    #[OA\Property(property: "verification_status", type: "integer", example: 1)]
+    public int $verification_status;
 
     #[OA\Property(property: "two_factor_status", type: "boolean", example: true)]
     public bool $two_factor_status;
+
+    #[OA\Property(property: "code_identity", type: "string", example: '4075224740324')]
+    public string $code_identity;
 
     #[OA\Property(property: "status", type: "string", example: "ACTIVE")]
     public string $status;

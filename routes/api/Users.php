@@ -21,6 +21,7 @@ Route::prefix('users')->group(function () {
     });
     
     // Controller user
+    Route::post('identityUserCode', [UserController::class, 'identityUserCode']);
     Route::post('identityUser', [UserController::class, 'identityUser']);
     Route::post('register', [UserController::class, 'registerUser']);
 });

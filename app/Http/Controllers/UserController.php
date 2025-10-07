@@ -13,6 +13,11 @@ use PragmaRX\Google2FA\Google2FA;
 use Illuminate\Support\Facades\DB;
 use App\Models\IdentityVerification;
 use Laravel\Sanctum\PersonalAccessToken;
+use App\Enums\UserStatus;
+use App\Http\Resources\UserResource;
+use App\Enums\VerificationStatus;
+
+use Faker\Factory;
 
 // notifications
 use App\Notifications\UserStatusAccountNotification;
@@ -87,6 +92,10 @@ class UserController extends Controller
                 return $this->apiResponse(false, 'El CURP ya está en uso.', null, null, 422);
             }
 
+            $faker = Factory::create();
+            $digits12 = implode('', $faker->randomElements(range('0', '9'), 12, true));
+            $checkDigit = User::calculateEan13CheckDigit($digits12);
+
             DB::beginTransaction();
 
             $user = User::create([
@@ -96,6 +105,7 @@ class UserController extends Controller
                 'phone' => $validateData['phone'],
                 'curp' => $validateData['curp'],
                 'password' => Hash::make($validateData['password']),
+                'code_identity' => $digits12 . $checkDigit,
                 'role_id' => Role::firstWhere('name', 'user')?->id,
                 'google2fa_secret' => (new Google2FA())->generateSecretKey(),
             ]);
@@ -103,7 +113,7 @@ class UserController extends Controller
 
             IdentityVerification::create([
                 'user_id' => $user->id,
-                'status' => IndentifyVerificationStatus::EMPTY->value,
+                'status' => VerificationStatus::EMPTY->value,
             ]);
 
             DB::commit();
@@ -172,6 +182,33 @@ class UserController extends Controller
 
             if (! $user) {
                 return $this->apiResponse(false, 'No se pudo identificar al usuario.', null, 'Usuario no encontrado.', 401);
+            }
+
+            if ($user->status !== UserStatus::ACTIVE) {
+                return $this->apiResponse(false, 'La cuenta del usuario no está activa.', null, 'Cuenta desactivada.', 403);
+            }
+
+            return $this->apiResponse(true, 'Se identifico al usuario exitosamente.', [
+                'user' => new UserResource($user),
+            ], null, 200);
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al identificar al usuario.', null, $e->getMessage(), 500);
+        }
+    }
+
+    public function identityUserCode(Request $request) 
+    {
+        try {
+            // token del usuario
+            $validateData = $request->validate([
+                'code' => 'required|string',
+            ]);
+
+            // buscamos el token
+            $user = User::where('code_identity', $validateData['code'])->first();
+
+            if (!$user) {
+                return $this->apiResponse(false, 'No se pudo identificar al usuario.', $validateData['code'], 'Usuario no encontrado.', 404);
             }
 
             if ($user->status !== UserStatus::ACTIVE) {
