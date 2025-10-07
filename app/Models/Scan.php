@@ -19,6 +19,7 @@ class Scan extends Model
         'material_type_id',
         'image',
         'is_valid',
+        'is_crushed',
         'points_awarded', // copia de material_type.points, para evitar problemas de integridad
         'scan_status',
         'description',
@@ -27,6 +28,7 @@ class Scan extends Model
 
     protected $casts = [
         'is_valid' => 'boolean',
+        'is_crushed' => 'boolean',
         'scan_status' => ScanStatus::class,
         'points_awarded' => 'integer',
         'scanned_at' => 'datetime',

@@ -10,6 +10,7 @@ Route::prefix('users')->group(function () {
         // Controller user
         Route::get('getAll', [UserController::class, 'getAll']);
         Route::post('toggleStatusAccount', [UserController::class, 'toggleStatusAccount']);
+        Route::post('identityUser', [UserController::class, 'identityUser']);
 
         // Controller IdentifyVerification
         Route::post('uploadDocuments', [IdentifyVerificationController::class, 'uploadDocuments']);

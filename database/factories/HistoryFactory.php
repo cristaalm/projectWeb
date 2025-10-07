@@ -7,6 +7,7 @@ use App\Models\MaterialTypes;
 use App\Models\Alliance;
 use App\Models\User;
 use App\Models\Reward;
+use App\Models\Scan;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class HistoryFactory extends Factory
@@ -20,6 +21,7 @@ class HistoryFactory extends Factory
         $alliance = null;
         $reward_id = null;
         $material_type = null;
+        $scan_id = null;
         $points = 0;
 
         if ( $type == 1 ) { // si es canjeo 
@@ -36,7 +38,13 @@ class HistoryFactory extends Factory
             $material_type = MaterialTypes::inRandomOrder()->where('points', '>', 0)->first()?->id
                 ?? MaterialTypes::factory()->create()->id;
 
-            $points = $this->faker->numberBetween(1, 100);
+                
+            $scan = Scan::where('material_type_id', $material_type)->inRandomOrder()->first()
+                ?? Scan::factory()->create();
+            
+            $points = $scan->points_awarded;
+            
+            $scan_id = $scan->id;
         }
 
         return [
@@ -49,6 +57,7 @@ class HistoryFactory extends Factory
             'material_type_id' => $material_type,
             'reward_id' => $reward_id,
             'points' => $points,
+            'scan_id' => $scan_id,
         ];
     }
 }

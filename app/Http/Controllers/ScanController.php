@@ -92,8 +92,6 @@ class ScanController extends Controller
 
             Storage::disk('public')->putFileAs($path, $image, $imageName);
 
-            DB::beginTransaction();
-
             $user->total_points += $points;
             $user->save();
 
@@ -110,9 +108,7 @@ class ScanController extends Controller
             ]);
 
             $history = new HistoryController();
-            $history->logHistory($validatedData['user_id'], null, $iaResult['tipo'], null, 2, $points);
-
-            DB::commit();
+            $history->logHistory($validatedData['user_id'], null, $iaResult['tipo'], null, 2, $scan->id, $points);
 
             $response = [
                 ...$iaResult,

@@ -34,7 +34,7 @@ class HistoryController extends Controller
                 }
             }
 
-            $histories = $historyQuery->with('alliance')->with('materialType')->with('reward')->where('user_id', $user_id)->paginate($perPage);
+            $histories = $historyQuery->with('alliance')->with('materialType')->with('reward')->with('scan')->where('user_id', $user_id)->paginate($perPage);
             // $data = $this->unsetDataPagination($histories);
             return $this->apiResponse(true, 'Historial obtenido exitosamente.', $histories, null, 200);
         } catch (\Exception $e) {
@@ -42,7 +42,7 @@ class HistoryController extends Controller
         }
     }
 
-    public function logHistory($user_id, $alliance_id, $material_type_id, $reward_id, $type_history, $points)
+    public function logHistory($user_id, $alliance_id, $material_type_id, $reward_id, $type_history, $scan_id, $points)
     {
 
         $request = new Request([
@@ -51,6 +51,7 @@ class HistoryController extends Controller
             'material_type_id' => $material_type_id,
             'reward_id' => $reward_id,
             'type_history' => $type_history,
+            'scan_id' => $scan_id,
             'points' => $points,
         ]);
 
@@ -61,6 +62,7 @@ class HistoryController extends Controller
                 'material_type_id' => 'nullable|exists:material_types,id',
                 'reward_id' => 'nullable|exists:rewards,id',
                 'type_history' => 'required|in:1,2',
+                'scan_id' => 'nullable|exists:scans,id',
                 'points' => 'required|numeric',
             ]);
 
@@ -68,6 +70,12 @@ class HistoryController extends Controller
             if ($request->type_history == 2 && $request->material_type_id == null ) {
                 throw ValidationException::withMessages([
                     'material_type_id' => 'El campo tipo de material es obligatorio.',
+                ]);
+            }
+
+            if ($request->type_history == 2 && $request->scan_id == null ) {
+                throw ValidationException::withMessages([
+                    'scan_id' => 'El campo escaneo es obligatorio.',
                 ]);
             }
 
@@ -84,6 +92,7 @@ class HistoryController extends Controller
                 'material_type_id' => $request->type_history == 2 ? $request->material_type_id : null,
                 'reward_id' => $request->type_history == 2 ? $request->reward_id : null,
                 'type_history' => $request->type_history,
+                'scan_id' => $request->scan_id,
                 'points' => $request->points,
             ]);
 

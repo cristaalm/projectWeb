@@ -15,6 +15,7 @@ return new class extends Migration
             $table->bigInteger('material_type_id')->unsigned();
             $table->string('image', 255);
             $table->boolean('is_valid')->default(false);
+            $table->boolean('is_crushed')->default(false);
             $table->integer('points_awarded')->default(0);
             $table->tinyInteger('scan_status')->default(0); // 0: pendiente, 1: aceptado, 2: rechazado
             $table->string('description', 255)->nullable();

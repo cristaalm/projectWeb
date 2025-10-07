@@ -15,6 +15,7 @@ class History extends Model
     protected $fillable = [
         'user_id',
         'type_history',
+        'scan_id',
         'material_type_id',
         'reward_id',
         'points',
@@ -23,6 +24,7 @@ class History extends Model
 
     protected $casts = [
         'type_history' => 'integer',
+        'scan_id' => 'integer',
         'points' => 'integer',
     ];
 
@@ -34,6 +36,11 @@ class History extends Model
     public function materialType(): BelongsTo
     {
         return $this->belongsTo(MaterialTypes::class);
+    }
+
+    public function scan(): BelongsTo
+    {
+        return $this->belongsTo(Scan::class);
     }
 
     public function reward(): BelongsTo
