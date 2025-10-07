@@ -151,8 +151,6 @@ class UserController extends Controller
     public function identityUser(Request $request)
     {
         try {
-            $authUser = $request->user();
-
             // token del usuario
             $validateData = $request->validate([
                 'token' => 'required|string',
