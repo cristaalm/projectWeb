@@ -17,8 +17,6 @@ use App\Enums\UserStatus;
 use App\Http\Resources\UserResource;
 use App\Enums\VerificationStatus;
 
-use Faker\Factory;
-
 // notifications
 use App\Notifications\UserStatusAccountNotification;
 
@@ -92,8 +90,7 @@ class UserController extends Controller
                 return $this->apiResponse(false, 'El CURP ya está en uso.', null, null, 422);
             }
 
-            $faker = Factory::create();
-            $digits12 = implode('', $faker->randomElements(range('0', '9'), 12, true));
+            $digits12 = str_pad(random_int(0, 999999999999), 12, '0', STR_PAD_LEFT);
             $checkDigit = User::calculateEan13CheckDigit($digits12);
 
             DB::beginTransaction();
