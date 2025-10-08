@@ -20,7 +20,8 @@ class RewardDocumentation
             new OA\Parameter(name: "query", in: "query", schema: new OA\Schema(type: "string"), description: "Búsqueda en nombre, descripción, código o nombre de alianza"),
             new OA\Parameter(name: "key", in: "query", schema: new OA\Schema(type: "string", enum: ["name", "description", "code", "status", "alliance.name"])),
             new OA\Parameter(name: "order", in: "query", schema: new OA\Schema(type: "string", enum: ["asc", "desc"], default: "asc")),
-            new OA\Parameter(name: "status", in: "query", schema: new OA\Schema(type: "integer", enum: [0, 1]), description: "1 = activo, 0 = inactivo")
+            new OA\Parameter(name: "status", in: "query", schema: new OA\Schema(type: "integer", enum: [0, 1]), description: "1 = activo, 0 = inactivo"),
+            new OA\Parameter(name: "alliance_id", in: "query", schema: new OA\Schema(type: "integer"), description: "ID de la alianza, en caso de ser nulo, se devolverán todas las recompensas sin filtro por alianza"),
         ],
         responses: [
             new OA\Response(

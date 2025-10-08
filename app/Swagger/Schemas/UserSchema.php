@@ -22,6 +22,9 @@ class UserSchema
     #[OA\Property(property: "phone", type: "string", example: "1234567890")]
     public string $phone;
 
+    #[OA\Property(property: "curp", type: "string", example: "CURP")]
+    public string $curp;
+
     #[OA\Property(property: "email_verified_at", type: "string", format: "date-time", example: "2025-04-01T10:00:00.000000Z")]
     public string $email_verified_at;
 

@@ -4628,6 +4628,14 @@
                                 1
                             ]
                         }
+                    },
+                    {
+                        "name": "alliance_id",
+                        "in": "query",
+                        "description": "ID de la alianza, en caso de ser nulo, se devolverán todas las recompensas sin filtro por alianza",
+                        "schema": {
+                            "type": "integer"
+                        }
                     }
                 ],
                 "responses": {
@@ -6898,6 +6906,11 @@
                                         "type": "string",
                                         "example": "+57 300 1234567"
                                     },
+                                    "curp": {
+                                        "description": "CURP del usuario",
+                                        "type": "string",
+                                        "example": "CURP"
+                                    },
                                     "password": {
                                         "description": "Contraseña (mínimo 8 caracteres)",
                                         "type": "string",
@@ -7769,6 +7782,10 @@
                     "phone": {
                         "type": "string",
                         "example": "1234567890"
+                    },
+                    "curp": {
+                        "type": "string",
+                        "example": "CURP"
                     },
                     "email_verified_at": {
                         "type": "string",

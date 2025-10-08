@@ -21,6 +21,7 @@ class RewardController extends Controller
             $key = $request->input('key');
             $order = strtolower($request->input('order', 'asc'));
             $status = $request->input('status');
+            $allianceId = $request->input('alliance_id');
 
             $rewardQuery = Reward::query();
 
@@ -37,6 +38,10 @@ class RewardController extends Controller
             
             if ($status != null && in_array($status, [0, 1])) {
                 $rewardQuery->where('is_active', $status);
+            }
+
+            if (!empty($allianceId)) {
+                $rewardQuery->where('alliance_id', $allianceId);
             }
             
             $allowedKeys = ['name', 'description', 'code', 'status', 'alliance.name'];

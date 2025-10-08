@@ -281,6 +281,7 @@ class UsersDocumentation
                     new OA\Property(property: "last_name", type: "string", example: "Pérez", description: "Apellido del usuario"),
                     new OA\Property(property: "email", type: "string", format: "email", example: "juan.perez@example.com", description: "Correo electrónico único"),
                     new OA\Property(property: "phone", type: "string", example: "+57 300 1234567", description: "Número de teléfono único"),
+                    new OA\Property(property: "curp", type: "string", example: "CURP", description: "CURP del usuario"),
                     new OA\Property(property: "password", type: "string", example: "password123", description: "Contraseña (mínimo 8 caracteres)"),
                     new OA\Property(property: "password_confirmation", type: "string", example: "password123", description: "Confirmación de la contraseña"),
                 ]
