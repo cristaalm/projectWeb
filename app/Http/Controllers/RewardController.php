@@ -56,8 +56,7 @@ class RewardController extends Controller
             }
             
             $rewards = $rewardQuery->paginate($perPage);
-            $data = $this->unsetDataPagination($rewards);
-            return $this->apiResponse(true, 'Recompensas obtenidos exitosamente.', $data, null, 200);
+            return $this->apiResponse(true, 'Recompensas obtenidos exitosamente.', $rewards, null, 200);
         } catch (\Exception $e) {
             return $this->apiResponse(false, 'Error al obtener las recompensas.', null, $e->getMessage(), 500);
         }

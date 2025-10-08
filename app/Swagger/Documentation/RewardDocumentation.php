@@ -30,7 +30,7 @@ class RewardDocumentation
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "success", type: "boolean", example: true),
-                        new OA\Property(property: "message", type: "string", example: "Comercios obtenidos exitosamente."),
+                        new OA\Property(property: "message", type: "string", example: "Recompensas obtenidas exitosamente."),
                         new OA\Property(
                             property: "data",
                             properties: [
@@ -61,7 +61,7 @@ class RewardDocumentation
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Error al obtener los comercios."),
+                        new OA\Property(property: "message", type: "string", example: "Error al obtener las recompensas."),
                         new OA\Property(property: "data", type: "null"),
                         new OA\Property(property: "error", type: "string", example: "Detalles del error interno..."),
                         new OA\Property(property: "status", type: "integer", example: 500)

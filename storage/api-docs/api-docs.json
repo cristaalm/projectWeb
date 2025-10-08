@@ -4651,7 +4651,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Comercios obtenidos exitosamente."
+                                            "example": "Recompensas obtenidas exitosamente."
                                         },
                                         "data": {
                                             "properties": {
