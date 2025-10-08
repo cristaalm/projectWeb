@@ -296,7 +296,12 @@ class UsersDocumentation
                     properties: [
                         new OA\Property(property: "success", type: "boolean", example: true),
                         new OA\Property(property: "message", type: "string", example: "Usuario registrado exitosamente."),
-                        new OA\Property(property: "data", ref: "#/components/schemas/User"),
+                        new OA\Property(property: "data", properties: [
+                            new OA\Property(property: "access_token", type: "string", example: "1|abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"),
+                            new OA\Property(property: "token_type", type: "string", example: "Bearer"),
+                            new OA\Property(property: "expires_at", type: "string", format: "date-time", example: "2025-12-31T23:59:59.000000Z"),
+                            new OA\Property(property: "user", type: "array", items: new OA\Items(ref: "#/components/schemas/User")),
+                        ]),
                         new OA\Property(property: "errors", type: "null", example: null),
                         new OA\Property(property: "status", type: "integer", example: 200),
                     ]

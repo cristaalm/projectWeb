@@ -20,6 +20,7 @@ use App\Models\IdentityVerification;
 use App\Http\Resources\UserResource;
 use App\Enums\UserStatus;
 use App\Enums\VerificationStatus;
+use Jenssegers\Agent\Agent;
 
 class AuthController extends Controller
 {
@@ -68,6 +69,13 @@ class AuthController extends Controller
     {
         try {
             // Validar credenciales y remember_me
+            $agent = new Agent();
+            $agent->setUserAgent($request->userAgent());
+            $agent->setHttpHeaders($request->headers->all());
+
+            $isPhone = $agent->isPhone();
+            $isDesktop = $agent->isDesktop();
+
             $request->validate([
                 'email' => 'required|email|exists:users,email',
                 'password' => 'required|string',
@@ -102,6 +110,13 @@ class AuthController extends Controller
 
             // Cargar relaciones
             $user->load('role');
+
+            $webAccept = ['admin', 'moderator'];
+
+            // vereificamos si $user->role->name esta dentro de webAccept
+            if (!in_array($user->role->name, $webAccept) && !$isPhone) {
+                return $this->apiResponse(false, 'No tienes permiso, para acceder al sistema.', null, null, 403);
+            }
 
             // Generar token SIN abilities
             $token = $user->createToken(

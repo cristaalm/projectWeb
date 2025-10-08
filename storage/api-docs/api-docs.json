@@ -4725,7 +4725,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Error al obtener los comercios."
+                                            "example": "Error al obtener las recompensas."
                                         },
                                         "data": {
                                             "type": "null"
@@ -6943,7 +6943,28 @@
                                             "example": "Usuario registrado exitosamente."
                                         },
                                         "data": {
-                                            "$ref": "#/components/schemas/User"
+                                            "properties": {
+                                                "access_token": {
+                                                    "type": "string",
+                                                    "example": "1|abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+                                                },
+                                                "token_type": {
+                                                    "type": "string",
+                                                    "example": "Bearer"
+                                                },
+                                                "expires_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-12-31T23:59:59.000000Z"
+                                                },
+                                                "user": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/User"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
                                         },
                                         "errors": {
                                             "type": "null",

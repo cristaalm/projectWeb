@@ -31,7 +31,7 @@ const headers = [
   { title: 'Email', align: 'start', key: 'email' },
   { title: 'Puntos', align: 'start', key: 'total_points' },
   { title: 'Verificación', align: 'center', key: 'verification_status', sortable: false },
-  { title: 'Tipo', align: 'start', key: 'role.name', sortable: false },
+  { title: 'Tipo', align: 'start', key: 'role.display_name', sortable: false },
   { title: 'Estado', key: 'status', align: 'center', sortable: false },
   { title: 'Registro', key: 'created_at', align: 'center' },
   { title: '', key: 'actions', sortable: false, align: 'end' },

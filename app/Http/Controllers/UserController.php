@@ -18,6 +18,7 @@ use App\Enums\UserStatus;
 use App\Http\Resources\UserResource;
 use App\Enums\VerificationStatus;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 // notifications
 use App\Notifications\UserStatusAccountNotification;
@@ -45,7 +46,7 @@ class UserController extends Controller
                       ->orWhere('total_points', 'like', '%' . $query . '%')
                       ->orWhere('id', 'like', '%' . $query . '%')
                       ->orWhereHas('role', function ($subQ) use ($query) {
-                          $subQ->where('name', 'like', '%' . $query . '%');
+                          $subQ->where('display_name', 'like', '%' . $query . '%');
                       });
                 });
             }
@@ -108,6 +109,7 @@ class UserController extends Controller
                 'role_id' => Role::firstWhere('name', 'user')?->id,
                 'google2fa_secret' => (new Google2FA())->generateSecretKey(),
             ]);
+
             $user->save();
 
             IdentityVerification::create([
@@ -117,7 +119,26 @@ class UserController extends Controller
 
             DB::commit();
 
-            return $this->apiResponse(true, 'Usuario registrado exitosamente.', $user, null, 200);
+            // generamos un token para el usuario
+
+            $rememberMinutes = config('auth.tokens.remember_expiration', 525600); // 30 días
+
+            $expiresAt = Carbon::now()->addMinutes($rememberMinutes);
+
+            $user->load('role');
+
+            // Generar token SIN abilities
+            $token = $user->createToken(
+                'auth-token',
+                expiresAt: $expiresAt // Laravel 10+ soportar named params
+            );
+
+            return $this->apiResponse(true, 'Usuario registrado exitosamente.', [
+                'access_token' => $token->plainTextToken,
+                'token_type' => 'Bearer',
+                'expires_at' => $expiresAt,
+                'user' => new UserResource($user),
+            ], null, 200);
         } catch (ValidationException $e) {
             DB::rollBack();
             return $this->apiResponse(false, 'Error al registrar el usuario.', null, $e->errors(), 422);
