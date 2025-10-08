@@ -16,6 +16,7 @@ use Laravel\Sanctum\PersonalAccessToken;
 use App\Enums\UserStatus;
 use App\Http\Resources\UserResource;
 use App\Enums\VerificationStatus;
+use Illuminate\Support\Facades\Hash;
 
 // notifications
 use App\Notifications\UserStatusAccountNotification;
