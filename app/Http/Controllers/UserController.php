@@ -8,6 +8,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Support\Facades\Log;
 use PragmaRX\Google2FA\Google2FA;
 use Illuminate\Support\Facades\DB;
