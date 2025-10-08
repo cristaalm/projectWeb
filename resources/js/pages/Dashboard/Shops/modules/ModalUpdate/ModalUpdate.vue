@@ -40,10 +40,10 @@ watch(isOpen, val => {
   emit('update:modelValue', val)
 })
 
-const handleSaveShop = () => {
+const handleSaveShop = async () => {
   if (!formValidate.value) return
 
-  const result = updateShop()
+  const result = await updateShop()
 
   if (!result) return
 

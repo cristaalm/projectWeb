@@ -9,7 +9,7 @@ use App\Models\Reward;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
-use App\Models\RewardUser;
+use App\Models\RewardsUser;
 use App\Models\User;
 use App\Enums\VerificationStatus;
 use App\Enums\UserStatus;
@@ -55,7 +55,7 @@ class RewardUserController extends Controller
 
             DB::beginTransaction();
 
-            $rewardUser = RewardUser::create([
+            $rewardUser = RewardsUser::create([
                 'user_id' => $user->id,
                 'reward_id' => $reward->id,
             ]);
