@@ -47,7 +47,7 @@ watch(isOpen, val => {
 
       <VCardText class="!p-0 max-h-none">
         <ViewPDF
-          src="/docs/Condiciones y terminos de uso.pdf"
+          src="/documents/Condiciones y terminos de uso.pdf"
           class="[&_div.pdf-vue3-scroller]:max-h-[730px!important]"
           @on-progress="(e) => console.log(e)"
         />

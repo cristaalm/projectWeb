@@ -104,9 +104,14 @@ class AuthController extends Controller
             $defaultMinutes = config('auth.tokens.default_expiration', 720);      // 1 hora
             $rememberMinutes = config('auth.tokens.remember_expiration', 525600); // 30 días
 
-            $expiresAt = $request->remember_me
-                ? Carbon::now()->addMinutes($rememberMinutes)
-                : Carbon::now()->addMinutes($defaultMinutes);
+            $expiresAt = 0;
+            
+            if ($request->remember) {
+                $expiresAt = Carbon::now()->addMinutes(config('tokens.remember_expiration_minutes'));
+            } else {
+                $expiresAt = Carbon::now()->addMinutes(config('tokens.default_expiration_minutes'));
+            }
+
 
             // Cargar relaciones
             $user->load('role');
