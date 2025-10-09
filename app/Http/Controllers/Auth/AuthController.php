@@ -112,12 +112,13 @@ class AuthController extends Controller
             $user->load('role');
 
             $webAccept = ['admin', 'moderator'];
+            $mobileAccept = ['user','comerciante', 'admin', 'moderator'];
 
             // vereificamos si $user->role->name esta dentro de webAccept
-            if (!in_array($user->role->name, $webAccept) && !$isPhone) {
+            if ($isDesktop && !in_array($user->role->name, $webAccept)) {
                 return $this->apiResponse(false, 'No tienes permiso, para acceder al sistema.', null, null, 403);
             }
-
+            
             // Generar token SIN abilities
             $token = $user->createToken(
                 'auth-token',
