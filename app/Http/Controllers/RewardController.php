@@ -15,13 +15,20 @@ class RewardController extends Controller
     public function getAll(Request $request)
     {
         try {
-            $perPage = (int) $request->input('per_page', 10);
+            $normalize = function ($value) {
+                if (is_string($value) && strtolower($value) === 'null') {
+                    return null;
+                }
+                return $value;
+            };
+    
+            $perPage = (int) ($normalize($request->input('per_page')) ?? 10);
             $perPage = max(1, min($perPage, 100));
-            $query = $request->input('query', '');
-            $key = $request->input('key');
-            $order = strtolower($request->input('order', 'asc'));
-            $status = $request->input('status');
-            $allianceId = $request->input('alliance_id');
+            $query = $normalize($request->input('query')) ?? '';
+            $key = $normalize($request->input('key')) ?? 'updated_at';
+            $order = strtolower($normalize($request->input('order')) ?? 'desc');
+            $status = $normalize($request->input('status'));
+            $allianceId = $normalize($request->input('alliance_id'));
 
             $rewardQuery = Reward::query();
 
@@ -44,7 +51,7 @@ class RewardController extends Controller
                 $rewardQuery->where('alliance_id', $allianceId);
             }
             
-            $allowedKeys = ['name', 'description', 'code', 'status', 'alliance.name'];
+            $allowedKeys = ['name', 'description', 'code', 'status', 'alliance.name', 'updated_at'];
             
             if (in_array($key, $allowedKeys) && in_array($order, ['asc', 'desc'])) {
                 if ($key === 'alliance.name') {

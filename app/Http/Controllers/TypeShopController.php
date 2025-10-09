@@ -15,11 +15,18 @@ class TypeShopController extends Controller
     public function getAll(Request $request)
     {
         try {
-            $perPage = (int) $request->input('per_page', 10);
+            $normalize = function ($value) {
+                if (is_string($value) && strtolower($value) === 'null') {
+                    return null;
+                }
+                return $value;
+            };
+    
+            $perPage = (int) ($normalize($request->input('per_page')) ?? 10);
             $perPage = max(1, min($perPage, 100));
-            $query = $request->input('query', '');
-            $key = $request->input('key');
-            $order = strtolower($request->input('order', 'asc'));
+            $query = $normalize($request->input('query')) ?? '';
+            $key = $normalize($request->input('key')) ?? 'updated_at';
+            $order = strtolower($normalize($request->input('order')) ?? 'desc');
 
             $typeShopQuery = TypeShop::query();
 
@@ -29,7 +36,7 @@ class TypeShopController extends Controller
                 });
             }
 
-            $allowedKeys = ['name'];
+            $allowedKeys = ['name', 'updated_at'];
             if (in_array($key, $allowedKeys) && in_array($order, ['asc', 'desc'])) {
                 $typeShopQuery->orderBy($key, $order);
             }

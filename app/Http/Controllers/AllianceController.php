@@ -8,45 +8,56 @@ use Illuminate\Validation\ValidationException;
 use App\Models\Alliance;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class AllianceController extends Controller
 {
     public function getAll(Request $request)
     {
         try {
-            $perPage = (int) $request->input('per_page', 10);
+            $normalize = function ($value) {
+                if (is_string($value) && strtolower($value) === 'null') {
+                    return null;
+                }
+                return $value;
+            };
+            
+            $key = $normalize($request->input('key')) ?? 'updated_at';
+            $order = strtolower($normalize($request->input('order')) ?? 'desc');
+            $perPage = (int) ($normalize($request->input('per_page')) ?? 10);
             $perPage = max(1, min($perPage, 100));
-            $query = $request->input('query', '');
-            $key = $request->input('key');
-            $order = strtolower($request->input('order', 'asc'));
-            $status = $request->input('status');
+            $query = $normalize($request->input('query')) ?? '';
+            $status = $normalize($request->input('status'));
 
             $allianceQuery = Alliance::query();
 
             if (!empty($query)) {
                 $allianceQuery->where(function ($q) use ($query) {
                     $q->where('name', 'like', '%' . $query . '%')
-                      ->orWhere('contact_name', 'like', '%' . $query . '%')
-                      ->orWhere('contact_email', 'like', '%' . $query . '%')
-                      ->orWhere('phone', 'like', '%' . $query . '%')
-                      ->orWhere('address', 'like', '%' . $query . '%')
-                      ->orWhereHas('typeShop', function ($subQ) use ($query) {
-                          $subQ->where('name', 'like', '%' . $query . '%');
-                      });
+                    ->orWhere('contact_name', 'like', '%' . $query . '%')
+                    ->orWhere('contact_email', 'like', '%' . $query . '%')
+                    ->orWhere('phone', 'like', '%' . $query . '%')
+                    ->orWhere('address', 'like', '%' . $query . '%')
+                    ->orWhereHas('typeShop', function ($subQ) use ($query) {
+                        $subQ->where('name', 'like', '%' . $query . '%');
+                    });
                 });
             }
 
-            if (in_array($status, [0, 1])) {
+            if (in_array($status, [0, 1], true)) {
                 $allianceQuery->where('status', $status);
             }
 
-            $allowedKeys = ['name', 'contact_name', 'contact_email', 'phone', 'address', 'status', 'type_shop.name'];
+            $allowedKeys = ['name', 'contact_name', 'contact_email', 'phone', 'address', 'status', 'type_shop.name', 'updated_at'];
 
-            if (in_array($key, $allowedKeys) && in_array($order, ['asc', 'desc'])) {
+            $validKey = $key !== null && in_array($key, $allowedKeys);
+            $validOrder = $order !== null && in_array(strtolower($order), ['asc', 'desc']);
+
+            if ($validKey && $validOrder) {
+                $order = strtolower($order);
                 if ($key === 'type_shop.name') {
-                    // Hacemos join solo si se ordena por nombre de categoría
                     $allianceQuery->join('type_shop', 'alliances.type_shop_id', '=', 'type_shop.id')
-                                  ->orderBy('type_shop.name', $order);
+                                ->orderBy('type_shop.name', $order);
                 } else {
                     $allianceQuery->orderBy($key, $order);
                 }

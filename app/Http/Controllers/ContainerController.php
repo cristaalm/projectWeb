@@ -14,12 +14,19 @@ class ContainerController extends Controller
     public function getAll(Request $request)
     {
         try {
-            $perPage = (int) $request->input('per_page', 10);
+            $normalize = function ($value) {
+                if (is_string($value) && strtolower($value) === 'null') {
+                    return null;
+                }
+                return $value;
+            };
+    
+            $perPage = (int) ($normalize($request->input('per_page')) ?? 10);
             $perPage = max(1, min($perPage, 100));
-            $query = $request->input('query', '');
-            $key = $request->input('key');
-            $order = strtolower($request->input('order', 'asc'));
-            $status = $request->input('status');
+            $query = $normalize($request->input('query')) ?? '';
+            $key = $normalize($request->input('key')) ?? 'updated_at';
+            $order = strtolower($normalize($request->input('order')) ?? 'desc');
+            $status = $normalize($request->input('status'));
 
             $containerQuery = Container::query();
 
@@ -31,13 +38,13 @@ class ContainerController extends Controller
                 });
             }
 
-            if (in_array($status, [0, 1])) {
+            if ($status != null && in_array($status, [0, 1])) {
                 $containerQuery->where('status', $status);
             }
 
-            $allowedKeys = ['serial_number', 'location', 'status'];
+            $allowedKeys = ['serial_number', 'location', 'status', 'updated_at'];
 
-            if (in_array($key, $allowedKeys) && in_array($order, ['asc', 'desc'])) {
+            if ($key != null && in_array($key, $allowedKeys) && in_array($order, ['asc', 'desc'])) {
                 $containerQuery->orderBy($key, $order);
             }
 

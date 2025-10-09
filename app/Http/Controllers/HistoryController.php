@@ -14,15 +14,22 @@ class HistoryController extends Controller
     public function getAll(Request $request)
     {
         try {
-            $perPage = (int) $request->input('per_page', 10);
+            $normalize = function ($value) {
+                if (is_string($value) && strtolower($value) === 'null') {
+                    return null;
+                }
+                return $value;
+            };
+    
+            $perPage = (int) ($normalize($request->input('per_page')) ?? 10);
             $perPage = max(1, min($perPage, 100));
-            $key = $request->input('key');
-            $order = strtolower($request->input('order', 'asc'));
+            $key = $normalize($request->input('key')) ?? 'created_at';
+            $order = strtolower($normalize($request->input('order')) ?? 'desc');
             $user_id = $request->user()->id;
             
             $historyQuery = History::query();
             
-            $allowedKeys = ['material_types.name', 'created_at'];
+            $allowedKeys = ['material_types.name', 'created_at', 'created_at'];
             
             if (in_array($key, $allowedKeys) && in_array($order, ['asc', 'desc'])) {
                 if ($key === 'material_types.name') {
