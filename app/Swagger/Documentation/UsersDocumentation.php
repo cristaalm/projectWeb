@@ -28,7 +28,7 @@ namespace App\Swagger\Documentation;
 use OpenApi\Attributes as OA;
 
 use App\Swagger\Schemas\UserSchema;
-
+use App\Swagger\Schemas\IdentityVerificationSchema;
 
 #[OA\Tag(name: 'Usuarios', description: 'Endpoints para gestión de usuarios')]
 class UsersDocumentation
@@ -359,6 +359,7 @@ class UsersDocumentation
                 required: ["token"],
                 properties: [
                     new OA\Property(property: "token", type: "string", example: "1|as87cwe4t98wea5a91sda65sd1va6sd74n2ta98waw56", description: "Token de sesión"),
+                    new OA\Property(property: "with_identity", type: "boolean", example: false, description: "Indica si se desea obtener la información de la verificación de identidad"),
                 ]
             )
         ),
@@ -373,6 +374,7 @@ class UsersDocumentation
                         new OA\Property(property: "message", type: "string", example: "Usuario identificado exitosamente."),
                         new OA\Property(property: "data", properties: [
                             new OA\Property(property: "user", ref: "#/components/schemas/User"),
+                            new OA\Property(property: "identityVerification", ref: "#/components/schemas/IdentityVerification"),
                         ]),
                         new OA\Property(property: "errors", type: "null", example: null),
                         new OA\Property(property: "status", type: "integer", example: 200),

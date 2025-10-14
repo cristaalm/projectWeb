@@ -191,6 +191,7 @@ class UserController extends Controller
             // token del usuario
             $validateData = $request->validate([
                 'token' => 'required|string',
+                'with_identity' => 'nullable|boolean',
             ]);
 
             // buscamos el token
@@ -215,8 +216,13 @@ class UserController extends Controller
                 return $this->apiResponse(false, 'La cuenta del usuario no está activa.', null, 'Cuenta desactivada.', 403);
             }
 
+            if ($validateData['with_identity']) {
+                $user->load('identityVerification');
+            }
+
             return $this->apiResponse(true, 'Se identifico al usuario exitosamente.', [
                 'user' => new UserResource($user),
+                'identityVerification' => $validateData['with_identity'] ? $user->identityVerification : null,
             ], null, 200);
         } catch (\Exception $e) {
             return $this->apiResponse(false, 'Error al identificar al usuario.', null, $e->getMessage(), 500);

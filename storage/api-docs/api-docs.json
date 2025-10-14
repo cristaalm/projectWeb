@@ -7095,6 +7095,11 @@
                                         "description": "Token de sesión",
                                         "type": "string",
                                         "example": "1|as87cwe4t98wea5a91sda65sd1va6sd74n2ta98waw56"
+                                    },
+                                    "with_identity": {
+                                        "description": "Indica si se desea obtener la información de la verificación de identidad",
+                                        "type": "boolean",
+                                        "example": false
                                     }
                                 },
                                 "type": "object"
@@ -7121,6 +7126,9 @@
                                             "properties": {
                                                 "user": {
                                                     "$ref": "#/components/schemas/User"
+                                                },
+                                                "identityVerification": {
+                                                    "$ref": "#/components/schemas/IdentityVerification"
                                                 }
                                             },
                                             "type": "object"
