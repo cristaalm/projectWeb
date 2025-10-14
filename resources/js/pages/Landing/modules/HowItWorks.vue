@@ -57,7 +57,7 @@ const steps = [
   {
     icon: 'mdi mdi-camera',
     title: 'Deposita tus materiales',
-    description: 'Coloca tus botellas de plástico o latas de aluminio. Nuestra IA las identifica automáticamente.',
+    description: 'Coloca tus botellas de plástico o latas de aluminio. Nuestro contenedor inteligente las identificará automáticamente.',
   },
   {
     icon: 'mdi mdi-gift',
