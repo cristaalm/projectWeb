@@ -1,8 +1,12 @@
+import '@fortawesome/fontawesome-free/css/all.css'
 import checkboxChecked from '@images/svg/checkbox-checked.svg'
 import checkboxIndeterminate from '@images/svg/checkbox-indeterminate.svg'
 import checkboxUnchecked from '@images/svg/checkbox-unchecked.svg'
 import radioChecked from '@images/svg/radio-checked.svg'
 import radioUnchecked from '@images/svg/radio-unchecked.svg'
+import '@mdi/font/css/materialdesignicons.css'
+import { fa, aliases as faAliases } from 'vuetify/iconsets/fa'
+import { mdi, aliases as mdiAliases } from 'vuetify/iconsets/mdi'
 
 const customIcons = {
   'mdi-checkbox-blank-outline': checkboxUnchecked,
@@ -70,8 +74,15 @@ export const iconify = {
 }
 export const icons = {
   defaultSet: 'iconify',
-  aliases,
+  aliases: {
+    ...aliases,
+    ...mdiAliases,
+    ...faAliases,
+  },
   sets: {
     iconify,
+    mdi,
+    fa,
   },
 }
+

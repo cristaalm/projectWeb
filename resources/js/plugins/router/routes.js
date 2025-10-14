@@ -1,5 +1,5 @@
 export const routes = [
-  { path: '/', redirect: { name: 'login' } },
+  { path: '/', component: () => import('@/pages/Landing') },
   {
     path: '/',
     component: () => import('@/layouts/default.vue'),

@@ -27,6 +27,11 @@ export function useThemeSwitcher() {
     darkModeStore.setDarkMode(false)
   }
 
+  function changeThemeToLight() {
+    globalTheme.name.value = 'light'
+    darkModeStore.setDarkMode(false)
+  }
+
   const darkMode = computed({
     get: () => darkModeStore.darkMode,
     set: value => darkModeStore.setDarkMode(value),
@@ -47,6 +52,7 @@ export function useThemeSwitcher() {
   return {
     themeName,
     changeTheme,
+    changeThemeToLight,
     darkMode,
     globalTheme,
     logoutMode,

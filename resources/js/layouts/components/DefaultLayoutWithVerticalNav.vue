@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/auth'
 import VerticalNavLayout from '@layouts/components/VerticalNavLayout.vue'
 import { useRouter } from 'vue-router'
 import { useTheme } from 'vuetify'
+import { getHours } from 'date-fns'
 
 const {
   name: themeName,
@@ -14,6 +15,14 @@ const {
 
 const authStore = useAuthStore()
 const router = useRouter()
+
+const greeting = computed(() => {
+  const hour = getHours(new Date())
+  if (hour >= 5 && hour < 12) return 'Buenos días'
+  if (hour >= 12 && hour < 19) return 'Buenas tardes'
+  
+  return 'Buenas noches'
+})
 
 const goToHome = () => {
   router.push({ name: 'panel' })
@@ -34,8 +43,8 @@ const goToHome = () => {
         </IconBtn>
 
         <!-- texto decorativo de bienvenida junto con el nombre -->
-        <span class="text-xl font-bold text-capitalize">
-          Bienvenido {{ authStore.user?.name ?? '' }}
+        <span class="text-xl font-bold">
+          {{ greeting }} {{ authStore.user?.name ?? '' }}
           <span class="hidden md:inline">
             {{ authStore.user?.last_name ?? '' }}
           </span>
