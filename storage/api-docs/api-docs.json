@@ -3225,6 +3225,192 @@
                 ]
             }
         },
+        "/api/dash/getStats": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Obtener estadísticas generales del sistema",
+                "description": "Devuelve métricas clave del sistema: total de usuarios activos, puntos acumulados, escaneos realizados y recompensas canjeadas, comparadas con el mes anterior.",
+                "operationId": "cba915f422995c6b3c40ea97eb6adb16",
+                "responses": {
+                    "200": {
+                        "description": "Estadísticas obtenidas correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Dashboard obtenido exitosamente."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "users": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 1250
+                                                        },
+                                                        "lastMonthTotal": {
+                                                            "type": "integer",
+                                                            "example": 1100
+                                                        },
+                                                        "growthPercentage": {
+                                                            "type": "number",
+                                                            "format": "float",
+                                                            "example": 13.6400000000000005684341886080801486968994140625
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "totalPoints": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 25000
+                                                        },
+                                                        "lastMonthTotal": {
+                                                            "type": "integer",
+                                                            "example": 22000
+                                                        },
+                                                        "growthPercentage": {
+                                                            "type": "number",
+                                                            "format": "float",
+                                                            "example": 13.6400000000000005684341886080801486968994140625
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "totalScans": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 8500
+                                                        },
+                                                        "lastMonthTotal": {
+                                                            "type": "integer",
+                                                            "example": 7800
+                                                        },
+                                                        "growthPercentage": {
+                                                            "type": "number",
+                                                            "format": "float",
+                                                            "example": 8.9700000000000006394884621840901672840118408203125
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "totalRewards": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 320
+                                                        },
+                                                        "lastMonthTotal": {
+                                                            "type": "integer",
+                                                            "example": 290
+                                                        },
+                                                        "growthPercentage": {
+                                                            "type": "number",
+                                                            "format": "float",
+                                                            "example": 10.339999999999999857891452847979962825775146484375
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token de autenticación no válido o no proporcionado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de autenticación no proporcionado."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado al obtener las estadísticas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al obtener el dashboard."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/history/getAll": {
             "get": {
                 "tags": [
@@ -7880,6 +8066,10 @@
         {
             "name": "Contenedores",
             "description": "Endpoints para gestión de contenedores"
+        },
+        {
+            "name": "Dashboard",
+            "description": "Endpoints para gestión de dashboard"
         },
         {
             "name": "Historial",

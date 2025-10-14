@@ -1,7 +1,7 @@
 <script setup>
-import DevelopModule from '@/components/developModule/'
+import CardsTop from './modules/cardsTop.vue'
 </script>
 
 <template>
-  <DevelopModule title="Panel" />
+  <CardsTop />
 </template>
