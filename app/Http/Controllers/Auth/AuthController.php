@@ -65,6 +65,71 @@ class AuthController extends Controller
         return $this->apiResponse(true, 'Sesión cerrada correctamente.', null, null, 200);
     }
 
+    public function generateToken(Request $request)
+    {
+        try {
+
+            $request->validate([
+                'email' => 'required|email|exists:users,email',
+                'password' => 'required|string',
+                'remember_me' => 'boolean',
+            ]);
+            
+            // Buscar usuario
+            $user = User::where('email', $request->email)->first();
+            
+            // Validar credenciales
+            if (! $user || ! Hash::check($request->password, $user->password)) {
+                return $this->apiResponse(false, 'Correo electrónico o contraseña incorrectos.', null, null, 401);
+            }
+
+            // Verificar estado del usuario
+            if ($user->status !== UserStatus::ACTIVE) {
+                return $this->apiResponse(false, 'Tu cuenta ha sido desactivada por un administrador.', null, null, 403);
+            }
+
+            // Verificar rol activo
+            if (! $user->role || ! $user->role->is_active) {
+                return $this->apiResponse(false, 'Tu cuenta no tiene permiso para acceder al sistema.', null, null, 403);
+            }
+
+            // Configurar expiración según remember_me
+            $defaultMinutes = config('auth.tokens.default_expiration', 720);      // 1 hora
+            $rememberMinutes = config('auth.tokens.remember_expiration', 525600); // 30 días
+
+            $expiresAt = 0;
+            
+            if ($request->remember) {
+                $expiresAt = Carbon::now()->addMinutes(config('tokens.remember_expiration_minutes'));
+            } else {
+                $expiresAt = Carbon::now()->addMinutes(config('tokens.default_expiration_minutes'));
+            }
+
+
+            // Cargar relaciones
+            $user->load('role');
+
+            // Generar token SIN abilities
+            $token = $user->createToken(
+                'auth-token',
+                expiresAt: $expiresAt // Laravel 10+ soportar named params
+            );
+
+            return $this->apiResponse(true, 'Inicio de sesión exitoso.', [
+                'access_token' => $token->plainTextToken,
+                'token_type' => 'Bearer',
+                'expires_at' => $expiresAt,
+                'user' => new UserResource($user),
+            ], null, 200);
+
+        } catch (ValidationException $e) {
+            return $this->apiResponse(false, 'Correo electrónico o contraseña incorrectos.', null, $e->errors(), 422);
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Ocurrió un error inesperado al intentar iniciar sesión.', null, $e->getMessage(), 500);
+        }
+    }
+
+
     public function login(Request $request)
     {
         try {

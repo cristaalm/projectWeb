@@ -142,6 +142,103 @@ class AuthDocumentation
     public function logout() {}
 
     #[OA\Post(
+        path: "/api/auth/generateToken",
+        tags: ["Autenticación"],
+        summary: "Generar token de sesión",
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["email", "password"],
+                properties: [
+                    new OA\Property(property: "email", type: "string", example: "test@example.com"),
+                    new OA\Property(property: "password", type: "string", example: "12345678"),
+                    new OA\Property(property: "remember_me", type: "boolean", example: true),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Inicio de sesión exitoso",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Inicio de sesión exitoso."),
+                        new OA\Property(property: "data", properties: [
+                            new OA\Property(property: "access_token", type: "string", example: "1|abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"),
+                            new OA\Property(property: "token_type", type: "string", example: "Bearer"),
+                            new OA\Property(property: "expires_at", type: "string", format: "date-time", example: "2025-12-31T23:59:59.000000Z"),
+                            new OA\Property(property: "user", type: "array", items: new OA\Items(ref: "#/components/schemas/User")),
+                        ]),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: "Credenciales inválidas",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Correo electrónico o contraseña incorrectos."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 401),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 403,
+                description: "Cuenta desactivada o sin permisos",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Tu cuenta ha sido desactivada por un administrador."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 403),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: "Error de validación",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Correo electrónico o contraseña incorrectos."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", properties: [
+                            new OA\Property(property: "email", type: "array", items: new OA\Items(type: "string", example: "The selected email is invalid.")),
+                        ]),
+                        new OA\Property(property: "status", type: "integer", example: 422),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Ocurrió un error inesperado al intentar iniciar sesión."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function generateToken() {}
+
+    #[OA\Post(
         path: "/api/auth/login",
         tags: ["Autenticación"],
         summary: "Iniciar sesión",
