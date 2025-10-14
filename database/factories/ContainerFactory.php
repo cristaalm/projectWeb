@@ -19,6 +19,7 @@ class ContainerFactory extends Factory
             'location' => $this->faker->address(),
             'latitude' => $this->faker->latitude(),
             'longitude' => $this->faker->longitude(),
+            'capacity' => $this->faker->numberBetween(1, 100),
             'status' => $this->faker->randomElement([
                 ContainerStatus::ACTIVE,
                 ContainerStatus::INACTIVE,

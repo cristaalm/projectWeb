@@ -109,6 +109,14 @@ class UserSeeder extends Seeder
         }
 
         // Usuarios normales
+        $users[] = User::factory(10)
+            ->state([
+                'role_id' => $comercianteRole->id,
+                'status' => UserStatus::ACTIVE->value,
+                'verification_status' => VerificationStatus::APPROVED->value,
+            ])
+            ->create();
+
         $users[] = User::factory(25)
             ->state([
                 'status' => UserStatus::ACTIVE->value,
@@ -116,21 +124,21 @@ class UserSeeder extends Seeder
             ])
             ->create();
 
-            $users[] = User::factory(25)
+        $users[] = User::factory(25)
             ->state([
                 'status' => UserStatus::ACTIVE->value,
                 'verification_status' => VerificationStatus::APPROVED->value,
             ])
             ->create();
 
-            $users[] = User::factory(25)
+        $users[] = User::factory(25)
             ->state([
                 'status' => UserStatus::ACTIVE->value,
                 'verification_status' => VerificationStatus::REJECTED->value,
             ])
             ->create();
 
-            $users[] = User::factory(25)
+        $users[] = User::factory(25)
             ->state([
                 'status' => UserStatus::ACTIVE->value,
                 'verification_status' => VerificationStatus::EMPTY->value,

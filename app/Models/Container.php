@@ -19,12 +19,14 @@ class Container extends Model
         'location',
         'latitude',
         'longitude',
+        'capacity',
         'status',
     ];
 
     protected $casts = [
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
+        'capacity' => 'integer',
         'status' => ContainerStatus::class,
     ];
 

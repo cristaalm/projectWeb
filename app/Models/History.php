@@ -14,6 +14,7 @@ class History extends Model
 
     protected $fillable = [
         'user_id',
+        'comerciant_id',
         'type_history',
         'scan_id',
         'material_type_id',
@@ -29,6 +30,11 @@ class History extends Model
     ];
 
     public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function comerciant(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }

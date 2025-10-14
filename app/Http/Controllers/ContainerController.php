@@ -132,7 +132,8 @@ class ContainerController extends Controller
         }
     }
 
-    public function catalog(Request $request) {
+    public function catalog(Request $request) 
+    {
         try {
             $alliances = Container::select('id', 'name', 'location')->where('status', 1)->get();
             return $this->apiResponse(true, 'Catalogo obtenido exitosamente.', $alliances, null, 200);

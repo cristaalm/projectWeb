@@ -66,13 +66,10 @@ class RewardUserController extends Controller
             $user->total_points -= $reward->points_required;
             $user->save();
 
+            $comerciant = $authUser->role_id == 4 ? $authUser : null;
 
             $history = new HistoryController();
-            $history->logHistory($validatedData['user_id'], $reward->alliance_id, null, $reward->id, 1, null, $reward->points_required);
-
-            if ($authUser->role_id === 4) {
-                $history->logHistory($validatedData['user_id'], $reward->alliance_id, null, $reward->id, 3, null, $reward->points_required);
-            }
+            $history->logHistory($validatedData['user_id'], $comerciant->id, $reward->alliance_id, null, $reward->id, 1, null, $reward->points_required);
             
             DB::commit();
             

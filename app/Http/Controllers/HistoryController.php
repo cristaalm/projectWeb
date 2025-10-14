@@ -25,7 +25,7 @@ class HistoryController extends Controller
             $perPage = max(1, min($perPage, 100));
             $key = $normalize($request->input('key')) ?? 'created_at';
             $order = strtolower($normalize($request->input('order')) ?? 'desc');
-            $user_id = $request->user()->id;
+            $user = $request->user();
             
             $historyQuery = History::query();
             
@@ -41,19 +41,27 @@ class HistoryController extends Controller
                 }
             }
 
-            $histories = $historyQuery->with('alliance')->with('materialType')->with('reward')->with('scan')->where('user_id', $user_id)->paginate($perPage);
-            // $data = $this->unsetDataPagination($histories);
+            if ($user->role_id == 4) {
+                $historyQuery->where('comerciant_id', $user->id);
+                $historyQuery->with('user');
+            } else {
+                $historyQuery->where('user_id', $user->id);
+                $historyQuery->with('comerciant');
+            }
+
+            $histories = $historyQuery->with('alliance')->with('materialType')->with('reward')->with('scan')->paginate($perPage);
             return $this->apiResponse(true, 'Historial obtenido exitosamente.', $histories, null, 200);
         } catch (\Exception $e) {
             return $this->apiResponse(false, 'Error al obtener el historial.', null, $e->getMessage() . ' ' . $e->getLine(), 500);
         }
     }
 
-    public function logHistory($user_id, $alliance_id, $material_type_id, $reward_id, $type_history, $scan_id, $points)
+    public function logHistory($user_id = null, $comerciant_id = null, $alliance_id = null, $material_type_id = null, $reward_id = null, $type_history = null, $scan_id = null, $points = null)
     {
 
         $request = new Request([
             'user_id' => $user_id,
+            'comerciant_id' => $comerciant_id,
             'alliance_id' => $alliance_id,
             'material_type_id' => $material_type_id,
             'reward_id' => $reward_id,
@@ -65,6 +73,7 @@ class HistoryController extends Controller
         try {
             $request->validate([
                 'user_id' => 'required|exists:users,id',
+                'comerciant_id' => 'nullable|exists:users,id',
                 'alliance_id' => 'nullable|exists:alliances,id',
                 'material_type_id' => 'nullable|exists:material_types,id',
                 'reward_id' => 'nullable|exists:rewards,id',
@@ -72,7 +81,7 @@ class HistoryController extends Controller
                 'scan_id' => 'nullable|exists:scans,id',
                 'points' => 'required|numeric',
             ]);
-
+            
             // si es tipo 2, validar que solo haya enviado material_type_id
             if ($request->type_history == 2 && $request->material_type_id == null ) {
                 throw ValidationException::withMessages([
@@ -85,19 +94,25 @@ class HistoryController extends Controller
                     'scan_id' => 'El campo escaneo es obligatorio.',
                 ]);
             }
-
-            // si es tipo 1, validar que solo haya enviado alliance_id
+            
             if ($request->type_history == 1 && $request->alliance_id == null ) {
                 throw ValidationException::withMessages([
                     'alliance_id' => 'El campo comercio es obligatorio.',
                 ]);
             }
 
+            if ($request->type_history == 1 && $request->reward_id == null ) {
+                throw ValidationException::withMessages([
+                    'reward_id' => 'El campo recompensa es obligatorio.',
+                ]);
+            }
+
             $history = History::create([
                 'user_id' => $request->user_id,
-                'alliance_id' => $request->type_history == 1 ? $request->alliance_id : null,
-                'material_type_id' => $request->type_history == 2 ? $request->material_type_id : null,
-                'reward_id' => $request->type_history == 2 ? $request->reward_id : null,
+                'comerciant_id' => $request->comerciant_id,
+                'alliance_id' => $request->alliance_id,
+                'material_type_id' => $request->material_type_id,
+                'reward_id' => $request->reward_id,
                 'type_history' => $request->type_history,
                 'scan_id' => $request->scan_id,
                 'points' => $request->points,
