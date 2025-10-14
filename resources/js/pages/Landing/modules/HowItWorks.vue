@@ -1,9 +1,14 @@
 <template>
-  <section id="como-funciona" class="py-20 px-4 bg-muted/30">
+  <section
+    id="como-funciona"
+    class="py-20 px-4 bg-muted/30"
+  >
     <VContainer class="max-w-7xl">
       <div class="text-center mb-16 space-y-4">
-        <h2 class="text-4xl md:text-5xl font-weight-bold text-balance">Tan fácil y rápido, en 3 pasos</h2>
-        <p class="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty">
+        <h2 class="text-4xl md:text-5xl font-weight-bold text-balance font-poppins">
+          Tan fácil y rápido, en 3 pasos
+        </h2>
+        <p class="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty font-poppins">
           Reciclar nunca fue tan simple. Sólo necesitas tu smartphone y ganas de hacer la diferencia.
         </p>
       </div>
@@ -23,10 +28,18 @@
               <span class="text-white font-weight-bold text-2xl">{{ index + 1 }}</span>
             </VSheet>
             <VSheet class="w-16 h-16 rounded-xl mb-6 d-flex align-center justify-center !bg-opacity-10 !bg-primary">
-              <VIcon :icon="step.icon" size="32" color="primary" />
+              <VIcon
+                :icon="step.icon"
+                size="32"
+                color="primary"
+              />
             </VSheet>
-            <h3 class="text-h5 font-weight-bold mb-3">{{ step.title }}</h3>
-            <p class="text-muted-foreground leading-relaxed">{{ step.description }}</p>
+            <h3 class="text-h5 font-weight-bold mb-3 font-poppins">
+              {{ step.title }}
+            </h3>
+            <p class="text-muted-foreground leading-relaxed font-poppins">
+              {{ step.description }}
+            </p>
           </VCard>
         </VCol>
       </VRow>

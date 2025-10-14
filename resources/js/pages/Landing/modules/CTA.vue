@@ -6,8 +6,10 @@
         <div class="blur-circle blur-circle-2" />
 
         <div class="position-relative z-10 text-center space-y-6">
-          <h2 class="text-4xl md:text-5xl font-weight-bold text-balance">Comienza a reciclar hoy</h2>
-          <p class="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty">
+          <h2 class="text-4xl md:text-5xl font-weight-bold text-balance font-poppins">
+            Comienza a reciclar hoy
+          </h2>
+          <p class="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty font-poppins">
             Únete a miles de personas que ya están ganando recompensas mientras cuidan el planeta.
           </p>
           <div class="d-flex flex-column flex-sm-row gap-4 justify-center pt-4">
@@ -15,7 +17,7 @@
               size="x-large"
               color="primary"
               variant="flat"
-              class="text-lg px-8"
+              class="text-lg px-8 font-poppins"
               prepend-icon="mdi mdi-cellphone"
               append-icon="mdi mdi-arrow-right"
             >
@@ -24,7 +26,7 @@
             <VBtn
               size="x-large"
               variant="outlined"
-              class="text-lg px-8"
+              class="text-lg px-8 font-poppins"
               to="login"
             >
               Soy Renova

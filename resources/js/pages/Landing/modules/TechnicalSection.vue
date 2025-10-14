@@ -1,9 +1,14 @@
 <template>
-  <section id="tecnico" class="pt-20 px-4 bg-muted/30">
+  <section
+    id="tecnico"
+    class="pt-20 px-4 bg-muted/30"
+  >
     <VContainer class="max-w-7xl">
       <div class="text-center mb-12 space-y-4">
-        <h2 class="text-4xl md:text-5xl font-weight-bold text-balance">Tecnología de vanguardia</h2>
-        <p class="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty">
+        <h2 class="text-4xl md:text-5xl font-weight-bold text-balance font-poppins">
+          Tecnología de vanguardia
+        </h2>
+        <p class="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty font-poppins">
           Un ecosistema completo que integra hardware, software y servicios en la nube.
         </p>
       </div>
@@ -12,16 +17,20 @@
         <VBtn
           size="large"
           variant="outlined"
-          @click="isExpanded = !isExpanded"
           append-icon="mdi mdi-chevron-down"
           :class="{ 'rotate-icon': isExpanded }"
+          class="font-poppins"
+          @click="isExpanded = !isExpanded"
         >
           {{ isExpanded ? 'Ver menos detalles' : 'Ver detalles técnicos' }}
         </VBtn>
       </div>
 
       <VExpandTransition>
-        <div v-show="isExpanded" class="space-y-8">
+        <div
+          v-show="isExpanded"
+          class="space-y-8 font-poppins"
+        >
           <VRow>
             <VCol
               v-for="(tech, index) in technologies"
@@ -32,26 +41,45 @@
             >
               <VCard class="pa-6 hover-shadow">
                 <VSheet class="w-12 h-12 rounded-lg mb-4 d-flex align-center justify-center !bg-opacity-10 !bg-primary">
-                  <VIcon :icon="tech.icon" size="24" color="primary" />
+                  <VIcon
+                    :icon="tech.icon"
+                    size="24"
+                    color="primary"
+                  />
                 </VSheet>
-                <h3 class="text-lg font-weight-bold mb-2">{{ tech.title }}</h3>
-                <p class="text-sm text-muted-foreground leading-relaxed">{{ tech.description }}</p>
+                <h3 class="text-lg font-weight-bold mb-2">
+                  {{ tech.title }}
+                </h3>
+                <p class="text-sm text-muted-foreground leading-relaxed">
+                  {{ tech.description }}
+                </p>
               </VCard>
             </VCol>
           </VRow>
 
           <VCard class="pa-8">
-            <h3 class="text-h5 font-weight-bold mb-6">Arquitectura del Sistema</h3>
+            <h3 class="text-h5 font-weight-bold mb-6">
+              Arquitectura del Sistema
+            </h3>
             <div class="space-y-4">
-              <div v-for="(arch, index) in architecture" :key="index">
-                <h4 class="font-weight-semibold mb-2">{{ arch.title }}</h4>
-                <p class="text-sm text-muted-foreground leading-relaxed">{{ arch.description }}</p>
+              <div
+                v-for="(arch, index) in architecture"
+                :key="index"
+              >
+                <h4 class="font-weight-semibold mb-2">
+                  {{ arch.title }}
+                </h4>
+                <p class="text-sm text-muted-foreground leading-relaxed">
+                  {{ arch.description }}
+                </p>
               </div>
             </div>
           </VCard>
 
           <VCard class="pa-8 differentiators-card">
-            <h3 class="text-h5 font-weight-bold mb-4">Diferenciadores Clave</h3>
+            <h3 class="text-h5 font-weight-bold mb-4">
+              Diferenciadores Clave
+            </h3>
             <div class="space-y-3">
               <div
                 v-for="(diff, index) in differentiators"
@@ -60,7 +88,12 @@
               >
                 <div class="flex items-center gap-[2px]">
                   <div class="flex items-center justify-center w-[18px] h-[18px] bg-primary rounded-full">
-                    <VIcon size="12" color="white">mdi mdi-check</VIcon>
+                    <VIcon
+                      size="12"
+                      color="white"
+                    >
+                      mdi mdi-check
+                    </VIcon>
                   </div>
                   <div class="w-[12px] h-[12px] bg-primary rounded-full" />
                   <div class="w-[8px] h-[8px] mt-[1px] bg-primary rounded-full" />

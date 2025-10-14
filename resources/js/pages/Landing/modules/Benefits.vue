@@ -1,9 +1,14 @@
 <template>
-  <section id="beneficios" class="py-20 px-4">
+  <section
+    id="beneficios"
+    class="py-20 px-4"
+  >
     <VContainer class="max-w-7xl">
       <div class="text-center mb-16 space-y-4">
-        <h2 class="text-4xl md:text-5xl font-weight-bold text-balance">¿Por qué elegir Renova?</h2>
-        <p class="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty">
+        <h2 class="text-4xl md:text-5xl font-weight-bold text-balance font-poppins">
+          ¿Por qué elegir Renova?
+        </h2>
+        <p class="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty font-poppins">
           Más que una app de reciclaje, es un ecosistema completo que te recompensa por hacer lo correcto.
         </p>
       </div>
@@ -17,10 +22,18 @@
         >
           <VCard class="pa-8 hover-card min-h-[300px]">
             <VSheet class="w-14 h-14 rounded-xl mb-6 d-flex align-center justify-center !bg-opacity-10 !bg-primary">
-              <VIcon :icon="benefit.icon" size="28" color="primary" />
+              <VIcon
+                :icon="benefit.icon"
+                size="28"
+                color="primary"
+              />
             </VSheet>
-            <h3 class="text-h5 font-weight-bold mb-3">{{ benefit.title }}</h3>
-            <p class="text-muted-foreground leading-relaxed text-pretty">{{ benefit.description }}</p>
+            <h3 class="text-h5 font-weight-bold mb-3 font-poppins">
+              {{ benefit.title }}
+            </h3>
+            <p class="text-muted-foreground leading-relaxed text-pretty font-poppins">
+              {{ benefit.description }}
+            </p>
           </VCard>
         </VCol>
       </VRow>

@@ -11,22 +11,25 @@ const scrollToSection = sectionId => {
   <section class="pt-8 pb-20 px-4">
     <VContainer class="max-w-7xl">
       <VRow class="align-center">
-        <VCol cols="12" lg="6">
+        <VCol
+          cols="12"
+          lg="6"
+        >
           <div class="space-y-8">
             <VChip
               color="primary"
               variant="tonal"
-              class="px-4 py-2"
+              class="px-4 py-2 font-poppins"
               prepend-icon="mdi mdi-recycle"
             >
               Gana recompensas reciclando
             </VChip>
 
-            <h1 class="text-5xl md:text-6xl lg:text-7xl font-weight-bold leading-tight text-balance">
+            <h1 class="text-5xl md:text-6xl lg:text-7xl font-weight-bold leading-tight text-balance font-poppins">
               Recicla y gana <span class="text-primary">recompensas</span>
             </h1>
 
-            <p class="text-xl text-muted-foreground leading-relaxed text-pretty">
+            <p class="text-xl text-muted-foreground leading-relaxed text-pretty font-poppins">
               Convierte tus botellas de plástico y latas de aluminio en puntos canjeables. Renova hace que reciclar sea
               fácil, divertido y gratificante.
             </p>
@@ -36,7 +39,7 @@ const scrollToSection = sectionId => {
                 size="x-large"
                 color="primary"
                 variant="flat"
-                class="text-lg px-8"
+                class="text-lg px-8 font-poppins"
                 prepend-icon="mdi mdi-cellphone"
                 append-icon="mdi mdi-arrow-right"
               >
@@ -45,33 +48,54 @@ const scrollToSection = sectionId => {
               <VBtn
                 size="x-large"
                 variant="outlined"
-                class="text-lg px-8"
+                class="text-lg px-8 font-poppins"
                 @click="() => scrollToSection('como-funciona')"
               >
                 Ver Cómo Funciona
               </VBtn>
             </div>
 
-            <div class="d-flex align-center gap-8 pt-4">
+            <div class="d-flex align-center gap-8 pt-4 font-poppins">
               <div>
-                <div class="text-h4 font-weight-bold text-primary">63%</div>
-                <div class="text-sm text-muted-foreground">Tasa de reciclaje PET</div>
+                <div class="text-h4 font-weight-bold text-primary">
+                  63%
+                </div>
+                <div class="text-sm text-muted-foreground">
+                  Tasa de reciclaje PET
+                </div>
               </div>
-              <VDivider vertical class="h-12" />
+              <VDivider
+                vertical
+                class="h-12"
+              />
               <div>
-                <div class="text-h4 font-weight-bold text-primary">+1000</div>
-                <div class="text-sm text-muted-foreground">Usuarios activos</div>
+                <div class="text-h4 font-weight-bold text-primary">
+                  +1000
+                </div>
+                <div class="text-sm text-muted-foreground">
+                  Usuarios activos
+                </div>
               </div>
-              <VDivider vertical class="h-12" />
+              <VDivider
+                vertical
+                class="h-12"
+              />
               <div>
-                <div class="text-h4 font-weight-bold text-primary">24/7</div>
-                <div class="text-sm text-muted-foreground">Contenedores disponibles</div>
+                <div class="text-h4 font-weight-bold text-primary">
+                  24/7
+                </div>
+                <div class="text-sm text-muted-foreground">
+                  Contenedores disponibles
+                </div>
               </div>
             </div>
           </div>
         </VCol>
 
-        <VCol cols="12" lg="6">
+        <VCol
+          cols="12"
+          lg="6"
+        >
           <div class="position-relative">
             <VSheet
               class="position-relative aspect-square rounded-xl pa-8 backdrop-blur"
