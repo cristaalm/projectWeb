@@ -1,7 +1,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useAuthStore } from '@/store/auth'
+import { useRouter } from 'vue-router'
 
 const drawer = ref(false)
+const authStore = useAuthStore()
+const router = useRouter()
 
 onMounted(() => {
   document.addEventListener('click', event => {
@@ -76,11 +80,20 @@ onMounted(() => {
         Técnico
       </a>
 
-      <!-- Botón de descarga dentro del drawer en móvil -->
+      <VBtn
+        v-if="authStore.accessToken"
+        color="primary"
+        variant="text"
+        class="mt-4 text-primary-foreground font-poppins"
+        @click="router.push({ name: 'panel' })"
+      >
+        Ir al panel
+      </VBtn>
+
       <VBtn
         color="primary"
         variant="flat"
-        class="mt-4 text-primary-foreground font-poppins"
+        class="text-primary-foreground font-poppins"
         prepend-icon="mdi-cellphone"
         @click="drawer = false"
       >
@@ -139,15 +152,29 @@ onMounted(() => {
       </VToolbarItems>
 
       <!-- Botón de descarga (visible en todos los tamaños) -->
-      <VBtn
-        color="primary"
-        variant="flat"
-        class="text-primary-foreground d-none d-md-flex font-poppins"
-        prepend-icon="mdi-cellphone"
-        append-icon="mdi-arrow-right"
-      >
-        Descargar App
-      </VBtn>
+      <div class="flex flex-row justify-between gap-2">
+        <!-- si tiene token, mostramos la opción de ir al dashboard -->
+
+        <VBtn
+          v-if="authStore.accessToken"
+          color="primary"
+          variant="text"
+          class="text-primary-foreground d-none d-md-flex font-poppins"
+          @click="router.push({ name: 'panel' })"
+        >
+          Ir al panel
+        </VBtn>
+
+        <VBtn
+          color="primary"
+          variant="flat"
+          class="text-primary-foreground d-none d-md-flex font-poppins"
+          prepend-icon="mdi mdi-cellphone"
+          @click="drawer = false"
+        >
+          Descargar App
+        </VBtn>
+      </div>
 
       <!-- Menú hamburguesa para móviles -->
       <VAppBarNavIcon
