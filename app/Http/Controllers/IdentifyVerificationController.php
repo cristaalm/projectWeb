@@ -23,38 +23,49 @@ class IdentifyVerificationController extends Controller
     {
         try {
             $authUser = $request->user();
-
+    
             $validateData = $request->validate([
                 'user_id' => 'required|exists:users,id',
                 'document_front' => 'required|image|mimes:jpeg,png,jpg|max:5120',
                 'document_back' => 'required|image|mimes:jpeg,png,jpg|max:5120',
             ]);
-
+    
             $user = User::findOrFail($validateData['user_id']);
             $identityVerification = IdentityVerification::where('user_id', $user->id)->first();
-
+    
             $documentFront = $request->file('document_front');
             $documentBack = $request->file('document_back');
-
+    
             $documentFrontName = 'ine_front' . $documentFront->getClientOriginalExtension();
             $documentBackName = 'ine_back' . $documentBack->getClientOriginalExtension();
-
+    
             DB::beginTransaction();
-
+    
             $documentFrontPath = $documentFront->storeAs('users/user_' . $user->id, $documentFrontName, 'local');
             $documentBackPath = $documentBack->storeAs('users/user_' . $user->id, $documentBackName, 'local');
-
+    
             $identityVerification->ine_front_url = $documentFrontPath;
             $identityVerification->ine_back_url = $documentBackPath;
             $identityVerification->status = IndentifyVerificationStatus::PENDING->value;
             $identityVerification->save();
-
+    
             $user->verification_status = VerificationStatus::PENDING->value;
             $user->save();
-
+    
             DB::commit();
-
+    
             return $this->apiResponse(true, 'Documentos subidos exitosamente.', $identityVerification, null, 200);
+        } catch (ValidationException $e) {
+            // Extraer el primer mensaje de error para devolverlo de forma clara
+            $errors = $e->validator->errors()->all();
+            $firstError = $errors[0] ?? 'Error de validación en los documentos.';
+            
+            // Mensaje específico si el error es por tamaño
+            if (str_contains($firstError, 'may not be greater than')) {
+                $firstError = 'El tamaño de la imagen no debe exceder los 5 MB.';
+            }
+    
+            return $this->apiResponse(false, $firstError, null, null, 422);
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->apiResponse(false, 'Error al subir los documentos.', null, $e->getMessage(), 500);
@@ -91,6 +102,16 @@ class IdentifyVerificationController extends Controller
             DB::commit();
 
             return $this->apiResponse(true, 'Selfie subido exitosamente.', $identityVerification, null, 200);
+        } catch (ValidationException $e) {
+            $errors = $e->validator->errors()->all();
+            $firstError = $errors[0] ?? 'Error de validación en el selfie.';
+
+            // Mensaje específico si el error es por tamaño del archivo
+            if (str_contains($firstError, 'may not be greater than')) {
+                $firstError = 'El tamaño de la imagen no debe exceder los 5 MB.';
+            }
+
+            return $this->apiResponse(false, $firstError, null, null, 422);
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->apiResponse(false, 'Error al subir el selfie.', null, $e->getMessage(), 500);
