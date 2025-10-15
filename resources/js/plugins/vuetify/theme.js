@@ -16,7 +16,7 @@ export const themes = {
       'on-secondary': '#fff',
       'secondary-darken-1': '#788393',
       'secondary-light': '#9DA8B5',
-      'success': '#71DD37',
+      'success': '#22C55E',
       'on-success': '#fff',
       'success-darken-1': '#66C732',
       'success-light': '#53D28C',

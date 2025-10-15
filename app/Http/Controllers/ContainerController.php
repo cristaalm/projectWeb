@@ -141,4 +141,35 @@ class ContainerController extends Controller
             return $this->apiResponse(false, 'Error al obtener el catalogo.', null, $e->getMessage(), 500);
         }
     }
+
+    // public function catalog(Request $request) 
+    // {
+    //     try {
+    //         $validatedData = $request->validate([
+    //             'status' => 'nullable|string',
+    //             'limit' => 'nullable|integer',
+    //         ]);
+
+    //         $status = null;
+    //         if ($validatedData['status'] != null && in_array($validatedData['status'], ['0', '1', 'true', 'false'])) {
+    //             $status = $validatedData['status'] === 'true' || $validatedData['status'] === '1';
+    //         }
+
+    //         $alliances = Container::select('id', 'name', 'location', 'capacity');
+
+    //         if ($status != null) {
+    //             $alliances->where('status', $status);
+    //         }
+
+    //         if ($validatedData['limit'] != null) {
+    //             $alliances->limit($validatedData['limit']);
+    //         }
+
+    //         $alliances = $alliances->get();
+
+    //         return $this->apiResponse(true, 'Catalogo obtenido exitosamente.', $alliances, null, 200);
+    //     } catch (\Exception $e) {
+    //         return $this->apiResponse(false, 'Error al obtener el catalogo.', null, $e->getMessage(), 500);
+    //     }
+    // }
 }

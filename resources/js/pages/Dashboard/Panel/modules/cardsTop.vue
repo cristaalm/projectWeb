@@ -50,7 +50,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 min-h-[200px]">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 min-h-[150px]">
     <template v-if="isLoading">
       <template 
         v-for="(item, index) in template" 
@@ -74,7 +74,7 @@ onMounted(() => {
         :key="index"
       >
         <div 
-          class="col-span-1 rounded-lg p-4 flex flex-col justify-between bg-white dark:bg-[#2A2B3E] shadow-lg"
+          class="col-span-1 rounded-lg p-4 flex flex-col justify-between bg-white dark:bg-[#2A2B3E] shadow"
           :class="item.to ? 'cursor-pointer transition-all duration-300 transform hover:-translate-y-1' : ''"
           @click="goTo(item.to)"
         >

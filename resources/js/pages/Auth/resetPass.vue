@@ -187,7 +187,7 @@ const goToHome = () => {
             block
             color="primary"
             class="font-poppins"
-            @click="router.push('/')"
+            @click="router.push({ name: 'login' })"
           >
             Ir al Inicio
           </VBtn>

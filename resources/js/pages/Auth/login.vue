@@ -120,7 +120,7 @@ const goToHome = () => {
                   <a
                     class="text-primary font-poppins"
                     href="./forgot-password"
-                    @click.prevent="router.push('/forgot-password')"
+                    @click.prevent="router.push({ name: 'forgot-password' })"
                   >
                     Olvidé mi contraseña
                   </a>

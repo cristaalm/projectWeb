@@ -56,6 +56,40 @@ class HistoryController extends Controller
         }
     }
 
+    public function getAllSystem(Request $request)
+    {
+        try {
+            $normalize = function ($value) {
+                if (is_string($value) && strtolower($value) === 'null') {
+                    return null;
+                }
+                return $value;
+            };
+    
+            $perPage = (int) ($normalize($request->input('per_page')) ?? 10);
+            $perPage = max(1, min($perPage, 100));
+            $key = $normalize($request->input('key')) ?? 'created_at';
+            $order = strtolower($normalize($request->input('order')) ?? 'desc');
+            $type_history = $normalize($request->input('type_history')) ?? null;
+            
+            $historyQuery = History::query();
+            
+            $allowedKeys = ['created_at', 'created_at'];
+            
+            if (in_array($key, $allowedKeys) && in_array($order, ['asc', 'desc'])) {
+                $historyQuery->orderBy($key, $order);
+            }
+
+            if ($type_history) {
+                $historyQuery->where('type_history', $type_history);
+            }
+            $histories = $historyQuery->with('reward')->with('user')->paginate($perPage);
+            return $this->apiResponse(true, 'Historial obtenido exitosamente.', $histories, null, 200);
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al obtener el historial.', null, $e->getMessage() . ' ' . $e->getLine(), 500);
+        }
+    }
+
     public function logHistory($user_id = null, $comerciant_id = null, $alliance_id = null, $material_type_id = null, $reward_id = null, $type_history = null, $scan_id = null, $points = null)
     {
 

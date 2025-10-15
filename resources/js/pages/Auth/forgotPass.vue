@@ -100,7 +100,7 @@ const goToHome = () => {
                   variant="text"
                   :disabled="loading"
                   class="mt-4 font-poppins"
-                  @click="router.push('/')"
+                  @click="router.push({ name: 'login' })"
                 >
                   Regresar
                 </VBtn>
@@ -141,7 +141,7 @@ const goToHome = () => {
             type="button"
             color="primary"
             class="mt-4 font-poppins"
-            @click="router.push('/')"
+            @click="router.push({ name: 'login'})"
           >
             Regresar al inicio
           </VBtn>
