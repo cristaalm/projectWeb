@@ -617,4 +617,112 @@ class UsersDocumentation
         ]
     )]
     public function identityUserCode() {}
+
+    #[OA\Post(
+        path: "/api/users/tourComplete/{userId}",
+        tags: ["Usuarios"],
+        summary: "Marcar el tour introductorio como completado",
+        description: "Marca el tour introductorio de la aplicación como completado para un usuario específico. Esto evita que se muestre nuevamente al iniciar sesión.",
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "userId",
+                description: "ID del usuario para el que se marca el tour como completado",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "integer", example: 5)
+            ),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["user_id"],
+                properties: [
+                    new OA\Property(
+                        property: "user_id",
+                        type: "integer",
+                        example: 5,
+                        description: "ID del usuario (debe coincidir con el parámetro de la URL)"
+                    ),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Tour completado exitosamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Se completo el tour del usuario exitosamente."),
+                        new OA\Property(property: "data", properties: [
+                            new OA\Property(property: "user", ref: "#/components/schemas/User"),
+                        ]),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: "Token de autenticación no válido o no proporcionado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Token de autenticación no proporcionado."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 401),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 403,
+                description: "No autorizado para modificar el tour del usuario",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "No tienes permiso para modificar el tour de este usuario."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 403),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: "Error de validación",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Ocurrio un error al intentar completar el tour del usuario."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", properties: [
+                            new OA\Property(property: "user_id", type: "array", items: new OA\Items(type: "string", example: "The selected user id is invalid.")),
+                        ]),
+                        new OA\Property(property: "status", type: "integer", example: 422),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Ocurrio un error al intentar completar el tour del usuario."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function tourComplete(Request $request, int $userId) {}
 }

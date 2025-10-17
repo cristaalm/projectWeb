@@ -12,6 +12,7 @@ Route::prefix('users')->group(function () {
         Route::post('toggleStatusAccount', [UserController::class, 'toggleStatusAccount']);
         Route::post('modifyPoints', [UserController::class, 'modifyPoints']);
         Route::post('create', [UserController::class, 'create']);
+        Route::post('tourComplete/{userId}', [UserController::class, 'tourComplete']);
         Route::post('updateField/{field}/{userId}', [UserController::class, 'updateField'])
         ->where('field', 'name|last_name|email|phone|curp');
         

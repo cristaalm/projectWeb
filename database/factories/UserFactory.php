@@ -29,6 +29,7 @@ class UserFactory extends Factory
             'curp' => $this->faker->unique()->bothify('????????????????'),
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
+            'tour' => false,
             'total_points' => $this->faker->numberBetween(0, 500),
             'verification_status' => $this->faker->randomElement(VerificationStatus::cases())->value,
             'status' => UserStatus::ACTIVE->value,

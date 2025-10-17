@@ -29,6 +29,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'curp',
         'password',
         'email_verified_at',
+        'tour',
         'total_points',
         'verification_status',
         'avatar',
@@ -53,6 +54,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'two_factor_status' => 'boolean',
         'status' => UserStatus::class,
         'total_points' => 'integer',
+        'tour' => 'boolean',
         'avatar' => 'string',
         'google2fa_secret' => 'string',
     ];

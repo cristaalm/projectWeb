@@ -393,4 +393,29 @@ class UserController extends Controller
             return $this->apiResponse(false, 'Ocurrio un error al intentar modificar los puntos del usuario.', null, $e->getMessage(), 500);
         }
     }
+
+    public function tourComplete(Request $request, int $userId)
+    {
+        try {
+            // merge
+            $request->merge([
+                'user_id' => $userId,
+            ]);
+
+            $validateData = $request->validate([
+                'user_id' => 'required|integer|exists:users,id',
+            ]);
+
+            $user = User::findOrFail($validateData['user_id']);
+
+            $user->tour = true;
+            $user->save();
+
+            return $this->apiResponse(true, 'Se completo el tour del usuario exitosamente.', [
+                'user' => new UserResource($user),
+            ], null, 200);
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Ocurrio un error al intentar completar el tour del usuario.', null, $e->getMessage(), 500);
+        }
+    }
 }

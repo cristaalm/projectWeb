@@ -36,6 +36,7 @@ class HistoryResource extends JsonResource
             'is_active' => $this->reward->is_active,
         ]) : null,
         'points' => $this->points,
+        'quantity' => $this->quantity,
         'alliance_id' => $this->alliance_id,
         'alliance' => $this->alliance ? $this->whenLoaded('alliance', [
             'id' => $this->alliance->id,
