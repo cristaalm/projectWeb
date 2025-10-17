@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('alliance_id')->index();
             $table->string('name', 100); 
             $table->string('last_name', 100); 
             $table->string('email', 255)->unique(); 
@@ -32,7 +33,8 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps(); 
 
-            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
+            $table->foreign('role_id')->references('id')->on('roles')->onDelete('no action');
+            $table->foreign('alliance_id')->references('id')->on('alliances')->onDelete('no action');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

@@ -24,6 +24,17 @@ const {
   loadData,
 } = requestOrderTable({ url: 'containers/getAll' })
 
+const countFilters = computed(() => {
+  let count = 0
+  if (status.value !== null) count++
+  
+  return count
+})
+
+const resetFilters = () => {
+  status.value = null
+}
+
 const headers = [
   { title: 'Nombre', align: 'left', key: 'name' },
   { title: 'Ubicación', align: 'start', key: 'location' },
@@ -100,7 +111,7 @@ const { showDeleteModal, openDeleteModal, selectedShopToDelete } = useModalDelet
       </div>
     </div>
 
-    <div class="col-span-12 p-2 md:p-6 space-y-6 bg-white dark:bg-[#2b2c40] flex flex-col md:flex-row justify-between items-center gap-6 shadow-lg">
+    <div class="col-span-12 p-2 md:p-6 bg-white dark:bg-[#2b2c40] flex flex-col md:flex-row justify-between items-center gap-6 shadow-lg">
       <VTextField
         v-model="search"
         label="Buscar"
@@ -110,17 +121,61 @@ const { showDeleteModal, openDeleteModal, selectedShopToDelete } = useModalDelet
         class="w-full md:!flex-[.5]"
         variant="outlined"
       />
-      <VSelect
-        v-model="status"
-        label="Filtrar por"
-        :items="[{ title: 'Todos', value: null }, { title: 'Activo', value: 1 }, { title: 'Inactivo', value: 0 }]"
-        placeholder="Filtrar por"
-        prepend-inner-icon="bx-filter"
-        :color="darkModeStore.darkMode ? 'white' : 'primary'"
-        class="w-full md:!flex-[.5] lg:!flex-[.2] mt-0"
-        variant="outlined"
-        no-data-text="No opciones de filtrado"
-      />
+      <VMenu
+        location="bottom end"
+        offset="10"
+        :close-on-content-click="false"
+      >
+        <template #activator="{ props }">
+          <VBtn
+            v-bind="props"
+            variant="outlined"
+            color="secondary"
+            class="w-full sm:w-auto relative"
+          >
+            <VBadge
+              v-if="countFilters > 0"
+              :content="countFilters"
+              color="primary"
+              class="absolute top-0 right-0"
+            />
+            <VIcon
+              icon="bx-filter"
+              start
+            />
+            Filtrar
+          </VBtn>
+        </template>
+
+        <VCard
+          class="pa-4 relative"
+          width="250"
+        >
+          <div class="flex flex-col gap-y-2">
+            <VSelect
+              v-model="status"
+              label="Estado"
+              :items="[{ title: 'Todos', value: null }, { title: 'Activo', value: 1 }, { title: 'Inactivo', value: 0 }]"
+              placeholder="Estado"
+              prepend-inner-icon="bx-filter"
+              :color="darkModeStore.darkMode ? 'white' : 'primary'"
+              class="mt-0"
+              variant="outlined"
+              no-data-text="No opciones de filtrado"
+            />
+            <VBtn
+              variant="outlined"
+              color="secondary"
+              class="w-full"
+              prepend-icon="mdi mdi-refresh"
+              :disabled="status == null"
+              @click="resetFilters"
+            >
+              Reinciar
+            </VBtn>
+          </div>
+        </VCard>
+      </VMenu>
     </div>
 
     <OrderTable

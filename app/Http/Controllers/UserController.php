@@ -19,9 +19,13 @@ use App\Http\Resources\UserResource;
 use App\Enums\VerificationStatus;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 // notifications
 use App\Notifications\UserStatusAccountNotification;
+use App\Mail\PointsModifiedMail;
+use App\Notifications\UserCredentialsNotification;
 
 class UserController extends Controller
 {
@@ -41,6 +45,8 @@ class UserController extends Controller
             $key = $normalize($request->input('key')) ?? 'updated_at';
             $order = strtolower($normalize($request->input('order')) ?? 'desc');
             $status = $normalize($request->input('status'));
+            $role = $normalize($request->input('tipo'));
+            $verificationStatus = $normalize($request->input('verification_status'));
 
             $userQuery = User::query();
 
@@ -58,8 +64,16 @@ class UserController extends Controller
                 });
             }
 
+            if ($role != null && in_array($role, [1, 2, 3, 4])) {
+                $userQuery->where('role_id', $role);
+            }
+
             if ($status != null && in_array($status, [0, 1])) {
                 $userQuery->where('status', $status);
+            }
+
+            if ($verificationStatus != null && in_array($verificationStatus, [0,1,2,3])) {
+                $userQuery->where('verification_status', $verificationStatus);
             }
 
             $allowedKeys = ['name', 'last_name', 'email', 'phone', 'total_points', 'updated_at'];
@@ -73,6 +87,63 @@ class UserController extends Controller
             return $this->apiResponse(true, 'Usuarios obtenidos exitosamente.', $data, null, 200);
         } catch (\Exception $e) {
             return $this->apiResponse(false, 'Error al obtener los usuarios.', null, $e->getMessage(), 500);
+        }
+    }
+
+    public function create(Request $request) 
+    {
+        try {
+            $authUser = $request->user();
+    
+            $validateData = $request->validate([
+                'name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users,email',
+                'phone' => 'nullable|string|max:255',
+                'curp' => 'required|string|max:20|unique:users,curp',
+                'role' => 'required|integer|in:3,4',
+                'alliance' => 'nullable|integer|exists:alliances,id',
+            ]);
+    
+            $plainPassword = User::generatePassword();
+    
+            $digits12 = str_pad(random_int(0, 999999999999), 12, '0', STR_PAD_LEFT);
+            $checkDigit = User::calculateEan13CheckDigit($digits12);
+    
+            DB::beginTransaction();
+    
+            $user = User::create([
+                'alliance_id' => $validateData['alliance'] ?? null,
+                'name' => $validateData['name'],
+                'last_name' => $validateData['last_name'],
+                'email' => $validateData['email'],
+                'phone' => $validateData['phone'],
+                'curp' => $validateData['curp'],
+                'password' => Hash::make($plainPassword),
+                'code_identity' => $digits12 . $checkDigit,
+                'verification_status' => VerificationStatus::APPROVED->value,
+                'role_id' => $validateData['role'],
+                'google2fa_secret' => (new Google2FA())->generateSecretKey(),
+            ]);
+    
+            IdentityVerification::create([
+                'user_id' => $user->id,
+                'status' => VerificationStatus::APPROVED->value,
+                'verified_by' => $authUser->id,
+                'verified_at' => Carbon::now(),
+            ]);
+    
+            DB::commit();
+
+            $user->notify(new UserCredentialsNotification($plainPassword));
+    
+            return $this->apiResponse(true, 'Usuario creado exitosamente.', $user, null, 201);
+        } catch (ValidationException $e) {
+            $firstError = collect($e->errors())->flatten()->first();
+            return $this->apiResponse(false, $firstError, null, $e->getMessage(), 400);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->apiResponse(false, 'Error al registrar el usuario.', null, $e->getMessage(), 500);
         }
     }
 
@@ -253,6 +324,41 @@ class UserController extends Controller
             ], null, 200);
         } catch (\Exception $e) {
             return $this->apiResponse(false, 'Error al identificar al usuario.', null, $e->getMessage(), 500);
+        }
+    }
+
+    public function modifyPoints(Request $request) 
+    {
+        try {
+            $validateData = $request->validate([
+                'user_id' => 'required|integer|exists:users,id',
+                'new_points' => 'required|integer',
+                'description' => 'required|string',
+            ]);
+
+            $user = User::findOrFail($validateData['user_id']);
+
+            $originalPoints = $user->total_points;
+
+            $user->total_points = $validateData['new_points'];
+            $user->save();
+
+            $history = new HistoryController();
+            $history->logHistory($validateData['user_id'], null, null, null, null, 3, null, $validateData['new_points'], $validateData['description']);
+
+            $sendMail = true;
+            try {
+                Mail::to($user->email)->send(new PointsModifiedMail($user, $originalPoints, $user->total_points, $validateData['description']));
+            } catch (\Exception $e) {
+                $sendMail = false;
+            }
+
+            return $this->apiResponse(true, 'Se modificaron los puntos del usuario exitosamente.', [
+                'user' => new UserResource($user),
+                'sendMail' => $sendMail,
+            ], null, 200);
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Ocurrio un error al intentar modificar los puntos del usuario.', null, $e->getMessage(), 500);
         }
     }
 }

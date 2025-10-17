@@ -108,7 +108,7 @@ class ScanController extends Controller
             ]);
 
             $history = new HistoryController();
-            $history->logHistory($validatedData['user_id'], null ,null, $iaResult['tipo'], null, 2, $scan->id, $points);
+            $history->logHistory($validatedData['user_id'], null ,null, $iaResult['tipo'], null, 2, $scan->id, $points, null);
 
             $response = [
                 ...$iaResult,

@@ -11,8 +11,9 @@ return new class extends Migration
         Schema::create('history', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id')->unsigned();
-            $table->bigInteger('comerciant_id')->unsigned()->nulleable(); // en caso de canjeo por medio del comerciante // osea type_history = 3
-            $table->tinyInteger('type_history')->unsigned(); // canjeo = 1, suma = 2, canjeo por comerciante = 3 
+            $table->bigInteger('comerciant_id')->unsigned()->nullable(); // en caso de canjeo por medio del comerciante // osea type_history = 3
+            $table->tinyInteger('type_history')->unsigned(); // canjeo = 1, suma = 2, modificación de puntos = 3 
+            $table->string('description')->nullable(); // solo en caso de tipo = 3
             $table->unsignedBigInteger('material_type_id')->nullable(); // en caso de canjeo es null, en caso de suma es el material resiclado
             $table->unsignedBigInteger('scan_id')->nullable(); // en caso de canjeo es null, en caso de suma es el scan
             $table->integer('points')->default(0)->nullable(); // puntos sumados o restados, segun el caso

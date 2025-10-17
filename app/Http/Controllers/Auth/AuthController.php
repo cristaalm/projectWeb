@@ -21,6 +21,7 @@ use App\Http\Resources\UserResource;
 use App\Enums\UserStatus;
 use App\Enums\VerificationStatus;
 use Jenssegers\Agent\Agent;
+use App\Enums\AllianceStatus;
 
 class AuthController extends Controller
 {
@@ -129,7 +130,6 @@ class AuthController extends Controller
         }
     }
 
-
     public function login(Request $request)
     {
         try {
@@ -165,7 +165,18 @@ class AuthController extends Controller
                 return $this->apiResponse(false, 'Tu cuenta no tiene permiso para acceder al sistema.', null, null, 403);
             }
 
-            // Configurar expiración según remember_me
+            $user->load('role');
+
+            if ($user->role_id == 4 && !$user->alliance) {
+                return $this->apiResponse(false, 'Tu cuenta no es valida, contacta con el administrador.', null, 'El usuario comerciante, no tiene un comercio asignado.', 403);
+            }
+
+            $user->load('alliance');
+
+            if ($user->alliance && $user->alliance->status == AllianceStatus::ACTIVE) {
+                return $this->apiResponse(false, 'El comercio al que perteneces, ya no esta vigente.', null, 'El comercio al que perteneces esta desactivado.', 403);
+            }
+
             $defaultMinutes = config('auth.tokens.default_expiration', 720);      // 1 hora
             $rememberMinutes = config('auth.tokens.remember_expiration', 525600); // 30 días
 
@@ -176,10 +187,6 @@ class AuthController extends Controller
             } else {
                 $expiresAt = Carbon::now()->addMinutes(config('tokens.default_expiration_minutes'));
             }
-
-
-            // Cargar relaciones
-            $user->load('role');
 
             $webAccept = ['admin', 'moderator'];
             $mobileAccept = ['user','comerciante', 'admin', 'moderator'];

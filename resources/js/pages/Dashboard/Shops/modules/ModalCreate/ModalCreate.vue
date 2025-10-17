@@ -94,7 +94,6 @@ const { showModalViewTypeShop, openModalViewTypeShop } = useModalViewTypeShop()
             outlined
             :color="darkModeStore.darkMode ? 'white' : 'primary'" 
             :class="formErrors.name ? '!max-h-[60px]' : '!max-h-[38px]'"
-            :loading="loading"
             :disabled="loading"
             :error="touchedFields.name && !!formErrors.name"
             :error-messages="touchedFields.name ? formErrors.name : ''"
@@ -108,7 +107,6 @@ const { showModalViewTypeShop, openModalViewTypeShop } = useModalViewTypeShop()
             outlined
             :color="darkModeStore.darkMode ? 'white' : 'primary'" 
             :class="formErrors.contact_name ? '!max-h-[60px]' : '!max-h-[38px]'"
-            :loading="loading"
             :disabled="loading"
             :error="touchedFields.contact_name && !!formErrors.contact_name"
             :error-messages="touchedFields.contact_name ? formErrors.contact_name : ''"
@@ -122,7 +120,6 @@ const { showModalViewTypeShop, openModalViewTypeShop } = useModalViewTypeShop()
             outlined
             :color="darkModeStore.darkMode ? 'white' : 'primary'" 
             :class="formErrors.contact_email ? '!max-h-[60px]' : '!max-h-[38px]'"
-            :loading="loading"
             :disabled="loading"
             :error="touchedFields.contact_email && !!formErrors.contact_email"
             :error-messages="touchedFields.contact_email ? formErrors.contact_email : ''"
@@ -136,7 +133,6 @@ const { showModalViewTypeShop, openModalViewTypeShop } = useModalViewTypeShop()
             outlined
             :color="darkModeStore.darkMode ? 'white' : 'primary'" 
             :class="formErrors.phone ? '!max-h-[60px]' : '!max-h-[38px]'"
-            :loading="loading"
             :disabled="loading"
             :error="touchedFields.phone && !!formErrors.phone"
             :error-messages="touchedFields.phone ? formErrors.phone : ''"
@@ -150,7 +146,6 @@ const { showModalViewTypeShop, openModalViewTypeShop } = useModalViewTypeShop()
             outlined
             :color="darkModeStore.darkMode ? 'white' : 'primary'" 
             :class="formErrors.address ? '!max-h-[60px]' : '!max-h-[38px]'"
-            :loading="loading"
             :disabled="loading"
             :error="touchedFields.address && !!formErrors.address"
             :error-messages="touchedFields.address ? formErrors.address : ''"
@@ -168,7 +163,7 @@ const { showModalViewTypeShop, openModalViewTypeShop } = useModalViewTypeShop()
               outlined
               :color="darkModeStore.darkMode ? 'white' : 'primary'" 
               :class="formErrors.type_shop_id ? '!max-h-[60px]' : '!max-h-[38px]'"
-              :loading="loadingTypeShop || loading"
+              :loading="loadingTypeShop"
               :disabled="loadingTypeShop || loading"
               :error="touchedFields.type_shop_id && !!formErrors.type_shop_id"
               :error-messages="touchedFields.type_shop_id ? formErrors.type_shop_id : ''"
@@ -178,7 +173,7 @@ const { showModalViewTypeShop, openModalViewTypeShop } = useModalViewTypeShop()
               color="primary"
               variant="flat"
               :disabled="loadingTypeShop || loading"
-              :loading="loadingTypeShop || loading"
+              :loading="loadingTypeShop"
               prepend-icon="bx-search"
               @click="openModalViewTypeShop"
             >

@@ -47,6 +47,10 @@ const confirmToggleStatus = async () => {
             ¿Estás seguro de restablecer la contraseña de la cuenta
             <strong>{{ data?.name }}</strong>?
           </p>
+          <p class="text-gray-600 dark:text-slate-300">
+            Se enviara una solicitud por correo de reinicio de contraseña a 
+            <strong>{{ data?.name }}</strong> 
+          </p>
         </div>
       </VCardText>
 

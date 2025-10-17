@@ -4,6 +4,7 @@ import useVerifyDocs from '@/hooks/Users/useVerifyDocs'
 import { ref, watch, onBeforeUnmount } from 'vue'
 import { useToastStore } from '@/store/useToastStore'
 import ImageZoom from '@/components/Base/ImageZoom'
+import { useDarkModeStore } from '@/store/dark-mode'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -11,6 +12,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'verify-docs'])
+
+const darkModeStore = useDarkModeStore()
 const { loadingListDocs, getListDocs, listDocs, resetListDocs, cleanupObjectUrls } = useGetListDocs()
 const { loadingVerifyDocs, verifyDocs } = useVerifyDocs()
 const toastStore = useToastStore()
@@ -155,6 +158,7 @@ onBeforeUnmount(() => {
               v-model="status"
               :items="itemsSelect"
               :disabled="loadingVerifyDocs"
+              :color="darkModeStore.darkMode ? 'white' : 'primary'"
               label="Verificación"
               placeholder="Seleccione una opción"
               item-title="title"
@@ -166,6 +170,7 @@ onBeforeUnmount(() => {
               v-model="justification"
               label="Justificación"
               placeholder="Ingrese la justificación para rechazar los documentos"
+              :color="darkModeStore.darkMode ? 'white' : 'primary'"
               :disabled="loadingVerifyDocs"
               class="w-full"
               auto-grow

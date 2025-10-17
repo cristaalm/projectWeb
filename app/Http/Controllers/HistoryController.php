@@ -90,7 +90,7 @@ class HistoryController extends Controller
         }
     }
 
-    public function logHistory($user_id = null, $comerciant_id = null, $alliance_id = null, $material_type_id = null, $reward_id = null, $type_history = null, $scan_id = null, $points = null)
+    public function logHistory($user_id = null, $comerciant_id = null, $alliance_id = null, $material_type_id = null, $reward_id = null, $type_history = null, $scan_id = null, $points = null, $description = null)
     {
 
         $request = new Request([
@@ -102,6 +102,7 @@ class HistoryController extends Controller
             'type_history' => $type_history,
             'scan_id' => $scan_id,
             'points' => $points,
+            'description' => $description,
         ]);
 
         try {
@@ -111,9 +112,10 @@ class HistoryController extends Controller
                 'alliance_id' => 'nullable|exists:alliances,id',
                 'material_type_id' => 'nullable|exists:material_types,id',
                 'reward_id' => 'nullable|exists:rewards,id',
-                'type_history' => 'required|in:1,2',
+                'type_history' => 'required|in:1,2,3',
                 'scan_id' => 'nullable|exists:scans,id',
                 'points' => 'required|numeric',
+                'description' => 'nullable|string',
             ]);
             
             // si es tipo 2, validar que solo haya enviado material_type_id
@@ -141,6 +143,12 @@ class HistoryController extends Controller
                 ]);
             }
 
+            if ($request->type_history == 3 && $request->description == null ) {
+                throw ValidationException::withMessages([
+                    'description' => 'El campo descripción es obligatorio.',
+                ]);
+            }
+
             $history = History::create([
                 'user_id' => $request->user_id,
                 'comerciant_id' => $request->comerciant_id,
@@ -150,6 +158,7 @@ class HistoryController extends Controller
                 'type_history' => $request->type_history,
                 'scan_id' => $request->scan_id,
                 'points' => $request->points,
+                'description' => $request->description,
             ]);
 
             return $history;

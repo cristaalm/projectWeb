@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Str;
 
 use App\Notifications\CustomResetPassword;
 
@@ -35,6 +36,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'code_identity',
         'status',
         'google2fa_secret',
+        'alliance_id',
         'role_id',
     ];
 
@@ -60,6 +62,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Role::class);
     }
 
+    public function alliance(): BelongsTo
+    {
+        return $this->belongsTo(Alliance::class);
+    }
+
     public function identityVerification(): HasMany
     {
         return $this->hasMany(IdentityVerification::class);
@@ -83,6 +90,12 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new CustomResetPassword($token, $this->email));
+    }
+    
+    public static function generatePassword($longitud = 16)
+    {
+        $caracteres = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+-=[]{}|;:,.<>?';
+        return Str::random($longitud, $caracteres);
     }
 
     public static function calculateEan13CheckDigit(string $digits12): string

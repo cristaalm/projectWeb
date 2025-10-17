@@ -23,6 +23,11 @@ const useMenuStore = defineStore('menu', {
           to: '/panel',
         },
         {
+          title: 'Usuarios',
+          icon: 'bx-user',
+          to: '/users',
+        },
+        {
           title: 'Contenedores',
           icon: 'bx-purchase-tag-alt',
           to: '/containers',

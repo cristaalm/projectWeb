@@ -125,18 +125,7 @@ class IdentifyVerificationController extends Controller
             $token = $request->bearerToken();
             
             // verificación del admin o moderador
-
-            if ($authUser->role_id !== 1 && $authUser->role_id !== 2) {
-                return $this->apiResponse(false, 'No tienes permiso para obtener los documentos.', null, null, 403);
-            }
-
             $accessToken = PersonalAccessToken::findToken($token);
-
-            $two_factor_status = $authUser->two_factor_status;
-
-            if ($two_factor_status && !(is_array($accessToken->abilities) && in_array('two_factor', $accessToken->abilities))) {
-                return $this->apiResponse(false, 'No tienes permiso para obtener los documentos.', null, null, 403);
-            }
 
             // obtener documentos
 

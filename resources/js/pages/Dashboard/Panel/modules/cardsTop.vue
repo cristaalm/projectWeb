@@ -56,14 +56,14 @@ onMounted(() => {
         v-for="(item, index) in template" 
         :key="index"
       >
-        <div class="col-span-1 rounded-lg p-4 flex flex-col justify-between bg-white animate-skeleton-pulse shadow-lg">
+        <div class="col-span-1 rounded-lg p-4 flex flex-col justify-between bg-white dark:bg-[#2A2B3E] animate-skeleton-pulse shadow-lg">
           <div class="flex flex-row w-full justify-between">
-            <div class="w-1/2 h-[32px] bg-gray-200 rounded-xl animate-skeleton-pulse" />
-            <div class="w-[32px] h-[32px] bg-gray-200 rounded-full animate-skeleton-pulse" />
+            <div class="w-1/2 h-[32px] bg-gray-200 dark:bg-slate-300 rounded-xl animate-skeleton-pulse" />
+            <div class="w-[32px] h-[32px] bg-gray-200 dark:bg-slate-300 rounded-full animate-skeleton-pulse" />
           </div>
           <div class="flex flex-col gap-1 w-full justify-between">
-            <div class="w-1/4 h-[25px] bg-gray-200 rounded-xl animate-skeleton-pulse" />
-            <div class="w-1/2 h-[20px] bg-gray-200 rounded-xl animate-skeleton-pulse" />
+            <div class="w-1/4 h-[25px] bg-gray-200 dark:bg-slate-300 rounded-xl animate-skeleton-pulse" />
+            <div class="w-1/2 h-[20px] bg-gray-200 dark:bg-slate-300 rounded-xl animate-skeleton-pulse" />
           </div>
         </div>
       </template>

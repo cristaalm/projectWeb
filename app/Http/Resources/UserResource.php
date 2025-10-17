@@ -11,6 +11,7 @@ class UserResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'alliance_id' => $this->alliance_id,
             'name' => $this->name,
             'last_name' => $this->last_name,
             'email' => $this->email,
@@ -23,13 +24,21 @@ class UserResource extends JsonResource
             'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-
-            'role' => $this->whenLoaded('role', [
+            'alliance' => $this->alliance_id ? $this->whenLoaded('alliance', [
+                'id' => $this->alliance->id,
+                'name' => $this->alliance->name,
+                'phone' => $this->alliance->phone,
+                'logo' => $this->alliance->logo,
+                'ext' => $this->alliance->ext,
+                'created_at' => $this->alliance->created_at,
+                'updated_at' => $this->alliance->updated_at,
+            ]) : null,
+            'role' => $this->role_id ? $this->whenLoaded('role', [
                 'id' => $this->role->id,
                 'name' => $this->role->name,
                 'display_name' => $this->role->display_name,
                 'is_active' => $this->role->is_active,
-            ]),
+            ]) : null,
         ];
     }
 }

@@ -2,7 +2,7 @@
 import useToggleStatus from '@/hooks/Users/useToggleStatus'
 import { ref, watch } from 'vue'
 import { useToastStore } from '@/store/useToastStore'
-
+import { useDarkModeStore } from '@/store/dark-mode'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -10,6 +10,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'toggle-status'])
+
+const darkModeStore = useDarkModeStore()
 const { loading, toggleStatus } = useToggleStatus()
 const toastStore = useToastStore()
 const data = computed(() => props.data)
@@ -57,7 +59,7 @@ const confirmToggleStatus = async () => {
             ¿Estás seguro de {{ data?.status == 1 ? 'activar' : 'desactivar' }} la cuenta
             <strong>{{ data?.user?.name }}</strong>?
           </p>
-          <p class="text-gray-600">
+          <p class="text-gray-600 dark:text-slate-300">
             Se le notificará a <strong>{{ data?.user?.name }}</strong> sobre la 
             {{ data?.status == 1 ? 'activación' : 'desactivación' }} de su cuenta.
           </p>
@@ -69,6 +71,7 @@ const confirmToggleStatus = async () => {
               label="Justificación"
               placeholder="Ingrese la justificación para desactivar la cuenta"
               class="w-full"
+              :color="darkModeStore.darkMode ? 'white' : 'primary'"
               auto-grow
               rows="3"
               :rules="[

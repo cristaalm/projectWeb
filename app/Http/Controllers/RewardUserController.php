@@ -69,7 +69,7 @@ class RewardUserController extends Controller
             $comerciant = $authUser->role_id == 4 ? $authUser : null;
 
             $history = new HistoryController();
-            $history->logHistory($validatedData['user_id'], $comerciant->id, $reward->alliance_id, null, $reward->id, 1, null, $reward->points_required);
+            $history->logHistory($validatedData['user_id'], $comerciant->id, $reward->alliance_id, null, $reward->id, 1, null, $reward->points_required, null);
             
             DB::commit();
             

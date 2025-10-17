@@ -9,9 +9,14 @@ import { useAuthStore } from '@/store/auth'
 import { ModalToggleStatus, useModalToggleStatus } from './modules/ModalToggleStatus'
 import { ModalResetPass, useModalResetPass } from './modules/ModalResetPass'
 import { ModalVerifyDocs, useModalVerifyDocs } from './modules/ModalVerifyDocs'
+import { ModalCreate, useModalCreate } from './modules/ModalCreate'
+import { ModalModifyPoints, useModalModifyPoints } from './modules/ModalModifyPoints'
 
 const authStore = useAuthStore()
 const darkModeStore = useDarkModeStore()
+
+const verification_status = ref(null)
+const role = ref(null)
 
 const {
   data: users,
@@ -23,7 +28,22 @@ const {
   search,
   status,
   loadData,
-} = requestOrderTable({ url: 'users/getAll' })
+} = requestOrderTable({ url: 'users/getAll', params: { verification_status, tipo: role } })
+
+const countFilters = computed(() => {
+  let count = 0
+  if (status.value !== null) count++
+  if (verification_status.value !== null) count++
+  if (role.value !== null) count++
+  
+  return count
+})
+
+const resetFilters = () => {
+  status.value = null
+  verification_status.value = null
+  role.value = null
+}
 
 const headers = [
   { title: '', align: 'left', key: 'avatar', sortable: false },
@@ -51,9 +71,22 @@ function formatPhone(phone) {
 const { showToggleStatusModal, openToggleStatusModal, selectedUserToToggleStatus } = useModalToggleStatus()
 const { showResetPassModal, openResetPassModal, selectedUserToResetPass } = useModalResetPass()
 const { showVerifyDocsModal, openVerifyDocsModal, selectedUserToVerifyDocs } = useModalVerifyDocs()
+const { showCreateModal, openCreateModal } = useModalCreate()
+const { showModifyPointsModal, openModifyPointsModal, selectedUserToModifyPoints } = useModalModifyPoints()
 </script>
 
 <template>
+  <ModalModifyPoints
+    v-model="showModifyPointsModal"
+    :data="selectedUserToModifyPoints"
+    @modify-points="loadData"
+  />
+
+  <ModalCreate
+    v-model="showCreateModal"
+    @create="loadData"
+  />
+
   <ModalToggleStatus
     v-model="showToggleStatusModal"
     :data="selectedUserToToggleStatus"
@@ -95,10 +128,20 @@ const { showVerifyDocsModal, openVerifyDocsModal, selectedUserToVerifyDocs } = u
         >
           Actualizar
         </VBtn>
+        <VBtn
+          class="disabled:opacity-50"
+          :color="darkModeStore.darkMode ? '#136b80' : 'primary'"
+          :disabled="authStore.user.role.id != 2"
+          variant="elevated"
+          prepend-icon="bx-plus"
+          @click="openCreateModal"
+        >
+          Agregar Usuario
+        </VBtn>
       </div>
     </div>
 
-    <div class="col-span-12 p-2 md:p-6 space-y-6 bg-white dark:bg-[#2b2c40] flex flex-col md:flex-row justify-between items-center gap-6 shadow-lg">
+    <div class="col-span-12 p-2 md:p-6 bg-white dark:bg-[#2b2c40] flex flex-col md:flex-row justify-between items-center gap-6 shadow-lg">
       <VTextField
         v-model="search"
         label="Buscar"
@@ -108,17 +151,83 @@ const { showVerifyDocsModal, openVerifyDocsModal, selectedUserToVerifyDocs } = u
         class="w-full md:!flex-[.5]"
         variant="outlined"
       />
-      <VSelect
-        v-model="status"
-        label="Filtrar por"
-        :items="[{ title: 'Todos', value: null }, { title: 'Activo', value: 1 }, { title: 'Inactivo', value: 0 }]"
-        placeholder="Filtrar por"
-        prepend-inner-icon="bx-filter"
-        :color="darkModeStore.darkMode ? 'white' : 'primary'"
-        class="w-full md:!flex-[.5] lg:!flex-[.2] mt-0"
-        variant="outlined"
-        no-data-text="No opciones de filtrado"
-      />
+      <VMenu
+        location="bottom end"
+        offset="10"
+        :close-on-content-click="false"
+      >
+        <template #activator="{ props }">
+          <VBtn
+            v-bind="props"
+            variant="outlined"
+            color="secondary"
+            class="w-full sm:w-auto relative"
+          >
+            <VBadge
+              v-if="countFilters > 0"
+              :content="countFilters"
+              color="primary"
+              class="absolute top-0 right-0"
+            />
+            <VIcon
+              icon="bx-filter"
+              start
+            />
+            Filtrar
+          </VBtn>
+        </template>
+
+        <VCard
+          class="pa-4 relative"
+          width="250"
+        >
+          <div class="flex flex-col gap-y-2">
+            <VSelect
+              v-model="verification_status"
+              label="Verificación"
+              :items="[{ title: 'Todos', value: null }, { title: 'Pendiente', value: 0 }, { title: 'Verificado', value: 1 }, { title: 'Rechazado', value: 2 }, { title: 'Sin Documentos', value: 3 }]"
+              placeholder="Verificación"
+              prepend-inner-icon="bx-filter"
+              :color="darkModeStore.darkMode ? 'white' : 'primary'"
+              class="mt-0"
+              variant="outlined"
+              no-data-text="No opciones de filtrado"
+            />
+            <VSelect
+              v-model="role"
+              label="Tipo"
+              :items="[{ title: 'Todos', value: null }, { title: 'Usuario', value: 1 }, { title: 'Administrador', value: 2 }, { title: 'Moderador', value: 3 }, { title: 'Comerciante', value: 4 }]"
+              placeholder="Tipo"
+              prepend-inner-icon="bx-filter"
+              :color="darkModeStore.darkMode ? 'white' : 'primary'"
+              class="mt-0"
+              variant="outlined"
+              no-data-text="No opciones de filtrado"
+            />
+            <VSelect
+              v-model="status"
+              label="Estado"
+              :items="[{ title: 'Todos', value: null }, { title: 'Activo', value: 1 }, { title: 'Inactivo', value: 0 }]"
+              placeholder="Estado"
+              prepend-inner-icon="bx-filter"
+              :color="darkModeStore.darkMode ? 'white' : 'primary'"
+              class="mt-0"
+              variant="outlined"
+              no-data-text="No opciones de filtrado"
+            />
+            <VBtn
+              variant="outlined"
+              color="secondary"
+              class="w-full"
+              prepend-icon="mdi mdi-refresh"
+              :disabled="status == null && role == null && verification_status == null"
+              @click="resetFilters"
+            >
+              Reinciar
+            </VBtn>
+          </div>
+        </VCard>
+      </VMenu>
     </div>
 
     <OrderTable
@@ -152,7 +261,7 @@ const { showVerifyDocsModal, openVerifyDocsModal, selectedUserToVerifyDocs } = u
     
       <template #item.name="{ item }">
         <div class="flex flex-col">
-          <span class="font-bold">{{ item.name }}</span>
+          <span class="font-bold">{{ item.name }} {{ item.last_name }}</span>
           <span class="text-gray-400">ID: {{ item.id }}</span>
         </div>
       </template>
@@ -194,7 +303,7 @@ const { showVerifyDocsModal, openVerifyDocsModal, selectedUserToVerifyDocs } = u
 
       <template #item.actions="{ item }">
         <VMenu
-          v-if="item.id != authStore.user.id"
+          v-if="item.id != authStore.user.id && item.role_id != 2 && item.role_id != authStore.user?.role?.id"
           offset="10"
           location="bottom end"
           width="250"
@@ -222,6 +331,21 @@ const { showVerifyDocsModal, openVerifyDocsModal, selectedUserToVerifyDocs } = u
               </template>
               <VListItemTitle class="text-blue-500">
                 Restablecer contraseña
+              </VListItemTitle>
+            </VListItem>
+            <VDivider />
+            <VListItem 
+              v-if="item.role_id != 4"
+              @click="openModifyPointsModal(item)"
+            >
+              <template #prepend>
+                <VIcon
+                  icon="mdi mdi-swap-horizontal"
+                  class="me-2 text-amber-500"
+                />
+              </template>
+              <VListItemTitle class="text-amber-500">
+                Modificar Puntos
               </VListItemTitle>
             </VListItem>
             <VDivider />
