@@ -12,14 +12,19 @@ Route::prefix('users')->group(function () {
         Route::post('toggleStatusAccount', [UserController::class, 'toggleStatusAccount']);
         Route::post('modifyPoints', [UserController::class, 'modifyPoints']);
         Route::post('create', [UserController::class, 'create']);
+        Route::post('updateField/{field}/{userId}', [UserController::class, 'updateField'])
+        ->where('field', 'name|last_name|email|phone|curp');
         
         // Controller IdentifyVerification
+        Route::post('verification-user', [IdentifyVerificationController::class, 'verificationUser']);
         Route::post('uploadDocuments', [IdentifyVerificationController::class, 'uploadDocuments']);
         Route::post('uploadSelfie', [IdentifyVerificationController::class, 'uploadSelfie']);
+        Route::post('toggle-status-pending/{userId}', [IdentifyVerificationController::class, 'toggleStatusPending']);
+        Route::post('documents/{type}/{userId}', [IdentifyVerificationController::class, 'uploadDoc'])
+        ->where('type', 'ine_front|ine_back|selfie');
+        Route::get('list-docs', [IdentifyVerificationController::class, 'getListDocs']);
         Route::get('documents/{type}/{userId}', [IdentifyVerificationController::class, 'getDocument'])
         ->where('type', 'front|back|selfie');
-        Route::get('list-docs', [IdentifyVerificationController::class, 'getListDocs']);
-        Route::post('verification-user', [IdentifyVerificationController::class, 'verificationUser']);
     });
     
     // Controller user

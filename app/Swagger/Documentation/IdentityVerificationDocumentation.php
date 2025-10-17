@@ -8,6 +8,218 @@ use OpenApi\Attributes as OA;
 class IdentityVerificationDocumentation
 {
     #[OA\Post(
+        path: "/api/users/toggle-status-pending/{userId}",
+        tags: ["Verificación de Identidad"],
+        summary: "Reiniciar el estado de verificación a pendiente",
+        description: "Cambia el estado de verificación de un usuario a 'pendiente' y limpia cualquier motivo de rechazo previo. Útil para permitir que el usuario vuelva a subir sus documentos.",
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "userId",
+                description: "ID del usuario cuyo estado se reiniciará",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "integer", example: 5)
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Estado actualizado exitosamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Estado actualizado exitosamente."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: "Token de autenticación no válido o no proporcionado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Token de autenticación no proporcionado."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 401),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 403,
+                description: "No autorizado para modificar el estado del usuario",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "No tienes permiso para modificar este estado."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 403),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: "Error de validación",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al actualizar el estado."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", properties: [
+                            new OA\Property(property: "user_id", type: "array", items: new OA\Items(type: "string", example: "The selected user id is invalid.")),
+                        ]),
+                        new OA\Property(property: "status", type: "integer", example: 422),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al actualizar el estado."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function toggleStatusPending(Request $request, int $userId) {}
+
+    #[OA\Post(
+        path: "/api/users/documents/{type}/{userId}",
+        tags: ["Verificación de Identidad"],
+        summary: "Subir un documento de verificación específico",
+        description: "Permite subir un documento de verificación individual (frente del INE, reverso del INE o selfie) para un usuario específico.",
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "type",
+                description: "Tipo de documento a subir",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "string", enum: ["ine_front", "ine_back", "selfie"], example: "ine_front")
+            ),
+            new OA\Parameter(
+                name: "userId",
+                description: "ID del usuario para el que se sube el documento",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "integer", example: 5)
+            ),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: [
+                new OA\MediaType(
+                    mediaType: "multipart/form-data",
+                    schema: new OA\Schema(
+                        required: ["document"],
+                        properties: [
+                            new OA\Property(
+                                property: "document",
+                                type: "string",
+                                format: "binary",
+                                description: "Archivo de imagen del documento (jpeg, png, jpg). Máx. 5MB."
+                            ),
+                        ]
+                    )
+                )
+            ]
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Documento subido exitosamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Documento subido exitosamente."),
+                        new OA\Property(property: "data", ref: "#/components/schemas/IdentityVerification"),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: "Token de autenticación no válido o no proporcionado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Token de autenticación no proporcionado."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 401),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 403,
+                description: "No autorizado para subir documentos",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "No tienes permiso para subir documentos."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 403),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: "Error de validación",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al subir los documentos."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", properties: [
+                            new OA\Property(property: "document", type: "array", items: new OA\Items(type: "string", example: "The document must be an image.")),
+                            new OA\Property(property: "type", type: "array", items: new OA\Items(type: "string", example: "The selected type is invalid.")),
+                            new OA\Property(property: "user_id", type: "array", items: new OA\Items(type: "string", example: "The selected user id is invalid.")),
+                        ]),
+                        new OA\Property(property: "status", type: "integer", example: 422),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al subir los documentos."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function uploadDoc(Request $request, string $type, int $userId) {}
+
+    #[OA\Post(
         path: "/api/users/uploadDocuments",
         tags: ["Verificación de Identidad"],
         summary: "Subir documentos de identidad (frente y reverso)",

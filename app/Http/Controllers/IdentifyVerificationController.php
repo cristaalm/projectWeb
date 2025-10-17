@@ -19,6 +19,80 @@ use App\Enums\VerificationStatus;
 
 class IdentifyVerificationController extends Controller
 {
+    public function toggleStatusPending(Request $request, int $userId)
+    {
+        try {
+            $authUser = $request->user();
+
+            $request->merge([
+                'user_id' => $userId,
+            ]);
+            
+            $validateData = $request->validate([
+                'user_id' => 'required|exists:users,id',
+            ]);
+            
+            DB::beginTransaction();
+            
+            $user = User::findOrFail($userId);
+            $identityVerification = IdentityVerification::where('user_id', $user->id)->first();
+
+            $user->verification_status = VerificationStatus::PENDING->value;
+            $user->save();
+
+            $identityVerification->status = IndentifyVerificationStatus::PENDING->value;
+            $identityVerification->rejection_reason = null;
+            $identityVerification->save();
+
+            DB::commit();
+            
+            return $this->apiResponse(true, 'Estado actualizado exitosamente.', null, null, 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->apiResponse(false, 'Error al actualizar el estado.', null, $e->getMessage(), 500);
+        }
+    }
+
+    public function uploadDoc(Request $request, string $type, int $userId)
+    {
+        try {
+            $authUser = $request->user();
+
+            $request->merge([
+                'type' => $type,
+                'user_id' => $userId,
+            ]);
+            
+            $validateData = $request->validate([
+                'document' => 'required|image|mimes:jpeg,png,jpg|max:5120',
+                'type' => 'required|in:ine_front,ine_back,selfie',
+                'user_id' => 'required|exists:users,id',
+            ]);
+            
+            $user = User::findOrFail($userId);
+            $identityVerification = IdentityVerification::where('user_id', $user->id)->first();
+
+            $document = $request->file('document');
+            $documentName = $type . '.' . $document->getClientOriginalExtension();
+
+            DB::beginTransaction();
+
+            $documentPath = $document->storeAs('users/user_' . $user->id, $documentName, 'local');
+
+            $type_url = $type . '_url';
+
+            $identityVerification->$type_url = $documentPath;
+            $identityVerification->save();
+
+            DB::commit();
+            
+            return $this->apiResponse(true, 'Documento subido exitosamente.', $identityVerification, null, 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->apiResponse(false, 'Error al subir los documentos.', null, $e->getMessage(), 500);
+        }
+    }
+
     public function uploadDocuments(Request $request) 
     {
         try {

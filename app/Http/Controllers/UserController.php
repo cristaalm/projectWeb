@@ -90,6 +90,38 @@ class UserController extends Controller
         }
     }
 
+    public function updateField(Request $request, string $field, int $userId)
+    {
+        try {
+            $authUser = $request->user();
+
+            $request->merge([
+                'field' => $field,
+                'user_id' => $userId,
+            ]);
+            
+            $validateData = $request->validate([
+                'field' => 'required|in:name,last_name,email,phone,curp',
+                'value' => 'required',
+                'user_id' => 'required|exists:users,id',
+            ]);
+            
+            $user = User::findOrFail($userId);
+
+            DB::beginTransaction();
+
+            $user->$field = $validateData['value'];
+            $user->save();
+
+            DB::commit();
+            
+            return $this->apiResponse(true, 'Campo actualizado exitosamente.', $user, null, 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->apiResponse(false, 'Error al actualizar el campo.', null, $e->getMessage(), 500);
+        }
+    }
+
     public function create(Request $request) 
     {
         try {

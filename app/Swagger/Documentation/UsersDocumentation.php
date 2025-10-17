@@ -171,6 +171,121 @@ class UsersDocumentation
     public function getAll(Request $request) {}
 
     #[OA\Post(
+        path: "/api/users/updateField/{field}/{userId}",
+        tags: ["Usuarios"],
+        summary: "Actualizar un campo específico del perfil de usuario",
+        description: "Permite actualizar un campo individual del perfil de un usuario (nombre, apellido, correo, teléfono o CURP).",
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "field",
+                description: "Nombre del campo a actualizar",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "string", enum: ["name", "last_name", "email", "phone", "curp"], example: "email")
+            ),
+            new OA\Parameter(
+                name: "userId",
+                description: "ID del usuario a actualizar",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "integer", example: 5)
+            ),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["value"],
+                properties: [
+                    new OA\Property(
+                        property: "value",
+                        type: "string",
+                        example: "nuevo.email@example.com",
+                        description: "Nuevo valor para el campo especificado"
+                    ),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Campo actualizado exitosamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Campo actualizado exitosamente."),
+                        new OA\Property(property: "data", ref: "#/components/schemas/User"),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: "Token de autenticación no válido o no proporcionado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Token de autenticación no proporcionado."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 401),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 403,
+                description: "No autorizado para actualizar el perfil del usuario",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "No tienes permiso para actualizar este perfil."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 403),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: "Error de validación",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al actualizar el campo."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", properties: [
+                            new OA\Property(property: "field", type: "array", items: new OA\Items(type: "string", example: "The selected field is invalid.")),
+                            new OA\Property(property: "value", type: "array", items: new OA\Items(type: "string", example: "The value field is required.")),
+                            new OA\Property(property: "user_id", type: "array", items: new OA\Items(type: "string", example: "The selected user id is invalid.")),
+                        ]),
+                        new OA\Property(property: "status", type: "integer", example: 422),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al actualizar el campo."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function updateField(Request $request, string $field, int $userId) {}
+
+    #[OA\Post(
         path: "/api/users/toggleStatusAccount",
         tags: ["Usuarios"],
         summary: "Cambiar el estado de activación de una cuenta de usuario",
