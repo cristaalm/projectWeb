@@ -24,6 +24,7 @@ class RewardUserController extends Controller
             $validatedData = $request->validate([
                 'user_id' => 'required|integer|exists:users,id',
                 'reward_id' => 'required|integer|exists:rewards,id',
+                'quantity' => 'required|integer',
             ]);
     
             $user = User::findOrFail($validatedData['user_id']);
@@ -44,12 +45,12 @@ class RewardUserController extends Controller
             }
 
             // el usuario debe tener puntos suficientes
-            if ($user->total_points < $reward->points_required) {
+            if ($user->total_points < $reward->points_required * $validatedData['quantity']) {
                 return $this->apiResponse(false, 'No tiene puntos suficientes.', null, null, 400);
             }
 
             // la recompensa debe tener stock suficiente, si es null, el stock es ilimitado
-            if ($reward->stock !== null && $reward->stock < 1) {
+            if ($reward->stock !== null && $reward->stock < 1 || $reward->stock <= $validatedData['quantity']) {
                 return $this->apiResponse(false, 'Recompensa agotada.', null, null, 400);
             }
 
@@ -58,18 +59,23 @@ class RewardUserController extends Controller
             $rewardUser = RewardsUser::create([
                 'user_id' => $user->id,
                 'reward_id' => $reward->id,
+                'quantity' => $validatedData['quantity'],
             ]);
 
-            $reward->stock !== null ? $reward->stock -= 1 : null;
+            $reward->stock !== null ? $reward->stock -= $validatedData['quantity'] : null;
             $reward->save();
 
-            $user->total_points -= $reward->points_required;
+            $user->total_points -= $reward->points_required * $validatedData['quantity'];
             $user->save();
 
             $comerciant = $authUser->role_id == 4 ? $authUser : null;
+            $comerciant_id = $comerciant ? $comerciant->id : null;
+
+            $points = $reward->points_required * $validatedData['quantity'];
+            $points *= -1;
 
             $history = new HistoryController();
-            $history->logHistory($validatedData['user_id'], $comerciant->id, $reward->alliance_id, null, $reward->id, 1, null, $reward->points_required, null);
+            $history->logHistory($validatedData['user_id'], $comerciant_id, $reward->alliance_id, null, $reward->id, 1, null, $validatedData['quantity'], $points, null);
             
             DB::commit();
             

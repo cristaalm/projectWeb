@@ -6102,7 +6102,8 @@
                             "schema": {
                                 "required": [
                                     "user_id",
-                                    "reward_id"
+                                    "reward_id",
+                                    "quantity"
                                 ],
                                 "properties": {
                                     "user_id": {
@@ -6114,6 +6115,11 @@
                                         "description": "ID de la recompensa a reclamar",
                                         "type": "integer",
                                         "example": 3
+                                    },
+                                    "quantity": {
+                                        "description": "Cantidad de recompensas a reclamar",
+                                        "type": "integer",
+                                        "example": 1
                                     }
                                 },
                                 "type": "object"
@@ -6149,6 +6155,10 @@
                                                 "reward_id": {
                                                     "type": "integer",
                                                     "example": 3
+                                                },
+                                                "quantity": {
+                                                    "type": "integer",
+                                                    "example": 1
                                                 },
                                                 "redeemed_at": {
                                                     "type": "string",

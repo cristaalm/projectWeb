@@ -14,6 +14,7 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('reward_id')->unsigned();
             $table->bigInteger('user_id')->unsigned();
+            $table->integer('quantity')->nullable();
             $table->timestamp('redeemed_at')->default(now());
 
             $table->index('reward_id');

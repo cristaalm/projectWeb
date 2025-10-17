@@ -22,10 +22,12 @@ class RewardsUser extends Model
         'reward_id',
         'user_id',
         'redeemed_at',
+        'quantity',
     ];
 
     protected $casts = [
         'redeemed_at' => 'datetime',
+        'quantity' => 'integer',
     ];
 
     public function reward(): BelongsTo

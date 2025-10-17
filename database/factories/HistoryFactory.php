@@ -25,6 +25,7 @@ class HistoryFactory extends Factory
         $points = 0;
         $user = null;
         $comerciant = null;
+        $quantity = null;
 
         // no tenga el rol 4
         $user = User::where('role_id', '!=', 4)->inRandomOrder()->first()?->id;
@@ -41,7 +42,10 @@ class HistoryFactory extends Factory
 
             $reward_id = $reward->id;
 
-            $points = $reward->points_required * -1;
+            $quantity = $this->faker->randomElement([1, 2, 3]);
+
+            $points = $reward->points_required * $quantity;
+            $points *= -1;
         } else { // si es suma
             $material_type = MaterialTypes::inRandomOrder()->where('points', '>', 0)->first()?->id
                 ?? MaterialTypes::factory()->create()->id;
@@ -65,6 +69,7 @@ class HistoryFactory extends Factory
             'reward_id' => $reward_id,
             'points' => $points,
             'scan_id' => $scan_id,
+            'quantity' => $quantity,
         ];
     }
 }

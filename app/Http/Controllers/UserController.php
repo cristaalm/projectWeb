@@ -376,7 +376,7 @@ class UserController extends Controller
             $user->save();
 
             $history = new HistoryController();
-            $history->logHistory($validateData['user_id'], null, null, null, null, 3, null, $validateData['new_points'], $validateData['description']);
+            $history->logHistory($validateData['user_id'], null, null, null, null, 3, null, null, $validateData['new_points'], $validateData['description']);
 
             $sendMail = true;
             try {

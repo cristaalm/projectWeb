@@ -20,6 +20,7 @@ class History extends Model
         'material_type_id',
         'reward_id',
         'points',
+        'quantity',
         'alliance_id',
     ];
 
@@ -27,6 +28,7 @@ class History extends Model
         'type_history' => 'integer',
         'scan_id' => 'integer',
         'points' => 'integer',
+        'quantity' => 'integer',
     ];
 
     public function user(): BelongsTo

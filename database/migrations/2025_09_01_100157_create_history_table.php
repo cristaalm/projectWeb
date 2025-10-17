@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('material_type_id')->nullable(); // en caso de canjeo es null, en caso de suma es el material resiclado
             $table->unsignedBigInteger('scan_id')->nullable(); // en caso de canjeo es null, en caso de suma es el scan
             $table->integer('points')->default(0)->nullable(); // puntos sumados o restados, segun el caso
+            $table->integer('quantity')->nullable();
             $table->unsignedBigInteger('reward_id')->nullable(); // en caso de suma es null, en caso de canjeo es el comercio
             $table->unsignedBigInteger('alliance_id')->nullable(); // en caso de suma es null, en caso de canjeo es el comercio
             $table->timestamps();

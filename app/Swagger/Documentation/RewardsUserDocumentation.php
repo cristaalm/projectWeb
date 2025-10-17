@@ -17,10 +17,11 @@ class RewardsUserDocumentation
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ["user_id", "reward_id"],
+                required: ["user_id", "reward_id", "quantity"],
                 properties: [
                     new OA\Property(property: "user_id", type: "integer", example: 5, description: "ID del usuario que reclama la recompensa"),
-                    new OA\Property(property: "reward_id", type: "integer", example: 3, description: "ID de la recompensa a reclamar")
+                    new OA\Property(property: "reward_id", type: "integer", example: 3, description: "ID de la recompensa a reclamar"),
+                    new OA\Property(property: "quantity", type: "integer", example: 1, description: "Cantidad de recompensas a reclamar")
                 ],
                 type: "object"
             )
@@ -39,6 +40,7 @@ class RewardsUserDocumentation
                                 new OA\Property(property: "id", type: "integer", example: 1),
                                 new OA\Property(property: "user_id", type: "integer", example: 5),
                                 new OA\Property(property: "reward_id", type: "integer", example: 3),
+                                new OA\Property(property: "quantity", type: "integer", example: 1),
                                 new OA\Property(property: "redeemed_at", type: "string", format: "date-time", example: "2025-04-05T14:30:00.000000Z")
                             ],
                             type: "object"

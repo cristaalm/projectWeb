@@ -17,6 +17,7 @@ class RewardsUserFactory extends Factory
         $reward = Reward::select('id', 'single_use', 'created_at', 'expires_at')->inRandomOrder()->first();
         $user;
         $redeemed_at;
+        $quantity;
         $usuariosElejidos = [];
 
         do {
@@ -30,10 +31,13 @@ class RewardsUserFactory extends Factory
             $redeemed_at = $this->faker->dateTimeBetween($reward->created_at, $reward->expires_at);
         }
 
+        $quantity = $this->faker->randomElement([1, 2, 3]);
+
         return [
             'reward_id' => $reward->id,
             'user_id' => $user->id,
             'redeemed_at' => $redeemed_at,
+            'quantity' => $quantity,
         ];
     }
 }

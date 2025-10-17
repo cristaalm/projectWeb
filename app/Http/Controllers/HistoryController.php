@@ -90,7 +90,7 @@ class HistoryController extends Controller
         }
     }
 
-    public function logHistory($user_id = null, $comerciant_id = null, $alliance_id = null, $material_type_id = null, $reward_id = null, $type_history = null, $scan_id = null, $points = null, $description = null)
+    public function logHistory($user_id = null, $comerciant_id = null, $alliance_id = null, $material_type_id = null, $reward_id = null, $type_history = null, $scan_id = null, $quantity = null, $points = null, $description = null)
     {
 
         $request = new Request([
@@ -101,6 +101,7 @@ class HistoryController extends Controller
             'reward_id' => $reward_id,
             'type_history' => $type_history,
             'scan_id' => $scan_id,
+            'quantity' => $quantity,
             'points' => $points,
             'description' => $description,
         ]);
@@ -114,6 +115,7 @@ class HistoryController extends Controller
                 'reward_id' => 'nullable|exists:rewards,id',
                 'type_history' => 'required|in:1,2,3',
                 'scan_id' => 'nullable|exists:scans,id',
+                'quantity' => 'required|numeric',
                 'points' => 'required|numeric',
                 'description' => 'nullable|string',
             ]);
@@ -157,6 +159,7 @@ class HistoryController extends Controller
                 'reward_id' => $request->reward_id,
                 'type_history' => $request->type_history,
                 'scan_id' => $request->scan_id,
+                'quantity' => $request->quantity,
                 'points' => $request->points,
                 'description' => $request->description,
             ]);
