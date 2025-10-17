@@ -115,12 +115,15 @@ class RewardFactory extends Factory
             'Caja de Mensajes Positivos' 
         ];
 
+        $digits12 = implode('', $this->faker->randomElements(range('0', '9'), 12, true));
+        $checkDigit = Reward::calculateEan13CheckDigit($digits12);
+
         return [
             'name' => $this->faker->randomElement($names),
             'description' => $this->faker->sentence(),
             'points_required' => $this->faker->numberBetween(100, 10000),
             'stock' => $this->faker->numberBetween(1, 100),
-            'code' => $this->faker->unique()->lexify('REWARD-????-####'),
+            'code' => $checkDigit,
             'is_active' => $this->faker->boolean(80), // 80% activo
             'expires_at' => $this->faker->optional(0.3)->dateTimeBetween('+1 week', '+6 months'),
             'alliance_id' => Alliance::factory(),
