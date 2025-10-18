@@ -173,7 +173,7 @@ class AuthController extends Controller
 
             $user->load('alliance');
 
-            if ($user->alliance && $user->alliance->status == AllianceStatus::ACTIVE) {
+            if ($user->alliance && $user->alliance->status == AllianceStatus::ACTIVE->value) {
                 return $this->apiResponse(false, 'El comercio al que perteneces, ya no esta vigente.', null, 'El comercio al que perteneces esta desactivado.', 403);
             }
 
