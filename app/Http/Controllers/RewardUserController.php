@@ -13,6 +13,11 @@ use App\Models\RewardsUser;
 use App\Models\User;
 use App\Enums\VerificationStatus;
 use App\Enums\UserStatus;
+use App\Models\DeviceToken;
+use Illuminate\Support\Facades\Log;
+use Kreait\Firebase\Contract\Messaging;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
 
 class RewardUserController extends Controller
 {
@@ -78,8 +83,80 @@ class RewardUserController extends Controller
             $history->logHistory($validatedData['user_id'], $comerciant_id, $reward->alliance_id, null, $reward->id, 1, null, $validatedData['quantity'], $points, null);
             
             DB::commit();
+
+            // Envío automático de notificaciones FCM (no afecta el resultado del claim)
+            $notifications = [
+                'client' => ['attempted' => 0, 'errors' => []],
+                'merchant' => ['attempted' => 0, 'errors' => []],
+            ];
+
+            try {
+                /** @var Messaging $messaging */
+                $messaging = app(Messaging::class);
+
+                // Notificación al cliente
+                $clientTokens = DeviceToken::where('user_id', $user->id)
+                    ->where('platform', 'android')
+                    ->pluck('token')
+                    ->all();
+                $notifications['client']['attempted'] = count($clientTokens);
+
+                $clientTitle = 'Compra finalizada';
+                $clientBody = sprintf(
+                    'Has canjeado %dx %s por %d puntos.',
+                    (int) $validatedData['quantity'],
+                    $reward->name,
+                    (int) ($reward->points_required * $validatedData['quantity'])
+                );
+
+                foreach ($clientTokens as $token) {
+                    try {
+                        $message = CloudMessage::withTarget('token', $token)
+                            ->withNotification(Notification::create($clientTitle, $clientBody))
+                            ->withData(['title' => $clientTitle, 'body' => $clientBody, 'type' => 'reward_claim', 'reward_id' => (string) $reward->id]);
+                        $messaging->send($message);
+                    } catch (\Throwable $e) {
+                        Log::warning('FCM send client error', ['token' => $token, 'error' => $e->getMessage()]);
+                        $notifications['client']['errors'][] = ['token' => $token, 'error' => $e->getMessage()];
+                    }
+                }
+
+                // Notificación al comerciante (si aplica)
+                if ($comerciant_id) {
+                    $merchantTokens = DeviceToken::where('user_id', $comerciant_id)
+                        ->where('platform', 'android')
+                        ->pluck('token')
+                        ->all();
+                    $notifications['merchant']['attempted'] = count($merchantTokens);
+
+                    $merchantTitle = 'Venta confirmada';
+                    $merchantBody = sprintf(
+                        'Se procesó el canje de %dx %s para el usuario #%d.',
+                        (int) $validatedData['quantity'],
+                        $reward->name,
+                        (int) $user->id
+                    );
+
+                    foreach ($merchantTokens as $token) {
+                        try {
+                            $message = CloudMessage::withTarget('token', $token)
+                                ->withNotification(Notification::create($merchantTitle, $merchantBody))
+                                ->withData(['title' => $merchantTitle, 'body' => $merchantBody, 'type' => 'reward_claim_merchant', 'reward_id' => (string) $reward->id]);
+                            $messaging->send($message);
+                        } catch (\Throwable $e) {
+                            Log::warning('FCM send merchant error', ['token' => $token, 'error' => $e->getMessage()]);
+                            $notifications['merchant']['errors'][] = ['token' => $token, 'error' => $e->getMessage()];
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::error('FCM send post-claim error', ['error' => $e->getMessage()]);
+            }
             
-            return $this->apiResponse(true, 'Recompensa reclamada exitosamente.', $rewardUser, null, 200);
+            return $this->apiResponse(true, 'Recompensa reclamada exitosamente.', [
+                'reward' => $rewardUser,
+                'notifications' => $notifications,
+            ], null, 200);
         } catch (ValidationException $e) {
             return $this->apiResponse(false, 'Datos inválidos.', null, $e->errors(), 422);
         } catch (\Exception $e) {
