@@ -13,6 +13,10 @@
         {
             "url": "http://127.0.0.1:8000",
             "description": "Servidor local (php artisan serve)"
+        },
+        {
+            "url": "http://127.0.0.1:8001",
+            "description": "Local 8001 (php artisan serve)"
         }
     ],
     "paths": {
@@ -3490,7 +3494,7 @@
                                                         "growthPercentage": {
                                                             "type": "number",
                                                             "format": "float",
-                                                            "example": 13.6400000000000005684341886080801486968994140625
+                                                            "example": 13.64
                                                         }
                                                     },
                                                     "type": "object"
@@ -3508,7 +3512,7 @@
                                                         "growthPercentage": {
                                                             "type": "number",
                                                             "format": "float",
-                                                            "example": 13.6400000000000005684341886080801486968994140625
+                                                            "example": 13.64
                                                         }
                                                     },
                                                     "type": "object"
@@ -3526,7 +3530,7 @@
                                                         "growthPercentage": {
                                                             "type": "number",
                                                             "format": "float",
-                                                            "example": 8.9700000000000006394884621840901672840118408203125
+                                                            "example": 8.97
                                                         }
                                                     },
                                                     "type": "object"
@@ -3544,7 +3548,7 @@
                                                         "growthPercentage": {
                                                             "type": "number",
                                                             "format": "float",
-                                                            "example": 10.339999999999999857891452847979962825775146484375
+                                                            "example": 10.34
                                                         }
                                                     },
                                                     "type": "object"
@@ -5401,6 +5405,641 @@
                                             "example": "Error interno del servidor."
                                         },
                                         "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications/registerToken": {
+            "post": {
+                "tags": [
+                    "Notificaciones"
+                ],
+                "summary": "Registrar/actualizar token FCM del usuario (Android)",
+                "description": "Guarda o actualiza el token de dispositivo FCM para el usuario autenticado. Solo se permite 'android' por ahora.",
+                "operationId": "8cec9084a85b5954ea755e7fc84efc00",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id",
+                                    "token",
+                                    "platform"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "description": "ID del usuario autenticado",
+                                        "type": "integer",
+                                        "example": 6
+                                    },
+                                    "token": {
+                                        "description": "Token FCM del dispositivo",
+                                        "type": "string",
+                                        "example": "fcm_token"
+                                    },
+                                    "platform": {
+                                        "description": "Plataforma del dispositivo",
+                                        "type": "string",
+                                        "enum": [
+                                            "android"
+                                        ],
+                                        "example": "android"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Token registrado/actualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "registered"
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No autorizado para registrar el token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No autorizado para registrar este token."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 403
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Datos inválidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Datos inválidos para registrar token."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "user_id": [
+                                                    "El campo user_id es obligatorio."
+                                                ],
+                                                "token": [
+                                                    "El campo token es obligatorio."
+                                                ],
+                                                "platform": [
+                                                    "El campo platform es obligatorio."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno al registrar token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al registrar token."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Detalle del error"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Notificaciones"
+                ],
+                "summary": "Eliminar token FCM del usuario",
+                "description": "Elimina un token específico o todos los tokens de una plataforma del usuario autenticado. Enviar solo 'token' o solo 'platform'.",
+                "operationId": "f97d343e9889809c100c5e6fe05cd1aa",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "oneOf": [
+                                    {
+                                        "required": [
+                                            "user_id",
+                                            "token"
+                                        ],
+                                        "properties": {
+                                            "user_id": {
+                                                "description": "ID del usuario autenticado",
+                                                "type": "integer",
+                                                "example": 6
+                                            },
+                                            "token": {
+                                                "description": "Token FCM a eliminar",
+                                                "type": "string",
+                                                "example": "fcm_token"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    {
+                                        "required": [
+                                            "user_id",
+                                            "platform"
+                                        ],
+                                        "properties": {
+                                            "user_id": {
+                                                "description": "ID del usuario autenticado",
+                                                "type": "integer",
+                                                "example": 6
+                                            },
+                                            "platform": {
+                                                "description": "Plataforma cuyos tokens se eliminarán",
+                                                "type": "string",
+                                                "enum": [
+                                                    "android"
+                                                ],
+                                                "example": "android"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Token(s) eliminado(s)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "deleted"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "deleted": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Token no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "token_not_found"
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validación: proporcionar token o platform, no ambos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Debe proporcionar token o platform."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "token": [
+                                                    "Se requiere token o platform"
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No autorizado para eliminar tokens del usuario",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No autorizado para eliminar tokens de este usuario."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 403
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno al eliminar token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al eliminar token."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Detalle del error"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications/send": {
+            "post": {
+                "tags": [
+                    "Notificaciones"
+                ],
+                "summary": "Enviar notificación push al usuario (Android)",
+                "description": "Envía una notificación FCM a todos los dispositivos Android registrados del usuario. Límite de título 100 caracteres, mensaje 500.",
+                "operationId": "92d781d50bde903b0273f86df65e9691",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id",
+                                    "title",
+                                    "message"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "description": "ID del usuario autenticado",
+                                        "type": "integer",
+                                        "example": 6
+                                    },
+                                    "title": {
+                                        "description": "Título de la notificación (<=100)",
+                                        "type": "string",
+                                        "example": "Bienvenido"
+                                    },
+                                    "message": {
+                                        "description": "Cuerpo de la notificación (<=500)",
+                                        "type": "string",
+                                        "example": "Tu cuenta fue actualizada"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Intento de envío realizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "sent"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "attempted": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "errors": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "token": {
+                                                                "type": "string",
+                                                                "example": "fcm_token"
+                                                            },
+                                                            "error": {
+                                                                "type": "string",
+                                                                "example": "MismatchSenderId"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "example": []
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Sin dispositivos registrados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No hay dispositivos registrados para el usuario."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Sin tokens"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Datos inválidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Datos inválidos para enviar notificación."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "user_id": [
+                                                    "El campo user_id es obligatorio."
+                                                ],
+                                                "title": [
+                                                    "El campo title es obligatorio."
+                                                ],
+                                                "message": [
+                                                    "El campo message es obligatorio."
+                                                ]
+                                            }
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno al enviar notificación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al enviar notificación."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Detalle del error"
+                                        },
+                                        "code": {
                                             "type": "integer",
                                             "example": 500
                                         }
@@ -9223,6 +9862,10 @@
         {
             "name": "Verificación de Identidad",
             "description": "Endpoints para gestión de documentos de verificación de identidad"
+        },
+        {
+            "name": "Notificaciones",
+            "description": "Gestión de tokens FCM y envío de notificaciones push"
         },
         {
             "name": "Rewards",

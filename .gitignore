@@ -71,7 +71,8 @@ vendor
 
 # ============================
 # BRISA, no subas esta carpeta
-.vscode 
+.vscode
+# trataré-att.bri
 # ============================
 
 pids

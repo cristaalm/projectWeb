@@ -24,4 +24,8 @@ use OpenApi\Attributes as OA;
     url: "http://127.0.0.1:8000",
     description: "Servidor local (php artisan serve)"
 )]
+#[OA\Server(
+    url: "http://127.0.0.1:8001",
+    description: "Local 8001 (php artisan serve)"
+)]
 class OpenApi {}

@@ -11,6 +11,7 @@ require __DIR__ . '/api/History.php';
 require __DIR__ . '/api/Containers.php';
 require __DIR__ . '/api/Users.php';
 require __DIR__ . '/api/Dash.php';
+require __DIR__ . '/api/Notifications.php';
 
 Route::get('/health', function () {
     return response()->json(['status' => 'ok', 'time' => now()]);
