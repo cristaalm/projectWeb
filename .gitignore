@@ -76,3 +76,17 @@ vendor
 # ============================
 
 pids
+
+# Swagger docs (generated)
+# (Se versiona api-docs.json para producción; si automatizas generación, puedes volver a ignorarlos)
+# /storage/api-docs/*.json
+# /storage/api-docs/*.yaml
+
+# Private keys & service accounts
+*.pem
+*.key
+id_rsa
+id_ed25519
+*.p8
+*service-account*.json
+firebase*.json
