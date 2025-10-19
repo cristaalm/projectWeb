@@ -66,8 +66,6 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 # Generar enlaces de storage
 RUN php artisan storage:link || true
 
-# Generar documentación OpenAPI para Swagger UI
-RUN php artisan l5-swagger:generate --ansi || true
 
 # Configurar permisos
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache

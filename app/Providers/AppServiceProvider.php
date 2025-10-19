@@ -18,16 +18,39 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(Messaging::class, function () {
             $config = config('services.firebase');
 
-            $serviceAccount = [
-                'type' => 'service_account',
-                'project_id' => $config['project_id'] ?? null,
-                'client_email' => $config['client_email'] ?? null,
-                'private_key' => $config['private_key'] ?? null,
-            ];
+            // Prefer a full JSON blob if provided
+            $credentialsJson = $config['credentials_json'] ?? null;
+            $serviceAccount = null;
+
+            if (!empty($credentialsJson)) {
+                $decoded = json_decode($credentialsJson, true);
+                if (is_array($decoded)) {
+                    // Normalize escaped newlines in private key, if any
+                    if (isset($decoded['private_key'])) {
+                        $decoded['private_key'] = str_replace('\\n', "\n", $decoded['private_key']);
+                    }
+                    // Ensure type is set
+                    $decoded['type'] = $decoded['type'] ?? 'service_account';
+                    $serviceAccount = $decoded;
+                }
+            }
+
+            if ($serviceAccount === null) {
+                $serviceAccount = [
+                    'type' => 'service_account',
+                    'project_id' => $config['project_id'] ?? null,
+                    'client_email' => $config['client_email'] ?? null,
+                    'private_key' => $config['private_key'] ?? null,
+                ];
+            }
 
             $factory = (new Factory())
-                ->withServiceAccount($serviceAccount)
-                ->withProjectId($config['project_id'] ?? null);
+                ->withServiceAccount($serviceAccount);
+
+            $projectId = $serviceAccount['project_id'] ?? ($config['project_id'] ?? null);
+            if (!empty($projectId)) {
+                $factory = $factory->withProjectId($projectId);
+            }
 
             return $factory->createMessaging();
         });
