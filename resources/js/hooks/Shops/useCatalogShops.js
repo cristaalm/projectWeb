@@ -7,7 +7,7 @@ export function useCatalogShops() {
   const loading = ref(false)
   const toast = useToastStore()
   const authStore = useAuthStore()
-  const catShopsData = ref({})
+  const catShopsData = ref([])
 
   const loadCatShops = async () => {
     loading.value = true

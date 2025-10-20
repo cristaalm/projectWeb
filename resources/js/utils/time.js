@@ -54,7 +54,7 @@ export const formatDateToISO = dateString => {
 }
 
 // Formatea una fecha en formato ISO a dd/MM/yyyy
-export const formatDateString = dateString => {
+export const formatDateToDDMMYYYY = dateString => {
   if (!dateString) return ''
 
   return format(parseISO(dateString), 'dd/MM/yyyy')

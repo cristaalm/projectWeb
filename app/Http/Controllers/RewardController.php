@@ -36,7 +36,8 @@ class RewardController extends Controller
                 $rewardQuery->where(function ($q) use ($query) {
                     $q->where('name', 'like', '%' . $query . '%')
                       ->orWhere('description', 'like', '%' . $query . '%')
-                      ->orWhere('code', 'like', '%' . $query . '%')
+                      ->orWhere('points_required', 'like', '%' . $query . '%')
+                      ->orWhere('stock', 'like', '%' . $query . '%')
                       ->orWhereHas('alliance', function ($subQ) use ($query) {
                           $subQ->where('name', 'like', '%' . $query . '%');
                       });
@@ -51,7 +52,7 @@ class RewardController extends Controller
                 $rewardQuery->where('alliance_id', $allianceId);
             }
             
-            $allowedKeys = ['name', 'description', 'code', 'status', 'alliance.name', 'updated_at'];
+            $allowedKeys = ['name', 'description', 'stock', 'points_required', 'status', 'alliance.name', 'updated_at'];
             
             if (in_array($key, $allowedKeys) && in_array($order, ['asc', 'desc'])) {
                 if ($key === 'alliance.name') {
@@ -62,7 +63,7 @@ class RewardController extends Controller
                 }
             }
             
-            $rewards = $rewardQuery->paginate($perPage);
+            $rewards = $rewardQuery->with('alliance')->paginate($perPage);
             return $this->apiResponse(true, 'Recompensas obtenidos exitosamente.', $rewards, null, 200);
         } catch (\Exception $e) {
             return $this->apiResponse(false, 'Error al obtener las recompensas.', null, $e->getMessage(), 500);
@@ -73,47 +74,33 @@ class RewardController extends Controller
     {
         try {
             $validatedData = $request->validate([
+                'alliance_id' => 'required|exists:alliances,id',
                 'name' => 'required|string|max:255',
                 'description' => 'required|string|max:255',
                 'points_required' => 'required|integer',
-                'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
                 'stock' => 'nullable|integer',
-                'code' => 'required|string|max:255',
                 'is_active' => 'required|boolean',
                 'expires_at' => 'nullable|date',
-                'alliance_id' => 'required|exists:alliances,id',
             ]);
-    
-            DB::beginTransaction();
-    
-            $reward = Reward::create(array_merge($validatedData, [
-                'image' => false,
-            ]));
-    
-            if ($request->hasFile('image')) {
-                $file = $request->file('image');
-                $ext = $file->extension();
-                $filename = "{$reward->id}.{$ext}";
-                $path = "rewards/{$reward->alliance_id}";
-                $filepath = "$path/$filename";
-    
-                try {
-                    Storage::disk('public')->putFileAs($path, $file, $filename);
-                    $reward->update(['image' => true]);
-                } catch (\Exception $e) {
-                    if (Storage::disk('public')->exists($filepath)) {
-                        Storage::disk('public')->delete($filepath);
-                    }
-                    DB::rollBack();
-                    return $this->apiResponse(false, 'Error al subir la imagen.', null, $e->getMessage(), 500);
-                }
-            }
-    
-            DB::commit();
+
+            $digits12 = str_pad(random_int(0, 999999999999), 12, '0', STR_PAD_LEFT);
+            $checkDigit = Reward::calculateEan13CheckDigit($digits12);
+            $reward = Reward::create([
+                'alliance_id' => $validatedData['alliance_id'],
+                'name' => $validatedData['name'],
+                'description' => $validatedData['description'],
+                'points_required' => $validatedData['points_required'],
+                'stock' => $validatedData['stock'],
+                'code' => $digits12 . $checkDigit,
+                'is_active' => $validatedData['is_active'],
+                'expires_at' => $validatedData['expires_at'],
+            ]);
+
             return $this->apiResponse(true, 'Recompensa creada exitosamente.', $reward, null, 201);
-    
         } catch (ValidationException $e) {
-            return $this->apiResponse(false, 'Datos inválidos.', null, $e->errors(), 422);
+            $errors = $e->validator->errors()->all();
+            $firstError = $errors[0] ?? 'Error de validación de los datos.';
+            return $this->apiResponse(false, $firstError, null, null, 422);
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->apiResponse(false, 'Error interno al crear la recompensa.', null, $e->getMessage(), 500);
@@ -124,50 +111,19 @@ class RewardController extends Controller
     {
         try {
             $validatedData = $request->validate([
+                'alliance_id' => 'sometimes|required|exists:alliances,id',
                 'name' => 'sometimes|required|string|max:255',
                 'description' => 'sometimes|required|string|max:255',
                 'points_required' => 'sometimes|required|integer',
-                'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
                 'stock' => 'nullable|integer',
-                'code' => 'sometimes|required|string|max:255',
                 'is_active' => 'sometimes|required|boolean',
                 'expires_at' => 'nullable|date',
-                'alliance_id' => 'sometimes|required|exists:alliances,id',
             ]);
 
             DB::beginTransaction();
 
             $reward = Reward::findOrFail($id);
             $reward->update($validatedData);
-
-            if ($request->hasFile('image')) {
-                $file = $request->file('image');
-                $ext = $file->extension();
-                $filename = "{$reward->id}.{$ext}";
-                $path = "rewards/{$reward->alliance_id}";
-                $newFilepath = "$path/$filename";
-
-                try {
-                    if ($reward->image) {
-                        $oldFilepath = "rewards/{$reward->alliance_id}/{$reward->id}.*";
-                        $existingFiles = Storage::disk('public')->files("rewards/{$reward->alliance_id}");
-                        foreach ($existingFiles as $file) {
-                            if (basename($file) === "{$reward->id}." . pathinfo($file, PATHINFO_EXTENSION)) {
-                                Storage::disk('public')->delete($file);
-                                break;
-                            }
-                        }
-                    }
-
-                    Storage::disk('public')->putFileAs($path, $file, $filename);
-
-                    $reward->update(['image' => true]);
-
-                } catch (\Exception $e) {
-                    DB::rollBack();
-                    return $this->apiResponse(false, 'Error al actualizar la imagen.', null, $e->getMessage(), 500);
-                }
-            }
 
             DB::commit();
             return $this->apiResponse(true, 'Recompensa actualizada exitosamente.', $reward, null, 200);
@@ -180,32 +136,15 @@ class RewardController extends Controller
         }
     }
 
-    public function destroy(Request $request, $id)
+    public function delete(Request $request, $id)
     {
         try {
             DB::beginTransaction();
 
             $reward = Reward::findOrFail($id);
-
-            if ($reward->image) {
-                $allianceId = $reward->alliance_id;
-                $rewardId = $reward->id;
-                $imageDirectory = "rewards/{$allianceId}";
-                $existingFiles = Storage::disk('public')->files($imageDirectory);
-
-                foreach ($existingFiles as $file) {
-                    $filename = basename($file);
-                    if (preg_match("/^{$rewardId}\.\w+$/", $filename)) {
-                        Storage::disk('public')->delete($file);
-                        break;
-                    }
-                }
-            }
-
             $reward->delete();
 
             DB::commit();
-
             return $this->apiResponse(true, 'Recompensa eliminada exitosamente.', null, null, 200);
 
         } catch (\Exception $e) {

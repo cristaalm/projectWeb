@@ -280,8 +280,9 @@ const { showModifyPointsModal, openModifyPointsModal, selectedUserToModifyPoints
       </template>
 
       <template #item.total_points="{ item }">
-        <div class="truncate max-w-xs">
-          {{ item.total_points }}
+        <div class="flex flex-row items-center gap-2">
+          <div class="w-2 h-2 rounded-full bg-primary dark:bg-[#05D16E]" />
+          {{ new Intl.NumberFormat('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(item.total_points) }}
         </div>
       </template>
 

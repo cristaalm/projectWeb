@@ -84,24 +84,22 @@ class RewardDocumentation
             content: new OA\MediaType(
                 mediaType: "multipart/form-data",
                 schema: new OA\Schema(
-                    required: ["name", "description", "points_required", "code", "is_active", "alliance_id"],
+                    required: ["alliance_id", "name", "description", "points_required", "is_active"],
                     properties: [
+                        new OA\Property(property: "alliance_id", type: "integer"),
                         new OA\Property(property: "name", type: "string", maxLength: 255),
                         new OA\Property(property: "description", type: "string", maxLength: 255),
                         new OA\Property(property: "points_required", type: "integer"),
-                        new OA\Property(property: "image", type: "string", format: "binary", nullable: true),
                         new OA\Property(property: "stock", type: "integer", nullable: true),
-                        new OA\Property(property: "code", type: "string", maxLength: 255),
                         new OA\Property(property: "is_active", type: "boolean"),
                         new OA\Property(property: "expires_at", type: "string", format: "date", nullable: true),
-                        new OA\Property(property: "alliance_id", type: "integer")
                     ]
                 )
             )
         ),
         responses: [
             new OA\Response(
-                response: 201,
+                response: 200,
                 description: "Recompensa creada exitosamente",
                 content: new OA\JsonContent(
                     properties: [
@@ -167,15 +165,13 @@ class RewardDocumentation
                 mediaType: "multipart/form-data",
                 schema: new OA\Schema(
                     properties: [
+                        new OA\Property(property: "alliance_id", type: "integer"),
                         new OA\Property(property: "name", type: "string", maxLength: 255),
                         new OA\Property(property: "description", type: "string", maxLength: 255),
                         new OA\Property(property: "points_required", type: "integer"),
-                        new OA\Property(property: "image", type: "string", format: "binary", nullable: true),
                         new OA\Property(property: "stock", type: "integer", nullable: true),
-                        new OA\Property(property: "code", type: "string", maxLength: 255),
                         new OA\Property(property: "is_active", type: "boolean"),
                         new OA\Property(property: "expires_at", type: "string", format: "date", nullable: true),
-                        new OA\Property(property: "alliance_id", type: "integer")
                     ]
                 )
             )
@@ -250,7 +246,7 @@ class RewardDocumentation
     #[OA\Delete(
         path: "/api/reward/delete/{id}",
         operationId: "deleteReward",
-        description: "Elimina una recompensa y su imagen asociada (si existe)",
+        description: "Elimina una recompensa de forma logica, para evitar problemas con el historial.",
         tags: ["Rewards"],
         security: [["bearerAuth" => []]],
         parameters: [
@@ -301,5 +297,5 @@ class RewardDocumentation
             )
         ]
     )]
-    public function destroy(Request $request, $id){}
+    public function deleteclear(Request $request, $id){}
 }

@@ -3494,7 +3494,7 @@
                                                         "growthPercentage": {
                                                             "type": "number",
                                                             "format": "float",
-                                                            "example": 13.64
+                                                            "example": 13.6400000000000005684341886080801486968994140625
                                                         }
                                                     },
                                                     "type": "object"
@@ -3512,7 +3512,7 @@
                                                         "growthPercentage": {
                                                             "type": "number",
                                                             "format": "float",
-                                                            "example": 13.64
+                                                            "example": 13.6400000000000005684341886080801486968994140625
                                                         }
                                                     },
                                                     "type": "object"
@@ -3530,7 +3530,7 @@
                                                         "growthPercentage": {
                                                             "type": "number",
                                                             "format": "float",
-                                                            "example": 8.97
+                                                            "example": 8.9700000000000006394884621840901672840118408203125
                                                         }
                                                     },
                                                     "type": "object"
@@ -3548,7 +3548,7 @@
                                                         "growthPercentage": {
                                                             "type": "number",
                                                             "format": "float",
-                                                            "example": 10.34
+                                                            "example": 10.339999999999999857891452847979962825775146484375
                                                         }
                                                     },
                                                     "type": "object"
@@ -6257,14 +6257,16 @@
                         "multipart/form-data": {
                             "schema": {
                                 "required": [
+                                    "alliance_id",
                                     "name",
                                     "description",
                                     "points_required",
-                                    "code",
-                                    "is_active",
-                                    "alliance_id"
+                                    "is_active"
                                 ],
                                 "properties": {
+                                    "alliance_id": {
+                                        "type": "integer"
+                                    },
                                     "name": {
                                         "type": "string",
                                         "maxLength": 255
@@ -6276,18 +6278,9 @@
                                     "points_required": {
                                         "type": "integer"
                                     },
-                                    "image": {
-                                        "type": "string",
-                                        "format": "binary",
-                                        "nullable": true
-                                    },
                                     "stock": {
                                         "type": "integer",
                                         "nullable": true
-                                    },
-                                    "code": {
-                                        "type": "string",
-                                        "maxLength": 255
                                     },
                                     "is_active": {
                                         "type": "boolean"
@@ -6296,9 +6289,6 @@
                                         "type": "string",
                                         "format": "date",
                                         "nullable": true
-                                    },
-                                    "alliance_id": {
-                                        "type": "integer"
                                     }
                                 },
                                 "type": "object"
@@ -6307,7 +6297,7 @@
                     }
                 },
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "Recompensa creada exitosamente",
                         "content": {
                             "application/json": {
@@ -6434,6 +6424,9 @@
                         "multipart/form-data": {
                             "schema": {
                                 "properties": {
+                                    "alliance_id": {
+                                        "type": "integer"
+                                    },
                                     "name": {
                                         "type": "string",
                                         "maxLength": 255
@@ -6445,18 +6438,9 @@
                                     "points_required": {
                                         "type": "integer"
                                     },
-                                    "image": {
-                                        "type": "string",
-                                        "format": "binary",
-                                        "nullable": true
-                                    },
                                     "stock": {
                                         "type": "integer",
                                         "nullable": true
-                                    },
-                                    "code": {
-                                        "type": "string",
-                                        "maxLength": 255
                                     },
                                     "is_active": {
                                         "type": "boolean"
@@ -6465,9 +6449,6 @@
                                         "type": "string",
                                         "format": "date",
                                         "nullable": true
-                                    },
-                                    "alliance_id": {
-                                        "type": "integer"
                                     }
                                 },
                                 "type": "object"
@@ -6615,7 +6596,7 @@
                 "tags": [
                     "Rewards"
                 ],
-                "description": "Elimina una recompensa y su imagen asociada (si existe)",
+                "description": "Elimina una recompensa de forma logica, para evitar problemas con el historial.",
                 "operationId": "deleteReward",
                 "parameters": [
                     {
@@ -9614,11 +9595,6 @@
                         "type": "integer",
                         "example": 1500
                     },
-                    "image": {
-                        "description": "Indica si la recompensa tiene una imagen asociada",
-                        "type": "boolean",
-                        "example": true
-                    },
                     "stock": {
                         "type": "integer",
                         "example": 50,
@@ -9627,7 +9603,7 @@
                     "code": {
                         "type": "string",
                         "maxLength": 255,
-                        "example": "REWARD-GAMER-001"
+                        "example": "1567845965743"
                     },
                     "is_active": {
                         "type": "boolean",
@@ -9650,12 +9626,7 @@
                         "example": "2025-04-02T14:30:00.000000Z"
                     },
                     "alliance": {
-                        "oneOf": [
-                            {
-                                "$ref": "#/components/schemas/Alliance"
-                            }
-                        ],
-                        "nullable": true
+                        "$ref": "#/components/schemas/Alliance"
                     }
                 },
                 "type": "object"
@@ -9763,6 +9734,10 @@
                 "description": "Representa un usuario",
                 "properties": {
                     "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "alliance_id": {
                         "type": "integer",
                         "example": 1
                     },
