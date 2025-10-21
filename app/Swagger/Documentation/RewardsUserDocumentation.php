@@ -21,7 +21,9 @@ class RewardsUserDocumentation
                 properties: [
                     new OA\Property(property: "user_id", type: "integer", example: 5, description: "ID del usuario que reclama la recompensa"),
                     new OA\Property(property: "reward_id", type: "integer", example: 3, description: "ID de la recompensa a reclamar"),
-                    new OA\Property(property: "quantity", type: "integer", example: 1, description: "Cantidad de recompensas a reclamar")
+                    new OA\Property(property: "quantity", type: "integer", example: 1, description: "Cantidad de recompensas a reclamar"),
+                    new OA\Property(property: "token", type: "string", nullable: true, example: "eJ9Y_realFCMToken", description: "Token FCM del cliente (opcional; se registra antes de notificar)"),
+                    new OA\Property(property: "platform", type: "string", nullable: true, enum: ["android"], example: "android", description: "Plataforma del dispositivo del cliente (opcional)")
                 ],
                 type: "object"
             )
@@ -36,14 +38,96 @@ class RewardsUserDocumentation
                         new OA\Property(property: "message", type: "string", example: "Recompensa reclamada exitosamente."),
                         new OA\Property(
                             property: "data",
+                            type: "object",
                             properties: [
-                                new OA\Property(property: "id", type: "integer", example: 1),
-                                new OA\Property(property: "user_id", type: "integer", example: 5),
-                                new OA\Property(property: "reward_id", type: "integer", example: 3),
-                                new OA\Property(property: "quantity", type: "integer", example: 1),
-                                new OA\Property(property: "redeemed_at", type: "string", format: "date-time", example: "2025-04-05T14:30:00.000000Z")
-                            ],
-                            type: "object"
+                                new OA\Property(property: "reward", ref: "#/components/schemas/RewardUser"),
+                                new OA\Property(
+                                    property: "notifications",
+                                    type: "object",
+                                    properties: [
+                                        new OA\Property(
+                                            property: "client",
+                                            type: "object",
+                                            properties: [
+                                                new OA\Property(property: "attempted", type: "integer", example: 1),
+                                                new OA\Property(
+                                                    property: "payload",
+                                                    type: "object",
+                                                    properties: [
+                                                        new OA\Property(property: "title", type: "string", example: "Compra finalizada"),
+                                                        new OA\Property(property: "body", type: "string", example: "Has canjeado 1x Auriculares Gamer RGB por 1500 puntos."),
+                                                        new OA\Property(property: "type", type: "string", example: "reward_claim"),
+                                                        new OA\Property(property: "reward_id", type: "string", example: "3"),
+                                                    ]
+                                                ),
+                                                new OA\Property(property: "tokens", type: "array", items: new OA\Items(type: "string")),
+                                                new OA\Property(
+                                                    property: "sent",
+                                                    type: "array",
+                                                    items: new OA\Items(
+                                                        type: "object",
+                                                        properties: [
+                                                            new OA\Property(property: "token", type: "string", example: "eJ9Y_realFCMToken"),
+                                                            new OA\Property(property: "message_id", type: "string", example: "projects/my-project/messages/0:1723532523666667%cccccccccccccccc"),
+                                                        ]
+                                                    )
+                                                ),
+                                                new OA\Property(
+                                                    property: "errors",
+                                                    type: "array",
+                                                    items: new OA\Items(
+                                                        type: "object",
+                                                        properties: [
+                                                            new OA\Property(property: "token", type: "string", example: "invalid_token"),
+                                                            new OA\Property(property: "error", type: "string", example: "The registration token is not a valid FCM registration token"),
+                                                        ]
+                                                    )
+                                                ),
+                                            ]
+                                        ),
+                                        new OA\Property(
+                                            property: "merchant",
+                                            type: "object",
+                                            properties: [
+                                                new OA\Property(property: "attempted", type: "integer", example: 0),
+                                                new OA\Property(
+                                                    property: "payload",
+                                                    type: "object",
+                                                    properties: [
+                                                        new OA\Property(property: "title", type: "string", example: "Venta confirmada"),
+                                                        new OA\Property(property: "body", type: "string", example: "Se procesó el canje de 1x Auriculares Gamer RGB para el usuario #5."),
+                                                        new OA\Property(property: "type", type: "string", example: "reward_claim_merchant"),
+                                                        new OA\Property(property: "reward_id", type: "string", example: "3"),
+                                                    ]
+                                                ),
+                                                new OA\Property(property: "tokens", type: "array", items: new OA\Items(type: "string")),
+                                                new OA\Property(
+                                                    property: "sent",
+                                                    type: "array",
+                                                    items: new OA\Items(
+                                                        type: "object",
+                                                        properties: [
+                                                            new OA\Property(property: "token", type: "string", example: "eJ9Y_realFCMTokenMerchant"),
+                                                            new OA\Property(property: "message_id", type: "string", example: "projects/my-project/messages/0:1723532523..."),
+                                                        ]
+                                                    )
+                                                ),
+                                                new OA\Property(
+                                                    property: "errors",
+                                                    type: "array",
+                                                    items: new OA\Items(
+                                                        type: "object",
+                                                        properties: [
+                                                            new OA\Property(property: "token", type: "string", example: "invalid_token"),
+                                                            new OA\Property(property: "error", type: "string", example: "The registration token is not a valid FCM registration token"),
+                                                        ]
+                                                    )
+                                                ),
+                                            ]
+                                        ),
+                                    ]
+                                ),
+                            ]
                         ),
                         new OA\Property(property: "error", type: "null"),
                         new OA\Property(property: "status", type: "integer", example: 200)
