@@ -30,6 +30,9 @@ class RewardUserController extends Controller
                 'user_id' => 'required|integer|exists:users,id',
                 'reward_id' => 'required|integer|exists:rewards,id',
                 'quantity' => 'required|integer',
+                // Opcional: token FCM del cliente enviado en el claim
+                'token' => 'nullable|string|max:255',
+                'platform' => 'nullable|string|in:android',
             ]);
     
             $user = User::findOrFail($validatedData['user_id']);
@@ -95,6 +98,16 @@ class RewardUserController extends Controller
                 $messaging = app(Messaging::class);
 
                 // Notificación al cliente
+                // Registrar token del cliente si viene en el claim (opcional)
+                $claimToken = $validatedData['token'] ?? null;
+                $claimPlatform = $validatedData['platform'] ?? 'android';
+                if (!empty($claimToken) && $claimPlatform === 'android') {
+                    DeviceToken::updateOrCreate(
+                        ['user_id' => $user->id, 'platform' => 'android'],
+                        ['token' => $claimToken]
+                    );
+                }
+
                 $clientTokens = DeviceToken::where('user_id', $user->id)
                     ->where('platform', 'android')
                     ->pluck('token')
@@ -109,12 +122,19 @@ class RewardUserController extends Controller
                     (int) ($reward->points_required * $validatedData['quantity'])
                 );
 
+                // Preparar payload y trazabilidad para el cliente
+                $clientData = ['title' => $clientTitle, 'body' => $clientBody, 'type' => 'reward_claim', 'reward_id' => (string) $reward->id];
+                $notifications['client']['payload'] = $clientData;
+                $notifications['client']['tokens'] = $clientTokens;
+                $notifications['client']['sent'] = [];
+
                 foreach ($clientTokens as $token) {
                     try {
                         $message = CloudMessage::withTarget('token', $token)
                             ->withNotification(Notification::create($clientTitle, $clientBody))
-                            ->withData(['title' => $clientTitle, 'body' => $clientBody, 'type' => 'reward_claim', 'reward_id' => (string) $reward->id]);
-                        $messaging->send($message);
+                            ->withData($clientData);
+                        $messageId = $messaging->send($message);
+                        $notifications['client']['sent'][] = ['token' => $token, 'message_id' => $messageId];
                     } catch (\Throwable $e) {
                         Log::warning('FCM send client error', ['token' => $token, 'error' => $e->getMessage()]);
                         $notifications['client']['errors'][] = ['token' => $token, 'error' => $e->getMessage()];
@@ -137,12 +157,19 @@ class RewardUserController extends Controller
                         (int) $user->id
                     );
 
+                    // Preparar payload y trazabilidad para el comerciante
+                    $merchantData = ['title' => $merchantTitle, 'body' => $merchantBody, 'type' => 'reward_claim_merchant', 'reward_id' => (string) $reward->id];
+                    $notifications['merchant']['payload'] = $merchantData;
+                    $notifications['merchant']['tokens'] = $merchantTokens;
+                    $notifications['merchant']['sent'] = [];
+
                     foreach ($merchantTokens as $token) {
                         try {
                             $message = CloudMessage::withTarget('token', $token)
                                 ->withNotification(Notification::create($merchantTitle, $merchantBody))
-                                ->withData(['title' => $merchantTitle, 'body' => $merchantBody, 'type' => 'reward_claim_merchant', 'reward_id' => (string) $reward->id]);
-                            $messaging->send($message);
+                                ->withData($merchantData);
+                            $messageId = $messaging->send($message);
+                            $notifications['merchant']['sent'][] = ['token' => $token, 'message_id' => $messageId];
                         } catch (\Throwable $e) {
                             Log::warning('FCM send merchant error', ['token' => $token, 'error' => $e->getMessage()]);
                             $notifications['merchant']['errors'][] = ['token' => $token, 'error' => $e->getMessage()];

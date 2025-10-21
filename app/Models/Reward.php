@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Reward extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'rewards';
     protected $primaryKey = 'id';
@@ -21,7 +22,6 @@ class Reward extends Model
         'name',
         'description',
         'points_required',
-        'image',
         'stock',
         'code',
         'is_active',
@@ -31,7 +31,6 @@ class Reward extends Model
     protected $casts = [
         'is_active' => 'boolean',
         'points_required' => 'integer',
-        'image' => 'boolean',
         'stock' => 'integer',
         'code' => 'string',
         'expires_at' => 'datetime',
@@ -40,11 +39,6 @@ class Reward extends Model
     public function alliance(): BelongsTo
     {
         return $this->belongsTo(Alliance::class);
-    }
-
-    public function redemptions(): HasMany
-    {
-        return $this->hasMany(RewardRedemption::class);
     }
     
     public static function calculateEan13CheckDigit(string $digits12): string

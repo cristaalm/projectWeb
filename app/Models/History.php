@@ -53,7 +53,7 @@ class History extends Model
 
     public function reward(): BelongsTo
     {
-        return $this->belongsTo(Reward::class);
+        return $this->belongsTo(Reward::class)->withTrashed();
     }
 
     public function alliance(): BelongsTo

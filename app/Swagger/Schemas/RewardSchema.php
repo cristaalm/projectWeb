@@ -26,13 +26,10 @@ class RewardSchema
     #[OA\Property(property: "points_required", type: "integer", example: 1500)]
     public int $points_required;
 
-    #[OA\Property(property: "image", type: "boolean", example: true, description: "Indica si la recompensa tiene una imagen asociada")]
-    public bool $image;
-
     #[OA\Property(property: "stock", type: "integer", nullable: true, example: 50)]
     public ?int $stock;
 
-    #[OA\Property(property: "code", type: "string", maxLength: 255, example: "REWARD-GAMER-001")]
+    #[OA\Property(property: "code", type: "string", maxLength: 255, example: "1567845965743")]
     public string $code;
 
     #[OA\Property(property: "is_active", type: "boolean", example: true)]
@@ -47,6 +44,6 @@ class RewardSchema
     #[OA\Property(property: "updated_at", type: "string", format: "date-time", example: "2025-04-02T14:30:00.000000Z")]
     public string $updated_at;
 
-    #[OA\Property(property: "alliance", ref: "#/components/schemas/Alliance", nullable: true)]
+    #[OA\Property(property: "alliance", ref: "#/components/schemas/Alliance", nullable: false)]
     public ?object $alliance;
 }

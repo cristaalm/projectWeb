@@ -10,6 +10,10 @@ class UserSchema
     #[OA\Property(property: "id", type: "integer", example: 1)]
     public int $id;
 
+
+    #[OA\Property(property: "alliance_id", type: "integer", example: 1)]
+    public int $alliance_id;
+
     #[OA\Property(property: "name", type: "string", example: "John Doe")]
     public string $name;
 
