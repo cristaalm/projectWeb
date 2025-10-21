@@ -12,6 +12,7 @@ class UserResource extends JsonResource
         return [
             'id' => $this->id,
             'alliance_id' => $this->alliance_id,
+            'avatar' => $this->avatar,
             'name' => $this->name,
             'last_name' => $this->last_name,
             'email' => $this->email,
@@ -30,6 +31,11 @@ class UserResource extends JsonResource
                 'name' => $this->alliance->name,
                 'phone' => $this->alliance->phone,
                 'logo' => $this->alliance->logo,
+                'address' => $this->alliance->address,
+                'type_shop' => $this->alliance->type_shop_id ? $this->whenLoaded('typeShop', [
+                    'id' => $this->alliance->typeShop->id,
+                    'name' => $this->alliance->typeShop->name,
+                ]) : null,
                 'ext' => $this->alliance->ext,
                 'created_at' => $this->alliance->created_at,
                 'updated_at' => $this->alliance->updated_at,
