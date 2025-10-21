@@ -55,7 +55,7 @@ class RewardUserController extends Controller
             }
 
             // la recompensa debe tener stock suficiente, si es null, el stock es ilimitado
-            if ($reward->stock !== null && $reward->stock < 1 || $reward->stock <= $validatedData['quantity']) {
+            if ($reward->stock !== null && ($reward->stock <= 0 || $reward->stock < $validatedData['quantity'])) {
                 return $this->apiResponse(false, 'Recompensa agotada.', null, null, 400);
             }
 
