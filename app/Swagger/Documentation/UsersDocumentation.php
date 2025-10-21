@@ -462,7 +462,7 @@ class UsersDocumentation
             ),
         ]
     )]
-    public function registerUser(Request $request) {}
+public function registerUser(Request $request) {}
 
     #[OA\Post(
         path: "/api/users/identityUser",
@@ -546,19 +546,22 @@ class UsersDocumentation
         path: "/api/users/identityUserCode",
         tags: ["Usuarios"],
         summary: "Identificar al usuario",
+        security: [new OA\SecurityScheme(ref: "#/components/securitySchemes/bearerAuth")],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
                 required: ["code"],
                 properties: [
-                    new OA\Property(property: "code", type: "string", example: "4075224740324", description: "Código de identificación de 13 digitos"),
+                    new OA\Property(property: "code", type: "string", example: "4075224740324", description: "Código de identificación de 13 dígitos"),
+                    new OA\Property(property: "token", type: "string", example: "1|as87cwe4t98wea5a91sda65sd1va6sd74n2ta98waw56", description: "Token del usuario identificado (opcional si se usa Authorization Bearer)"),
+                    new OA\Property(property: "with_identity", type: "boolean", example: false, description: "Indica si se desea obtener la información de la verificación de identidad"),
                 ]
             )
         ),
         responses: [
             new OA\Response(
                 response: 200,
-                description: "Se identifico al usuario exitosamente.",
+                description: "Se identificó al usuario exitosamente.",
                 content: new OA\JsonContent(
                     type: "object",
                     properties: [
@@ -566,6 +569,10 @@ class UsersDocumentation
                         new OA\Property(property: "message", type: "string", example: "Usuario identificado exitosamente."),
                         new OA\Property(property: "data", properties: [
                             new OA\Property(property: "user", ref: "#/components/schemas/User"),
+                            new OA\Property(property: "identityVerification", ref: "#/components/schemas/IdentityVerification"),
+                            new OA\Property(property: "access_token", type: "string", example: "1|as87cwe4t98wea5a91sda65sd1va6sd74n2ta98waw56"),
+                            new OA\Property(property: "token_type", type: "string", example: "Bearer"),
+                            new OA\Property(property: "expires_at", type: "string", example: "2025-04-01T10:00:00.000000Z"),
                         ]),
                         new OA\Property(property: "errors", type: "null", example: null),
                         new OA\Property(property: "status", type: "integer", example: 200),
@@ -573,22 +580,22 @@ class UsersDocumentation
                 )
             ),
             new OA\Response(
-                response: 404,
-                description: "El codigo esta mal o el usuario no existe",
+                response: 401,
+                description: "Token inválido, expirado, no proporcionado o que no pertenece al usuario identificado",
                 content: new OA\JsonContent(
                     type: "object",
                     properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "success", type: "boolean", example: false),
                         new OA\Property(property: "message", type: "string", example: "No se pudo identificar al usuario."),
                         new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", type: "string", example: "Usuario no encontrado."),
-                        new OA\Property(property: "status", type: "integer", example: 404),
+                        new OA\Property(property: "errors", type: "string", example: "Necesita iniciar sesión."),
+                        new OA\Property(property: "status", type: "integer", example: 401),
                     ]
                 )
             ),
             new OA\Response(
                 response: 403,
-                description: "Cuenta desactivada",
+                description: "Cuenta de usuario no activa",
                 content: new OA\JsonContent(
                     type: "object",
                     properties: [
@@ -601,8 +608,22 @@ class UsersDocumentation
                 )
             ),
             new OA\Response(
+                response: 404,
+                description: "Usuario no encontrado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "No se pudo identificar al usuario."),
+                        new OA\Property(property: "data", type: "string", example: "4075224740324"),
+                        new OA\Property(property: "errors", type: "string", example: "Usuario no encontrado."),
+                        new OA\Property(property: "status", type: "integer", example: 404),
+                    ]
+                )
+            ),
+            new OA\Response(
                 response: 500,
-                description: "Error inesperado",
+                description: "Error inesperado al identificar al usuario",
                 content: new OA\JsonContent(
                     type: "object",
                     properties: [
@@ -616,7 +637,7 @@ class UsersDocumentation
             ),
         ]
     )]
-    public function identityUserCode() {}
+    public function identityUserCode(Request $request) {}
 
     #[OA\Post(
         path: "/api/users/tourComplete/{userId}",

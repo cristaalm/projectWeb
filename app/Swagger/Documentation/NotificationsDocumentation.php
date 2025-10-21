@@ -93,15 +93,15 @@ class NotificationsDocumentation
     #[OA\Post(
         path: "/api/notifications/send",
         tags: ["Notificaciones"],
-        summary: "Enviar notificación push al usuario (Android)",
-        description: "Envía una notificación FCM a todos los dispositivos Android registrados del usuario. Límite de título 100 caracteres, mensaje 500.",
+        summary: "Enviar notificación push al usuario destino (Android)",
+        description: "Envía una notificación FCM a todos los dispositivos Android registrados del usuario destino. Permitido para el propio usuario, 'comerciante' y 'admin'. Límite de título 100 caracteres, mensaje 500.",
         security: [["bearerAuth" => []]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
                 required: ["user_id", "title", "message"],
                 properties: [
-                    new OA\Property(property: "user_id", type: "integer", example: 6, description: "ID del usuario autenticado"),
+                    new OA\Property(property: "user_id", type: "integer", example: 6, description: "ID del usuario destino de la notificación"),
                     new OA\Property(property: "title", type: "string", example: "Bienvenido", description: "Título de la notificación (<=100)"),
                     new OA\Property(property: "message", type: "string", example: "Tu cuenta fue actualizada", description: "Cuerpo de la notificación (<=500)")
                 ],
@@ -137,6 +137,20 @@ class NotificationsDocumentation
                         ),
                         new OA\Property(property: "errors", type: "null", example: null),
                         new OA\Property(property: "code", type: "integer", example: 200)
+                    ],
+                    type: "object"
+                )
+            ),
+            new OA\Response(
+                response: 403,
+                description: "No autorizado: solo propio usuario, comercio o admin",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "No autorizado para enviar notificaciones: solo el propio usuario, comercio o admin."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "code", type: "integer", example: 403)
                     ],
                     type: "object"
                 )

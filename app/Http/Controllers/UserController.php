@@ -301,7 +301,7 @@ class UserController extends Controller
             $accessToken = PersonalAccessToken::findToken($validateData['token']);
 
             if (!$accessToken) {
-                return $this->apiResponse(false, 'No se pudo identificar al usuario.', null, null, 404);
+                return $this->apiResponse(false, 'No se pudo identificar al usuario.', null, 'Token inválido.', 401);
             }
 
             if ($accessToken->expires_at && $accessToken->expires_at->isPast()) {
@@ -311,7 +311,7 @@ class UserController extends Controller
 
             $user = $accessToken->tokenable;
 
-            if (! $user) {
+            if (!$user) {
                 return $this->apiResponse(false, 'No se pudo identificar al usuario.', null, 'Usuario no encontrado.', 401);
             }
 
@@ -319,7 +319,7 @@ class UserController extends Controller
                 return $this->apiResponse(false, 'La cuenta del usuario no está activa.', null, 'Cuenta desactivada.', 403);
             }
 
-            if ($validateData['with_identity']) {
+            if (!empty($validateData['with_identity'])) {
                 $user->load('identityVerification');
             }
 
@@ -335,12 +335,13 @@ class UserController extends Controller
     public function identityUserCode(Request $request) 
     {
         try {
-            // token del usuario
             $validateData = $request->validate([
                 'code' => 'required|string',
+                'token' => 'nullable|string',
+                'with_identity' => 'nullable|boolean',
             ]);
 
-            // buscamos el token
+            // localizar usuario por código
             $user = User::where('code_identity', $validateData['code'])->first();
 
             if (!$user) {
@@ -351,8 +352,40 @@ class UserController extends Controller
                 return $this->apiResponse(false, 'La cuenta del usuario no está activa.', null, 'Cuenta desactivada.', 403);
             }
 
+            // tomar token del body o del Authorization Bearer
+            $incomingToken = $validateData['token'] ?? null;
+            $bearerToken = $request->bearerToken();
+            $tokenString = $incomingToken ?: $bearerToken;
+
+            if (!$tokenString) {
+                return $this->apiResponse(false, 'No se pudo identificar al usuario.', null, 'Necesita iniciar sesión.', 401);
+            }
+
+            $accessToken = PersonalAccessToken::findToken($tokenString);
+            if (!$accessToken) {
+                return $this->apiResponse(false, 'No se pudo identificar al usuario.', null, 'Token inválido.', 401);
+            }
+            if ($accessToken->expires_at && $accessToken->expires_at->isPast()) {
+                $accessToken->delete();
+                return $this->apiResponse(false, 'No se pudo identificar al usuario.', null, 'Token expirado.', 401);
+            }
+            
+            // el token debe pertenecer al usuario identificado por código
+            $tokenUser = $accessToken->tokenable;
+            if (!$tokenUser || $tokenUser->id !== $user->id) {
+                return $this->apiResponse(false, 'No se pudo identificar al usuario.', null, 'Necesita iniciar sesión.', 401);
+            }
+
+            if (!empty($validateData['with_identity'])) {
+                $user->load('identityVerification');
+            }
+
             return $this->apiResponse(true, 'Se identifico al usuario exitosamente.', [
                 'user' => new UserResource($user),
+                'identityVerification' => !empty($validateData['with_identity']) ? $user->identityVerification : null,
+                'access_token' => $tokenString,
+                'token_type' => 'Bearer',
+                'expires_at' => $accessToken->expires_at,
             ], null, 200);
         } catch (\Exception $e) {
             return $this->apiResponse(false, 'Error al identificar al usuario.', null, $e->getMessage(), 500);
@@ -411,7 +444,7 @@ class UserController extends Controller
             $user->tour = true;
             $user->save();
 
-            return $this->apiResponse(true, 'Se completo el tour del usuario exitosamente.', [
+            return $this->apiResponse(true, 'Se completó el tour del usuario exitosamente.', [
                 'user' => new UserResource($user),
             ], null, 200);
         } catch (\Exception $e) {
