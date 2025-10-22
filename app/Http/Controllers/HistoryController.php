@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use App\Models\History;
+use App\Models\Alliance;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 
@@ -88,6 +89,35 @@ class HistoryController extends Controller
         } catch (\Exception $e) {
             return $this->apiResponse(false, 'Error al obtener el historial.', null, $e->getMessage() . ' ' . $e->getLine(), 500);
         }
+    }
+
+    public function topAlliancesByRedemptions(): JsonResponse
+    {
+        // Paso 1: Obtener los 7 alliance_id con más canjeos (type_history = 1)
+        $topAlliances = History::query()
+            ->where('type_history', 1)
+            ->selectRaw('alliance_id, SUM(quantity) as total_quantity')
+            ->groupBy('alliance_id')
+            ->orderByDesc('total_quantity')
+            ->limit(7)
+            ->pluck('total_quantity', 'alliance_id'); // [alliance_id => total_quantity]
+
+        if ($topAlliances->isEmpty()) {
+            return response()->json([]);
+        }
+
+        // Paso 2: Cargar los modelos Alliance correspondientes
+        $alliances = Alliance::find(array_keys($topAlliances->toArray()));
+
+        // Paso 3: Formatear la respuesta
+        $result = $alliances->map(function (Alliance $alliance) use ($topAlliances) {
+            return [
+                'alliance' => $alliance,
+                'quantity' => (int) $topAlliances[$alliance->id],
+            ];
+        })->values();
+
+        return response()->json($result);
     }
 
     public function logHistory($user_id = null, $comerciant_id = null, $alliance_id = null, $material_type_id = null, $reward_id = null, $type_history = null, $scan_id = null, $quantity = null, $points = null, $description = null)

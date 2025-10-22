@@ -159,4 +159,65 @@ class HistoryDocumentation
         ]
     )]
     public function getAll(Request $request) {}
+
+    #[OA\Get(
+        path: "/api/history/topAlliancesByRedemptions",
+        tags: ["Historial"],
+        summary: "Obtener los 7 comercios con más canjeos de productos",
+        description: "Devuelve una lista de los 7 comercios (alianzas) con mayor cantidad total de productos canjeados. Solo se consideran registros del historial donde `type_history = 1` y se suma el campo `quantity` por comercio.",
+        security: [["bearerAuth" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Lista de los 7 comercios con más canjeos obtenida correctamente",
+                content: new OA\JsonContent(
+                    type: "array",
+                    items: new OA\Items(
+                        properties: [
+                            new OA\Property(
+                                property: "Alliance", 
+                                ref: "#/components/schemas/Alliance"
+                            ),
+                            new OA\Property(
+                                property: "quantity",
+                                type: "integer",
+                                example: 1250,
+                                description: "Cantidad total de productos canjeados en este comercio"
+                            ),
+                        ],
+                        type: "object"
+                    )
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: "Token de autenticación no válido o no proporcionado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Token de autenticación no proporcionado."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 401),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado al obtener los comercios con más canjeos",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al obtener los comercios con más canjeos."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function topAlliancesByRedemptions() {}
 }
