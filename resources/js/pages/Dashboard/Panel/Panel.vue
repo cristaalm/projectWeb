@@ -2,6 +2,7 @@
 import CardsTop from './modules/cardsTop.vue'
 import CardContainers from './modules/CardContainers.vue'
 import CardHistory from './modules/CardHistory.vue'
+import Graphs from './modules/CardGraphs.vue'
 import { useAuthStore } from '@/store/auth'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 
@@ -33,16 +34,14 @@ const updateClock = () => {
 
   currentTime.value = `${hours}:${minutes}`
 
-  // Sol entre 6 AM y 6 PM (ajustable)
   currentIcon.value = hours >= 6 && hours < 18 ? 'mdi mdi-weather-sunny' : 'mdi mdi-weather-night'
 }
 
 onMounted(() => {
   updateClock()
 
-  const interval = setInterval(updateClock, 1000) // cada segundo
+  const interval = setInterval(updateClock, 1000) 
 
-  // Guardamos el intervalo para limpiarlo después
   window.clockInterval = interval
 })
 
@@ -80,5 +79,6 @@ onBeforeUnmount(() => {
       <CardContainers class="col-span-1" />
       <CardHistory class="col-span-1" />
     </div>
+    <Graphs />
   </div>
 </template>
