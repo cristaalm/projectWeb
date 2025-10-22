@@ -120,6 +120,29 @@ class HistoryController extends Controller
         return response()->json($result);
     }
 
+    public function totalPointsByShop(Request $request, int $alliance_id) 
+    {
+        try {
+            $request->merge([
+                'alliance_id' => $alliance_id,
+            ]);
+
+            $validateData = $request->validate([
+                'alliance_id' => 'required|exists:alliances,id',
+                'date_start' => 'required|date',
+                'date_end' => 'required|date',
+            ]);
+
+            $totalPoints = History::where('alliance_id', $validateData['alliance_id'])
+                ->where('type_history', 1)
+                ->whereBetween('created_at', [$validateData['date_start'], $validateData['date_end']])
+                ->sum('points');
+            return $this->apiResponse(true, 'Total de puntos obtenido exitosamente.', ['total_points' => $totalPoints * -1], null, 200);
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al obtener el historial.', null, $e->getMessage() . ' ' . $e->getLine(), 500);
+        }
+    }
+
     public function logHistory($user_id = null, $comerciant_id = null, $alliance_id = null, $material_type_id = null, $reward_id = null, $type_history = null, $scan_id = null, $quantity = null, $points = null, $description = null)
     {
 

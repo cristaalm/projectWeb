@@ -177,8 +177,11 @@ class AuthController extends Controller
                 return $this->apiResponse(false, 'El comercio al que perteneces, ya no esta vigente.', null, 'El comercio al que perteneces esta desactivado.', 403);
             }
 
-            $defaultMinutes = config('auth.tokens.default_expiration', 720);      // 1 hora
-            $rememberMinutes = config('auth.tokens.remember_expiration', 525600); // 30 días
+            // // debug
+            // return $this->apiResponse(false, 'Inicio de sesión exitoso.', [
+            //     'tokens.default_expiration_minutes' => config('tokens.default_expiration_minutes'),
+            //     'tokens.remember_expiration_minutes' => config('tokens.remember_expiration_minutes'),
+            // ], null, 500);
 
             $expiresAt = 0;
             
@@ -443,6 +446,11 @@ class AuthController extends Controller
             $user->two_factor_status = 0;
             $user->google2fa_secret = null;
             $user->save();
+            
+            $accessToken = PersonalAccessToken::findToken($request->bearerToken());
+            $accessToken->abilities = ['*'];
+            $accessToken->save();
+
             return $this->apiResponse(true, 'Autenticación de dos factores deshabilitada correctamente.', null, null, 200);
         } catch (Exception $e) {
             return $this->apiResponse(false, 'Ocurrió un error inesperado al deshabilitar la autenticación de dos factores.', null, $e->getMessage(), 500);

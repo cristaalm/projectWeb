@@ -168,7 +168,7 @@ function updatePhone(event) {
                   v-model="dataUser.name"
                   :color="darkModeStore.darkMode ? 'white' : 'primary'"
                   :error="!validateData.name"
-                  error-message="Nombre invalido"
+                  error-message="Nombre inválido"
                   placeholder="Nombre"
                   label="Nombre"
                 />
@@ -183,7 +183,7 @@ function updatePhone(event) {
                   v-model="dataUser.last_name"
                   :color="darkModeStore.darkMode ? 'white' : 'primary'"
                   :error="!validateData.last_name"
-                  error-message="Apellido invalido"
+                  error-message="Apellido inválido"
                   placeholder="Apellido"
                   label="Apellido"
                 />
@@ -198,9 +198,9 @@ function updatePhone(event) {
                   v-model="dataUser.phone"
                   :color="darkModeStore.darkMode ? 'white' : 'primary'"
                   :error="!validateData.phone"
-                  error-message="Telefono invalido"
+                  error-message="Teléfono inválido"
                   placeholder="(###) ###-####"
-                  label="Telefono"
+                  label="Teléfono"
                   @input="(e) => {updatePhone(e)}"
                 />
               </VCol>
@@ -214,7 +214,7 @@ function updatePhone(event) {
                   v-model="dataUser.curp"
                   :color="darkModeStore.darkMode ? 'white' : 'primary'"
                   :error="!validateData.curp"
-                  error-message="CURP invalido"
+                  error-message="CURP inválido"
                   placeholder="##################"
                   label="CURP"
                 />

@@ -220,4 +220,80 @@ class HistoryDocumentation
         ]
     )]
     public function topAlliancesByRedemptions() {}
+
+    #[OA\Get(
+        path: "/api/history/totalPointsByShop/{alliance_id}",
+        tags: ["Historial"],
+        summary: "Obtener el total de puntos por comercio (alianza) en un rango de fechas",
+        description: "Suma el total de puntos del historial con `type_history = 1` para un comercio específico (alliance_id) dentro de un rango de fechas.",
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "alliance_id",
+                description: "ID del comercio (alianza)",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "integer", example: 3)
+            ),
+            new OA\Parameter(
+                name: "date_start",
+                description: "Fecha de inicio del rango",
+                in: "query",
+                required: true,
+                schema: new OA\Schema(type: "string", format: "date", example: "2025-10-01")
+            ),
+            new OA\Parameter(
+                name: "date_end",
+                description: "Fecha de fin del rango",
+                in: "query",
+                required: true,
+                schema: new OA\Schema(type: "string", format: "date", example: "2025-10-31")
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Total de puntos obtenido correctamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Total de puntos obtenido exitosamente."),
+                        new OA\Property(property: "data", type: "integer", example: 1520, description: "Suma total de puntos en el rango consultado"),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: "Token de autenticación no válido o no proporcionado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Token de autenticación no proporcionado."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 401),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado al obtener el total de puntos",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al obtener el historial."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function totalPointsByShop() {}
 }

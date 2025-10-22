@@ -32,11 +32,11 @@ const activeTapChangePass = ref(false)
 const activeTapTwoFactor = ref(false)
 
 const passwordRequirements = [
-  'Minimo 8 caracteres de largo - cuanto mas, mejor',
-  'Al menos una letra minuscula',
-  'Al menos una letra mayuscula',
-  'Al menos un numero',
-  'Al menos un simbolo',
+  'Mínimo 8 caracteres de largo - cuanto más, mejor',
+  'Al menos una letra minúscula',
+  'Al menos una letra mayúscula',
+  'Al menos un número',
+  'Al menos un símbolo',
 ]
 
 async function handleSavePass() {
@@ -185,7 +185,7 @@ const handleEnable2FA = async () => {
               <!-- 👉 Password Requirements -->
               <VCardText>
                 <p class="text-base font-weight-medium mt-2">
-                  Password Requirements:
+                  Requisitos de contraseña:
                 </p>
 
                 <ul class="d-flex flex-column gap-y-3">
@@ -216,7 +216,7 @@ const handleEnable2FA = async () => {
                   prepend-icon="bx-save"
                   @click="handleSavePass"
                 >
-                  Cambiar Contraseña
+                  Cambiar contraseña
                 </VBtn>
               </VCardText>
             </VForm>
@@ -255,10 +255,10 @@ const handleEnable2FA = async () => {
             <!-- Deshabilitado -->
             <VCardText v-if="levelProcess2FA === 1">
               <p class="font-weight-semibold">
-                Autenticación de dos factores no está habilitada.
+                La autenticación de dos factores no está habilitada.
               </p>
               <p>
-                La autenticación de dos factores agrega una capa adicional de seguridad a su cuenta al requerir más de solo una contraseña para iniciar sesión.
+                La autenticación de dos factores agrega una capa adicional de seguridad a su cuenta al requerir más que solo una contraseña para iniciar sesión.
               </p>
 
               <div class="flex flex-row justify-end gap-2">
@@ -502,7 +502,7 @@ const handleEnable2FA = async () => {
                   class="mb-4"
                 />
                 <h3 class="text-h6 font-weight-bold">
-                  ¿Desactivar autenticación de dos factores?
+                  ¿Desactivar la autenticación de dos factores?
                 </h3>
                 <p class="mt-2 max-w-md">
                   Al desactivar 2FA, tu cuenta será menos segura. Solo deberías hacerlo si ya no usas tu app de autenticación o has perdido acceso a ella.
