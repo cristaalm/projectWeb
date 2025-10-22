@@ -9,12 +9,17 @@ Route::prefix('users')->group(function () {
 
         // Controller user
         Route::get('getAll', [UserController::class, 'getAll']);
+
         Route::post('toggleStatusAccount', [UserController::class, 'toggleStatusAccount']);
         Route::post('modifyPoints', [UserController::class, 'modifyPoints']);
         Route::post('create', [UserController::class, 'create']);
+        Route::post('updateAccount', [UserController::class, 'updateAccount']);
+        Route::post('resetPassword', [UserController::class, 'resetPassword']);
+        Route::post('updateAvatar/{userId}', [UserController::class, 'updateAvatar']);
         Route::post('tourComplete/{userId}', [UserController::class, 'tourComplete']);
         Route::post('updateField/{field}/{userId}', [UserController::class, 'updateField'])
         ->where('field', 'name|last_name|email|phone|curp');
+
         
         // Controller IdentifyVerification
         Route::post('verification-user', [IdentifyVerificationController::class, 'verificationUser']);

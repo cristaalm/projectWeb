@@ -448,27 +448,4 @@ class AuthController extends Controller
             return $this->apiResponse(false, 'Ocurrió un error inesperado al deshabilitar la autenticación de dos factores.', null, $e->getMessage(), 500);
         }
     }
-
-    // public function verifyEmail(Request $request)
-    // {
-    //     try {
-    //         $request->validate([
-    //             'email' => 'required|email',
-    //         ]);
-
-    //         $user = User::where('email', $request->email)->first();
-    //         if (!$user) {
-    //             return $this->apiResponse(false, 'El correo electrónico no está registrado en el sistema.', null, null, 404);
-    //         }
-
-    //         $user->email_verified = true;
-    //         $user->save();
-
-    //         return $this->apiResponse(true, 'Correo electrónico verificado correctamente.', null, null, 200);
-    //     } catch (ValidationException $e) {
-    //         return $this->apiResponse(false, 'Correo electrónico inválido o no registrado.', null, $e->errors(), 422);
-    //     } catch (Exception $e) {
-    //         return $this->apiResponse(false, 'Ocurrió un error inesperado al verificar el correo electrónico.', null, $e->getMessage(), 500);
-    //     }
-    // }
 }

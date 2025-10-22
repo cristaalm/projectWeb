@@ -1,5 +1,5 @@
 <script setup>
-import { useVerify2FA } from '@/hooks/Auth/2FA/useVerify2FA'
+import { useVerify2FA } from '@/hooks/Auth/useVerify2FA'
 import { useAuthStore } from '@/store/auth'
 import { IMask } from 'vue-imask'
 import { useRouter } from 'vue-router'

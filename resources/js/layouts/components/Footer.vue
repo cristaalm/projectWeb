@@ -17,17 +17,18 @@ const { showViewTermsModal, openViewTermsModal } = useModalViewTerms()
         size="1.25rem"
         class="mx-1"
       />
-      por <span class="text-primary ms-1">RENOVA</span>
+      por <span class="text-primary dark:!text-slate-300 ms-1">RENOVA</span>
     </span>
     <!-- 👉 Footer: right content -->
     <span class="flex-row items-center justify-end gap-x-4 text-primary hidden md:flex">
       <a
         href="/api/docs"
         target="_blank"
+        class="dark:!text-slate-300"
       >API Docs</a>
       <a
         href="#"
-        class="hover:underline  !cursor-pointer"
+        class="hover:underline  !cursor-pointer dark:!text-slate-300"
         @click="(e) => { e.preventDefault(); openViewTermsModal() }"
       >Condiciones y términos de uso</a>
     </span>

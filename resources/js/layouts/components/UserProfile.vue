@@ -1,11 +1,20 @@
 <script setup>
+import avatar from '@images/placeholders/avatar.png?url'
 import { useThemeSwitcher } from '@/hooks/layout/useThemeSwitcher'
+import { storageURL } from '@/utils/constants'
 import { useAuthStore } from '@/store/auth'
 import { useRouter } from 'vue-router'
 
 const { themeName, changeTheme } = useThemeSwitcher()
-const user = useAuthStore().getUser()
+const authStore = useAuthStore()
+const user = authStore.getUser()
 const router = useRouter()
+
+const avatarImg = computed(() => {
+  if (authStore.user.avatar !== null) return storageURL + authStore.user.avatar
+  
+  return avatar
+})
 </script>
 
 <template>
@@ -14,11 +23,7 @@ const router = useRouter()
       class="cursor-pointer !bg-primary/50"
       variant="tonal"
     >
-      <!-- <VImg :src="user.avatar" /> -->
-      <VIcon
-        icon="bx-user"
-        class="dark:text-white"
-      />
+      <VImg :src="avatarImg" />
   
       <!-- SECTION Menu -->
       <VMenu
@@ -29,7 +34,10 @@ const router = useRouter()
       >
         <VList>
           <!-- 👉 User Avatar & Name -->
-          <VListItem>
+          <VListItem
+            link
+            @click="router.push({ name: 'profile' })"
+          >
             <template #prepend>
               <VListItemAction start>
                 <VBadge
@@ -43,11 +51,7 @@ const router = useRouter()
                     color="primary"
                     variant="tonal"
                   >
-                    <!-- <VImg :src="user.avatar" /> -->
-                    <VIcon
-                      icon="bx-user"
-                      class="dark:text-white"
-                    />
+                    <VImg :src="avatarImg" />
                   </VAvatar>
                 </VBadge>
               </VListItemAction>
@@ -59,6 +63,21 @@ const router = useRouter()
             <VListItemSubtitle v-if="user.role">
               {{ user.role.name }}
             </VListItemSubtitle>
+          </VListItem>
+          <VDivider class="my-2" />
+          <!-- 👉 Modo oscuro / claro -->
+          <VListItem
+            link
+            @click="router.push({ name: 'profile' })"
+          >
+            <template #prepend>
+              <VIcon
+                class="me-2"
+                icon="bx-user"
+                size="22"
+              />
+            </template>
+            <VListItemTitle>Perfil</VListItemTitle>
           </VListItem>
           <VDivider class="my-2" />
           <!-- 👉 Modo oscuro / claro -->
