@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Laravel\Sanctum\TransientToken;
 
 // notifications
 use App\Notifications\UserStatusAccountNotification;
@@ -398,9 +399,9 @@ class UserController extends Controller
             $authUser->password = Hash::make($request->password);
             $authUser->save();
     
-            // Eliminar todos los tokens del usuario, excepto el actual (solo si es un token real)
             $currentToken = $authUser->currentAccessToken();
-            if (! $currentToken instanceof TransientToken) {
+
+            if ($currentToken && ! $currentToken instanceof TransientToken) {
                 $authUser->tokens()->where('id', '!=', $currentToken->id)->delete();
             }
     
