@@ -21,7 +21,6 @@ use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use Laravel\Sanctum\TransientToken;
 
 // notifications
 use App\Notifications\UserStatusAccountNotification;
@@ -320,7 +319,7 @@ class UserController extends Controller
                 return $this->apiResponse(false, 'La cuenta del usuario no está activa.', null, 'Cuenta desactivada.', 403);
             }
 
-            if (!empty($validateData['with_identity'])) {
+            if ($validateData['with_identity']) {
                 $user->load('identityVerification');
             }
 
@@ -336,10 +335,9 @@ class UserController extends Controller
     public function identityUserCode(Request $request) 
     {
         try {
+            // token del usuario
             $validateData = $request->validate([
                 'code' => 'required|string',
-                'token' => 'nullable|string',
-                'with_identity' => 'nullable|boolean',
             ]);
 
             // localizar usuario por código
@@ -353,40 +351,8 @@ class UserController extends Controller
                 return $this->apiResponse(false, 'La cuenta del usuario no está activa.', null, 'Cuenta desactivada.', 403);
             }
 
-            // tomar token del body o del Authorization Bearer
-            $incomingToken = $validateData['token'] ?? null;
-            $bearerToken = $request->bearerToken();
-            $tokenString = $incomingToken ?: $bearerToken;
-
-            if (!$tokenString) {
-                return $this->apiResponse(false, 'No se pudo identificar al usuario.', null, 'Necesita iniciar sesión.', 401);
-            }
-
-            $accessToken = PersonalAccessToken::findToken($tokenString);
-            if (!$accessToken) {
-                return $this->apiResponse(false, 'No se pudo identificar al usuario.', null, 'Token inválido.', 401);
-            }
-            if ($accessToken->expires_at && $accessToken->expires_at->isPast()) {
-                $accessToken->delete();
-                return $this->apiResponse(false, 'No se pudo identificar al usuario.', null, 'Token expirado.', 401);
-            }
-            
-            // el token debe pertenecer al usuario identificado por código
-            $tokenUser = $accessToken->tokenable;
-            if (!$tokenUser || $tokenUser->id !== $user->id) {
-                return $this->apiResponse(false, 'No se pudo identificar al usuario.', null, 'Necesita iniciar sesión.', 401);
-            }
-
-            if (!empty($validateData['with_identity'])) {
-                $user->load('identityVerification');
-            }
-
             return $this->apiResponse(true, 'Se identifico al usuario exitosamente.', [
                 'user' => new UserResource($user),
-                'identityVerification' => !empty($validateData['with_identity']) ? $user->identityVerification : null,
-                'access_token' => $tokenString,
-                'token_type' => 'Bearer',
-                'expires_at' => $accessToken->expires_at,
             ], null, 200);
         } catch (\Exception $e) {
             return $this->apiResponse(false, 'Error al identificar al usuario.', null, $e->getMessage(), 500);
@@ -445,135 +411,11 @@ class UserController extends Controller
             $user->tour = true;
             $user->save();
 
-            return $this->apiResponse(true, 'Se completó el tour del usuario exitosamente.', [
+            return $this->apiResponse(true, 'Se completo el tour del usuario exitosamente.', [
                 'user' => new UserResource($user),
             ], null, 200);
         } catch (\Exception $e) {
             return $this->apiResponse(false, 'Ocurrio un error al intentar completar el tour del usuario.', null, $e->getMessage(), 500);
-        }
-    }
-
-    public function updateAvatar(Request $request, int $id)
-    {
-        try {
-            $request->merge([
-                'avatar' => !$request->hasFile('avatar') ? null : $request->avatar,
-                'delete' => $request->delete === 'true',
-            ]);
-
-            $validateData = $request->validate([
-                'avatar' => 'nullable|file|mimes:jpeg,png,jpg,webp|max:2048',
-                'delete' => 'nullable|boolean',
-            ]);
-
-            $delete = $validateData['delete'] ?? false;
-            $user;
-
-            try {
-                $user = User::findOrFail($id);
-            } catch (\Exception $e) {
-                return $this->apiResponse(false, 'El usuario no existe.', null, $e->getMessage(), 404);
-            }
-
-            if ($user->avatar || $delete) {
-                Storage::delete($user->avatar);
-            }
-
-            if (!$delete && $request->hasFile('avatar')) {
-                $path = "users/user_$user->id";
-    
-                $avatar = $request->file('avatar');
-                $avatarName = 'avatar.' . $avatar->getClientOriginalExtension();
-                $filePath = "$path/$avatarName";
-                $avatar->storeAs($path, $avatarName, 'public');
-    
-                $user->avatar = $filePath;
-            } else {
-                $user->avatar = null;
-            }
-            
-            $user->save();
-
-            return $this->apiResponse(true, 'El avatar se actualizo exitosamente.', [
-                'avatar_url' => $user->avatar,
-            ], null, 200);
-        } catch (ValidationException $e) {
-            // Extraer el primer mensaje de error para devolverlo de forma clara
-            $errors = $e->validator->errors()->all();
-            $firstError = $errors[0] ?? 'Error de validación en los documentos.';
-            
-            // Mensaje específico si el error es por tamaño
-            if (str_contains($firstError, 'ser mayor')) {
-                $firstError = 'El tamaño de la imagen no debe exceder los 2 MB.';
-            }
-    
-            return $this->apiResponse(false, $firstError, null, null, 422);
-        } catch (\Exception $e) {
-            return $this->apiResponse(false, 'Ocurrio un error al intentar actualizar el avatar del usuario.', null, $e->getMessage(), 500);
-        }
-    }
-
-    public function updateAccount(Request $request)
-    {
-        try {
-            $validateData = $request->validate([
-                'id' => 'required|integer|exists:users,id',
-                'name' => 'required|string|max:255',
-                'last_name' => 'required|string|max:255',
-                'phone' => 'required|string|max:255',
-                'curp' => 'required|string|max:18|min:18'
-            ]);
-
-            $user = User::findOrFail($validateData['id']);
-
-            $user->name = $validateData['name'];
-            $user->last_name = $validateData['last_name'];
-            $user->phone = $validateData['phone'];
-            $user->curp = $validateData['curp'];
-            $user->save();
-
-            return $this->apiResponse(true, 'Se actualizo la cuenta del usuario exitosamente.', [
-                'user' => new UserResource($user),
-            ], null, 200);
-        } catch (\Exception $e) {
-            return $this->apiResponse(false, 'Ocurrio un error al intentar actualizar la cuenta del usuario.', null, $e->getMessage(), 500);
-        }
-    }
-
-    public function resetPassword(Request $request)
-    {
-        try {
-            $authUser = $request->user();
-    
-            $request->validate([
-                'current_password' => 'required',
-                'password' => 'required|min:8|confirmed',
-            ]);
-    
-            if (!Hash::check($request->current_password, $authUser->password)) {
-                return $this->apiResponse(false, 'Contraseña actual incorrecta.', null, null, 401);
-            }
-
-            // la nueva contraseña, no puede ser igual a la actual
-            if (Hash::check($request->password, $authUser->password)) {
-                return $this->apiResponse(false, 'La nueva contraseña, no puede ser igual a la actual', null, null, 401);
-            }
-    
-            $authUser->password = Hash::make($request->password);
-            $authUser->save();
-    
-            // Eliminar todos los tokens del usuario, excepto el actual (solo si es un token real)
-            $currentToken = $authUser->currentAccessToken();
-            if (! $currentToken instanceof TransientToken) {
-                $authUser->tokens()->where('id', '!=', $currentToken->id)->delete();
-            }
-    
-            return $this->apiResponse(true, 'Contraseña restablecida exitosamente.', null, null, 200);
-    
-        } catch (ValidationException $e) {
-            return $this->apiResponse(false, 'Datos inválidos para restablecer la contraseña.', null, $e->errors(), 422);
-        } catch (Exception $e) {
-            return $this->apiResponse(false, 'Ocurrió un error inesperado al restablecer la contraseña.', null, $e->getMessage(), 500);
         }
     }
 }

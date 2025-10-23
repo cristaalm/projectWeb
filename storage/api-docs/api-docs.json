@@ -3494,7 +3494,7 @@
                                                         "growthPercentage": {
                                                             "type": "number",
                                                             "format": "float",
-                                                            "example": 13.6400000000000005684341886080801486968994140625
+                                                            "example": 13.64
                                                         }
                                                     },
                                                     "type": "object"
@@ -3512,7 +3512,7 @@
                                                         "growthPercentage": {
                                                             "type": "number",
                                                             "format": "float",
-                                                            "example": 13.6400000000000005684341886080801486968994140625
+                                                            "example": 13.64
                                                         }
                                                     },
                                                     "type": "object"
@@ -3530,7 +3530,7 @@
                                                         "growthPercentage": {
                                                             "type": "number",
                                                             "format": "float",
-                                                            "example": 8.9700000000000006394884621840901672840118408203125
+                                                            "example": 8.97
                                                         }
                                                     },
                                                     "type": "object"
@@ -3548,7 +3548,7 @@
                                                         "growthPercentage": {
                                                             "type": "number",
                                                             "format": "float",
-                                                            "example": 10.339999999999999857891452847979962825775146484375
+                                                            "example": 10.34
                                                         }
                                                     },
                                                     "type": "object"
@@ -6105,8 +6105,8 @@
                 "tags": [
                     "Notificaciones"
                 ],
-                "summary": "Enviar notificación push al usuario destino (Android)",
-                "description": "Envía una notificación FCM a todos los dispositivos Android registrados del usuario destino. Permitido para el propio usuario, 'comerciante' y 'admin'. Límite de título 100 caracteres, mensaje 500.",
+                "summary": "Enviar notificación push al usuario (Android)",
+                "description": "Envía una notificación FCM a todos los dispositivos Android registrados del usuario. Límite de título 100 caracteres, mensaje 500.",
                 "operationId": "92d781d50bde903b0273f86df65e9691",
                 "requestBody": {
                     "required": true,
@@ -9403,7 +9403,7 @@
                 "tags": [
                     "Usuarios"
                 ],
-                "summary": "Identificar al usuario",
+                "summary": "Identificar al usuario por código de barras",
                 "operationId": "241136353a4c7aafab61ca87a2d0b7c5",
                 "requestBody": {
                     "required": true,
@@ -9418,16 +9418,6 @@
                                         "description": "Código de identificación de 13 dígitos",
                                         "type": "string",
                                         "example": "4075224740324"
-                                    },
-                                    "token": {
-                                        "description": "Token del usuario identificado (opcional si se usa Authorization Bearer)",
-                                        "type": "string",
-                                        "example": "1|as87cwe4t98wea5a91sda65sd1va6sd74n2ta98waw56"
-                                    },
-                                    "with_identity": {
-                                        "description": "Indica si se desea obtener la información de la verificación de identidad",
-                                        "type": "boolean",
-                                        "example": false
                                     }
                                 },
                                 "type": "object"
@@ -9454,21 +9444,6 @@
                                             "properties": {
                                                 "user": {
                                                     "$ref": "#/components/schemas/User"
-                                                },
-                                                "identityVerification": {
-                                                    "$ref": "#/components/schemas/IdentityVerification"
-                                                },
-                                                "access_token": {
-                                                    "type": "string",
-                                                    "example": "1|as87cwe4t98wea5a91sda65sd1va6sd74n2ta98waw56"
-                                                },
-                                                "token_type": {
-                                                    "type": "string",
-                                                    "example": "Bearer"
-                                                },
-                                                "expires_at": {
-                                                    "type": "string",
-                                                    "example": "2025-04-01T10:00:00.000000Z"
                                                 }
                                             },
                                             "type": "object"
@@ -9551,40 +9526,8 @@
                             }
                         }
                     },
-                    "404": {
-                        "description": "Usuario no encontrado",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "No se pudo identificar al usuario."
-                                        },
-                                        "data": {
-                                            "type": "string",
-                                            "example": "4075224740324"
-                                        },
-                                        "errors": {
-                                            "type": "string",
-                                            "example": "Usuario no encontrado."
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 404
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
                     "500": {
-                        "description": "Error inesperado al identificar al usuario",
+                        "description": "Error inesperado",
                         "content": {
                             "application/json": {
                                 "schema": {
