@@ -9,6 +9,7 @@ use App\Models\History;
 use App\Models\Alliance;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class HistoryController extends Controller
 {
@@ -221,6 +222,27 @@ class HistoryController extends Controller
             
         } catch (\Exception $e) {
             return $this->apiResponse(false, 'Error al registrar el historial.', null, $e->getMessage(), 500);
+        }
+    }
+
+    //Nueva funcion para mostrar en la grafica
+    public function getTopAlliancesByRedemptions(Request $request)
+    {
+        try {
+            $topAlliances = History::query()
+                ->select('alliance_id', DB::raw('SUM(quantity) as quantity'))
+                ->where('type_history', 1) // Solo canjeos
+                ->whereNotNull('alliance_id') // Asegurarse de que la alianza no sea nula
+                ->groupBy('alliance_id')
+                ->orderByDesc('quantity')
+                ->limit(7)
+                ->with('alliance') // Cargar la información de la alianza
+                ->get();
+
+            return $this->apiResponse(true, 'Lista de los 7 comercios con más canjeos obtenida correctamente.', $topAlliances, null, 200);
+
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al obtener los comercios con más canjeos.', null, $e->getMessage(), 500);
         }
     }
 }

@@ -1,264 +1,211 @@
 <script setup>
+import { ref, onMounted, computed } from 'vue'
 import { useTheme } from 'vuetify'
-import statsVerticalChart from '@images/cards/chart-success.png'
-import statsVerticalPaypal from '@images/cards/paypal-error.png'
-import statsVerticalWallet from '@images/cards/wallet-primary.png'
+import VueApexCharts from 'vue3-apexcharts'
 import { hexToRgb } from '@layouts/utils'
+import { requestGet } from '@/services/requests.js'
+import { useAuthStore } from '@/store/auth'
 
 const vuetifyTheme = useTheme()
+const authStore = useAuthStore()
+const loading = ref(true) 
+const topAlliances = ref([])
 
-const series = {
-  income: [{
-    data: [
-      24,
-      21,
-      30,
-      22,
-      42,
-      26,
-      35,
-      29,
-    ],
-  }],
-  expenses: [{
-    data: [
-      24,
-      21,
-      30,
-      25,
-      42,
-      26,
-      35,
-      29,
-    ],
-  }],
-  profit: [{
-    data: [
-      24,
-      21,
-      30,
-      22,
-      42,
-      26,
-      35,
-      35,
-    ],
-  }],
+
+const fetchTopAlliances = async () => {
+  loading.value = true
+  topAlliances.value = []
+  try {
+    const token = authStore.getAccessToken()
+    console.log('CardGraphs: Obteniendo token...', token)
+
+    const response = await requestGet({
+      url: 'history/topAlliancesByRedemptions',
+      token: token,
+    })
+    console.log('CardGraphs: Respuesta de la API:', JSON.parse(JSON.stringify(response)))
+
+    if (Array.isArray(response)) {
+      topAlliances.value = response
+      console.log('CardGraphs: Datos guardados en topAlliances:', topAlliances.value)
+    } else {
+      console.error('CardGraphs: La API no devolvió un array.', response)
+    }
+  } catch (error) {
+    console.error('CardGraphs: Error en el bloque catch al llamar a la API:', error)
+  } finally {
+    loading.value = false
+  }
 }
 
-const currentTab = ref('income')
 
-const tabData = computed(() => {
-  const data = {
-    income: {
-      avatar: statsVerticalWallet,
-      title: 'Total Income',
-      stats: '$459.1k',
-      profitLoss: 65,
-      profitLossAmount: '6.5',
-      compareToLastWeek: '$39k',
-    },
-    expenses: {
-      avatar: statsVerticalPaypal,
-      title: 'Total Expenses',
-      stats: '$316.5k',
-      profitLoss: 27.8,
-      profitLossAmount: '7.2',
-      compareToLastWeek: '$16k',
-    },
-    profit: {
-      avatar: statsVerticalChart,
-      title: 'Total Profit',
-      stats: '$147.9k',
-      profitLoss: 35.1,
-      profitLossAmount: '4.5',
-      compareToLastWeek: '$28k',
-    },
-  }
-  
-  return data[currentTab.value]
+const donutSeries = computed(() => {
+  return topAlliances.value.map(item => item.quantity)
 })
 
-const chartConfig = computed(() => {
+const donutLabels = computed(() => {
+  return topAlliances.value.map(item => item.alliance?.name || 'N/A')
+})
+
+const totalRedemptions = computed(() => {
+  return topAlliances.value.reduce((acc, item) => acc + item.quantity, 0)
+})
+
+const donutChartConfig = computed(() => {
   const currentTheme = vuetifyTheme.current.value.colors
   const variableTheme = vuetifyTheme.current.value.variables
-  const disabledTextColor = `rgba(${ hexToRgb(String(currentTheme['on-surface'])) },${ variableTheme['disabled-opacity'] })`
-  const borderColor = `rgba(${ hexToRgb(String(variableTheme['border-color'])) },${ variableTheme['border-opacity'] })`
   
+  const onSurfaceColor = `rgba(${hexToRgb(currentTheme['on-surface'])},${variableTheme['high-emphasis-opacity']})`
+
   return {
     chart: {
-      parentHeightOffset: 0,
-      toolbar: { show: false },
+      type: 'donut',
     },
-    dataLabels: { enabled: false },
     stroke: {
-      width: 3,
-      curve: 'smooth',
+      show: true,
+      width: 1,
+      colors: [currentTheme['on-surface']],
     },
-    grid: {
-      strokeDashArray: 4.5,
-      borderColor,
-      padding: {
-        left: 0,
-        top: -20,
-        right: 11,
-        bottom: 7,
-      },
-    },
-    fill: {
-      type: 'gradient',
-      gradient: {
-        opacityTo: 0.25,
-        opacityFrom: 0.5,
-        stops: [
-          0,
-          95,
-          100,
-        ],
-        shadeIntensity: 0.6,
-        colorStops: [[
-          {
-            offset: 0,
-            opacity: 0.4,
-            color: currentTheme.primary,
+    labels: donutLabels.value, 
+    colors: [
+      currentTheme.primary,
+      currentTheme.secondary,
+      currentTheme.success,
+      currentTheme.info,
+      currentTheme.warning,
+      currentTheme.error,
+      `rgba(${hexToRgb(currentTheme.primary)}, 0.5)`, 
+    ],
+    plotOptions: {
+      pie: {
+        donut: {
+          size: '70%',
+          labels: {
+            show: true,
+            total: {
+              show: true,
+              label: 'Total',
+              fontSize: '1.5rem',
+              color: onSurfaceColor, 
+              formatter: () => totalRedemptions.value.toLocaleString(),
+            },
+            name: {
+              show: true,
+              color: onSurfaceColor, 
+              formatter: (val) => {
+                if (val.length > 25) {
+                  return val.substring(0, 22) + '...'
+                }
+                return val
+              },
+            },
+            value: {
+              show: true,
+              color: onSurfaceColor, 
+              formatter: val => val, 
+            },
           },
-          {
-            offset: 100,
-            opacity: 0.2,
-            color: currentTheme.surface,
-          },
-        ]],
-      },
-    },
-    theme: {
-      monochrome: {
-        enabled: true,
-        shadeTo: 'light',
-        shadeIntensity: 1,
-        color: currentTheme.primary,
-      },
-    },
-    xaxis: {
-      axisTicks: { show: false },
-      axisBorder: { show: false },
-      categories: [
-        '',
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-      ],
-      offsetY: 20,
-      offsetX: -24,
-      labels: {
-        style: {
-          fontSize: '14px',
-          colors: disabledTextColor,
-          fontFamily: 'Public Sans',
         },
       },
     },
-    yaxis: {
-      min: 10,
-      max: 50,
-      show: false,
-      tickAmount: 4,
+    legend: {
+      position: 'bottom', 
+      labels: {
+        colors: onSurfaceColor, 
+      },
     },
-    markers: {
-      size: 8,
-      strokeWidth: 6,
-      strokeOpacity: 1,
-      offsetX: -10,
-      hover: { size: 8 },
-      colors: ['transparent'],
-      strokeColors: 'transparent',
-      discrete: [{
-        size: 8,
-        seriesIndex: 0,
-        fillColor: '#fff',
-        strokeColor: currentTheme.primary,
-        dataPointIndex: series[currentTab.value][0].data.length - 1,
-      }],
+    dataLabels: {
+      enabled: true,
+      formatter: (val) => {
+        return `${val.toFixed(1)}%`
+      },
+      style: {
+        colors: ['#FFF'], 
+        fontSize: '12px',
+        fontWeight: 600,
+      },
+      dropShadow: { 
+         enabled: true,
+         top: 1,
+         left: 1,
+         blur: 1,
+         opacity: 0.45,
+      },
     },
+    responsive: [{
+      breakpoint: 480,
+      options: {
+        chart: {
+          width: 300,
+        },
+        legend: {
+          position: 'bottom',
+        },
+      },
+    }],
   }
+})
+
+onMounted(() => {
+  fetchTopAlliances()
 })
 </script>
 
 <template>
   <VCard>
-    <VCardText>
-      <VTabs
-        v-model="currentTab"
-        class="v-tabs-pill"
-      >
-        <VTab value="income">
-          Income
-        </VTab>
-        <VTab value="expenses">
-          Expenses
-        </VTab>
-        <VTab value="profit">
-          Profit
-        </VTab>
-      </VTabs>
-    </VCardText>
-
-    <VCardText class="d-flex align-center gap-3">
-      <VAvatar
-        size="48"
-        rounded
-        :image="tabData.avatar"
-      />
-
-      <div>
-        <p class="mb-0">
-          {{ tabData.title }}
-        </p>
-        <div class="d-flex align-center gap-2">
-          <h6 class="text-h6">
-            {{ tabData.stats }}
-          </h6>
-          <span
-            class="text-sm"
-            :class="tabData.profitLoss > 0 ? 'text-success' : 'text-error'"
-          >
-            <VIcon
-              size="24"
-              icon="bx-chevron-up"
-            />
-            {{ tabData.profitLoss }}%
-          </span>
-        </div>
-      </div>
-    </VCardText>
-
-    <VCardText>
-      <VueApexCharts
-        type="area"
-        :height="230"
-        :options="chartConfig"
-        :series="series[currentTab]"
-      />
-    </VCardText>
-
-    <VCardText class="d-flex align-center justify-center pt-2 gap-4">
-      <VProgressCircular
-        size="45"
+    <VCardItem class="d-flex align-center gap-3">
+      <VCardTitle>
+        <VIcon
+        icon="mdi mdi-chart-donut"
         color="primary"
-        :model-value="tabData.profitLoss"
-      >
-        <span class="text-overline text-medium-emphasis">${{ tabData.profitLossAmount }}</span>
-      </VProgressCircular>
+        class="dark:!text-white"
+        size="32"
+        />
+        Volumen de Canjes por Alianza Comercial</VCardTitle>
+    </VCardItem>
 
-      <div>
-        <h6 class="text-base font-weight-regular">
-          <span class="text-capitalize d-inline-block">{{ currentTab }} this week</span>
-        </h6>
-        <span class="text-sm d-inline-block">{{ tabData.compareToLastWeek }} less than last week</span>
-      </div>
+    <VOverlay
+      v-model="loading"
+      contained
+      class="align-center justify-center"
+    >
+      <VProgressCircular
+        indeterminate
+        color="primary"
+      />
+    </VOverlay>
+
+    <VCardText>
+ 
+      <template v-if="loading">
+        <VSkeletonLoader type="image" />
+      </template>
+
+      <template v-else-if="topAlliances.length > 0">
+        <VueApexCharts
+          type="donut"
+          :height="500"
+          :options="donutChartConfig"
+          :series="donutSeries"
+        />
+      </template>
+
+      <template v-else>
+        <div class="text-center pa-5">
+          <VIcon
+            icon="mdi-chart-bar-off"
+            size="48"
+            class="mb-2"
+          />
+          <h6 class="text-h6">
+            No se pudieron cargar los datos
+          </h6>
+          <p class="text-sm text-medium-emphasis">
+            No se encontraron datos de canjeos o hubo un error al consultar la API.
+          </p>
+        </div>
+      </template>
     </VCardText>
   </VCard>
 </template>
+
