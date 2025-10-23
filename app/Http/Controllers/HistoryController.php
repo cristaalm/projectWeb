@@ -92,35 +92,6 @@ class HistoryController extends Controller
         }
     }
 
-    public function topAlliancesByRedemptions(): JsonResponse
-    {
-        // Paso 1: Obtener los 7 alliance_id con más canjeos (type_history = 1)
-        $topAlliances = History::query()
-            ->where('type_history', 1)
-            ->selectRaw('alliance_id, SUM(quantity) as total_quantity')
-            ->groupBy('alliance_id')
-            ->orderByDesc('total_quantity')
-            ->limit(7)
-            ->pluck('total_quantity', 'alliance_id'); // [alliance_id => total_quantity]
-
-        if ($topAlliances->isEmpty()) {
-            return response()->json([]);
-        }
-
-        // Paso 2: Cargar los modelos Alliance correspondientes
-        $alliances = Alliance::find(array_keys($topAlliances->toArray()));
-
-        // Paso 3: Formatear la respuesta
-        $result = $alliances->map(function (Alliance $alliance) use ($topAlliances) {
-            return [
-                'alliance' => $alliance,
-                'quantity' => (int) $topAlliances[$alliance->id],
-            ];
-        })->values();
-
-        return response()->json($result);
-    }
-
     public function totalPointsByShop(Request $request, int $alliance_id) 
     {
         try {
@@ -229,17 +200,32 @@ class HistoryController extends Controller
     public function getTopAlliancesByRedemptions(Request $request)
     {
         try {
-            $topAlliances = History::query()
-                ->select('alliance_id', DB::raw('SUM(quantity) as quantity'))
-                ->where('type_history', 1) // Solo canjeos
-                ->whereNotNull('alliance_id') // Asegurarse de que la alianza no sea nula
-                ->groupBy('alliance_id')
-                ->orderByDesc('quantity')
-                ->limit(7)
-                ->with('alliance') // Cargar la información de la alianza
-                ->get();
+        // Paso 1: Obtener los 7 alliance_id con más canjeos (type_history = 1)
+        $topAlliances = History::query()
+            ->where('type_history', 1)
+            ->selectRaw('alliance_id, SUM(quantity) as total_quantity')
+            ->groupBy('alliance_id')
+            ->orderByDesc('total_quantity')
+            ->limit(7)
+            ->pluck('total_quantity', 'alliance_id'); // [alliance_id => total_quantity]
 
-            return $this->apiResponse(true, 'Lista de los 7 comercios con más canjeos obtenida correctamente.', $topAlliances, null, 200);
+        if ($topAlliances->isEmpty()) {
+            return response()->json([]);
+        }
+
+        // Paso 2: Cargar los modelos Alliance correspondientes
+        $alliances = Alliance::find(array_keys($topAlliances->toArray()));
+
+        // Paso 3: Formatear la respuesta
+        $result = $alliances->map(function (Alliance $alliance) use ($topAlliances) {
+            return [
+                'alliance_id' => $alliance->id,
+                'alliance' => $alliance,
+                'quantity' => (int) $topAlliances[$alliance->id],
+            ];
+        })->values();
+
+        return $this->apiResponse(true, 'Lista de los 7 comercios con más canjeos obtenida correctamente.', $result, null, 200);
 
         } catch (\Exception $e) {
             return $this->apiResponse(false, 'Error al obtener los comercios con más canjeos.', null, $e->getMessage(), 500);

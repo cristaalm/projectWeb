@@ -25,8 +25,8 @@ const fetchTopAlliances = async () => {
     })
     console.log('CardGraphs: Respuesta de la API:', JSON.parse(JSON.stringify(response)))
 
-    if (Array.isArray(response)) {
-      topAlliances.value = response
+    if (Array.isArray(response.data)) {
+      topAlliances.value = response.data
       console.log('CardGraphs: Datos guardados en topAlliances:', topAlliances.value)
     } else {
       console.error('CardGraphs: La API no devolvió un array.', response)
@@ -63,7 +63,7 @@ const donutChartConfig = computed(() => {
     },
     stroke: {
       show: true,
-      width: 1,
+      width: 0,
       colors: [currentTheme['on-surface']],
     },
     labels: donutLabels.value, 
@@ -79,7 +79,7 @@ const donutChartConfig = computed(() => {
     plotOptions: {
       pie: {
         donut: {
-          size: '70%',
+          size: '60%',
           labels: {
             show: true,
             total: {
@@ -94,7 +94,7 @@ const donutChartConfig = computed(() => {
               color: onSurfaceColor, 
               formatter: (val) => {
                 if (val.length > 25) {
-                  return val.substring(0, 22) + '...'
+                  return val.substring(0, 17) + '...'
                 }
                 return val
               },
@@ -121,11 +121,11 @@ const donutChartConfig = computed(() => {
       },
       style: {
         colors: ['#FFF'], 
-        fontSize: '12px',
+        fontSize: '17px',
         fontWeight: 600,
       },
       dropShadow: { 
-         enabled: true,
+         enabled: false,
          top: 1,
          left: 1,
          blur: 1,
