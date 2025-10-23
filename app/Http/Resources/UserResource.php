@@ -32,10 +32,10 @@ class UserResource extends JsonResource
                 'phone' => $this->alliance->phone,
                 'logo' => $this->alliance->logo,
                 'address' => $this->alliance->address,
-                'type_shop' => $this->alliance->type_shop_id ? $this->whenLoaded('typeShop', [
+                'type_shop' => $this->alliance->type_shop_id ? [
                     'id' => $this->alliance->typeShop->id,
                     'name' => $this->alliance->typeShop->name,
-                ]) : null,
+                ]: null,
                 'ext' => $this->alliance->ext,
                 'created_at' => $this->alliance->created_at,
                 'updated_at' => $this->alliance->updated_at,
