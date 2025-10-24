@@ -124,7 +124,7 @@ watch(isOpen, val => {
                 <VCheckbox v-model="containerData.status" />
               </td>
               <td class="text-sm text-gray-500 dark:text-slate-300">
-                El contenedor estara habilitado o deshabilitado
+                El contenedor estará habilitado o deshabilitado
               </td>
             </tr>
           </tbody>

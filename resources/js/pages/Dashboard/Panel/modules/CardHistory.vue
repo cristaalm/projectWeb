@@ -32,7 +32,7 @@ const {
           Canjeos recientes
         </h2>
       </div>
-      <span class="text-sm text-gray-500 dark:text-gray-300">Los ultimos canjeos realizados</span>
+      <span class="text-sm text-gray-500 dark:text-gray-300">Los últimos canjeos realizados</span>
     </div>
 
     <!-- MAIN -->

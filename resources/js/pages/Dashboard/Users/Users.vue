@@ -48,7 +48,7 @@ const resetFilters = () => {
 const headers = [
   { title: '', align: 'left', key: 'avatar', sortable: false },
   { title: 'Nombre', align: 'left', key: 'name' },
-  { title: 'Email', align: 'start', key: 'email' },
+  { title: 'CORREO ELECTRÓNICO', align: 'start', key: 'email' },
   { title: 'Puntos', align: 'start', key: 'total_points' },
   { title: 'Verificación', align: 'center', key: 'verification_status', sortable: false },
   { title: 'Tipo', align: 'start', key: 'role.display_name', sortable: false },

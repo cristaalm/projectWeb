@@ -22,7 +22,7 @@ const template = computed(() => [
     growthPercentage: stats.value.totalPoints.growthPercentage,
   },
   {
-    title: 'Escaneos validos',
+    title: 'Escaneos válidos',
     icon: 'mdi mdi-camera-outline',
     color: 'primary',
     value: stats.value.totalScans.total,

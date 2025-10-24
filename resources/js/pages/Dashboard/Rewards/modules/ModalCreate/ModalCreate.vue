@@ -97,8 +97,8 @@ watch(isOpen, val => {
           />
           <VTextField
             v-model="rewardData.description"
-            label="Descripcion de la recompensa"
-            placeholder="Descripcion de la recompensa"
+            label="Descripción de la recompensa"
+            placeholder="Descripción de la recompensa"
             outlined
             :color="darkModeStore.darkMode ? 'white' : 'primary'" 
             :class="formErrors.description ? '!max-h-[60px]' : '!max-h-[38px]'"
@@ -201,7 +201,7 @@ watch(isOpen, val => {
                 <VCheckbox v-model="rewardData.is_active" />
               </td>
               <td class="text-sm text-gray-500 dark:text-slate-300">
-                La recompensa estara habilitada o deshabilitada
+                La recompensa  habilitada o deshabilitada
               </td>
             </tr>
           </tbody>

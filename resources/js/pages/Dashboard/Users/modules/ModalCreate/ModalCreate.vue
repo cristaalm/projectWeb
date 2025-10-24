@@ -120,7 +120,7 @@ watch(isOpen, val => {
           />
           <VTextField
             v-model="userData.phone"
-            label="Telefono"
+            label="Teléfono"
             placeholder="(###) ###-####"
             outlined
             :color="darkModeStore.darkMode ? 'white' : 'primary'" 

@@ -89,7 +89,7 @@ function updatePhone(event) {
           />
           <VTextField
             v-model="containerData.serial_number"
-            label="Numero de serie del contenedor"
+            label="Número de serie del contenedor"
             placeholder="Numero de serie del contenedor"
             outlined
             :color="darkModeStore.darkMode ? 'white' : 'primary'" 
@@ -103,8 +103,8 @@ function updatePhone(event) {
           />
           <VTextField
             v-model="containerData.location"
-            label="Ubicacion del contenedor"
-            placeholder="Ubicacion del contenedor"
+            label="Ubicación del contenedor"
+            placeholder="Ubicación del contenedor"
             outlined
             :color="darkModeStore.darkMode ? 'white' : 'primary'" 
             :class="formErrors.location ? '!max-h-[60px]' : '!max-h-[38px]'"
@@ -136,7 +136,7 @@ function updatePhone(event) {
                 <VCheckbox v-model="containerData.status" />
               </td>
               <td class="text-sm text-gray-500 dark:text-slate-300">
-                El contenedor estara habilitado o deshabilitado
+                El contenedor  habilitado o deshabilitado
               </td>
             </tr>
           </tbody>

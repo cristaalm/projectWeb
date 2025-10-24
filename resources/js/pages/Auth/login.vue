@@ -85,7 +85,7 @@ const goToHome = () => {
                 <VTextField
                   v-model="form.email"
                   autofocus
-                  label="Correo Electrónico"
+                  label="Correo electrónico"
                   type="email"
                   placeholder="johndoe@email.com"
                   class="font-poppins"

@@ -128,7 +128,7 @@ const { showModalViewTypeShop, openModalViewTypeShop } = useModalViewTypeShop()
           />
           <VTextField
             v-model="shopData.phone"
-            label="Telefono"
+            label="Teléfono"
             placeholder="(###) ###-####"
             outlined
             :color="darkModeStore.darkMode ? 'white' : 'primary'" 
@@ -201,7 +201,7 @@ const { showModalViewTypeShop, openModalViewTypeShop } = useModalViewTypeShop()
                 <VCheckbox v-model="shopData.status" />
               </td>
               <td class="text-sm text-gray-500 dark:text-slate-300">
-                El comercio estara habilitado o deshabilitado
+                El comercio  habilitado o deshabilitado
               </td>
             </tr>
           </tbody>
