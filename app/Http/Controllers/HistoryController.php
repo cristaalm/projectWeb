@@ -118,75 +118,18 @@ class HistoryController extends Controller
     public function logHistory($user_id = null, $comerciant_id = null, $alliance_id = null, $material_type_id = null, $reward_id = null, $type_history = null, $scan_id = null, $quantity = null, $points = null, $description = null)
     {
 
-        $request = new Request([
-            'user_id' => $user_id,
-            'comerciant_id' => $comerciant_id,
-            'alliance_id' => $alliance_id,
-            'material_type_id' => $material_type_id,
-            'reward_id' => $reward_id,
-            'type_history' => $type_history,
-            'scan_id' => $scan_id,
-            'quantity' => $quantity,
-            'points' => $points,
-            'description' => $description,
-        ]);
-
         try {
-            $request->validate([
-                'user_id' => 'required|exists:users,id',
-                'comerciant_id' => 'nullable|exists:users,id',
-                'alliance_id' => 'nullable|exists:alliances,id',
-                'material_type_id' => 'nullable|exists:material_types,id',
-                'reward_id' => 'nullable|exists:rewards,id',
-                'type_history' => 'required|in:1,2,3',
-                'scan_id' => 'nullable|exists:scans,id',
-                'quantity' => 'required|numeric',
-                'points' => 'required|numeric',
-                'description' => 'nullable|string',
-            ]);
-            
-            // si es tipo 2, validar que solo haya enviado material_type_id
-            if ($request->type_history == 2 && $request->material_type_id == null ) {
-                throw ValidationException::withMessages([
-                    'material_type_id' => 'El campo tipo de material es obligatorio.',
-                ]);
-            }
-
-            if ($request->type_history == 2 && $request->scan_id == null ) {
-                throw ValidationException::withMessages([
-                    'scan_id' => 'El campo escaneo es obligatorio.',
-                ]);
-            }
-            
-            if ($request->type_history == 1 && $request->alliance_id == null ) {
-                throw ValidationException::withMessages([
-                    'alliance_id' => 'El campo comercio es obligatorio.',
-                ]);
-            }
-
-            if ($request->type_history == 1 && $request->reward_id == null ) {
-                throw ValidationException::withMessages([
-                    'reward_id' => 'El campo recompensa es obligatorio.',
-                ]);
-            }
-
-            if ($request->type_history == 3 && $request->description == null ) {
-                throw ValidationException::withMessages([
-                    'description' => 'El campo descripción es obligatorio.',
-                ]);
-            }
-
             $history = History::create([
-                'user_id' => $request->user_id,
-                'comerciant_id' => $request->comerciant_id,
-                'alliance_id' => $request->alliance_id,
-                'material_type_id' => $request->material_type_id,
-                'reward_id' => $request->reward_id,
-                'type_history' => $request->type_history,
-                'scan_id' => $request->scan_id,
-                'quantity' => $request->quantity,
-                'points' => $request->points,
-                'description' => $request->description,
+                'user_id' => $user_id,
+                'comerciant_id' => $comerciant_id,
+                'alliance_id' => $alliance_id,
+                'material_type_id' => $material_type_id,
+                'reward_id' => $reward_id,
+                'type_history' => $type_history,
+                'scan_id' => $scan_id,
+                'quantity' => $quantity,
+                'points' => $points,
+                'description' => $description,
             ]);
 
             return $history;

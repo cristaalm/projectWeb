@@ -9,6 +9,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\Scan;
 use App\Models\MaterialTypes;
@@ -102,23 +103,30 @@ class ScanController extends Controller
                 'image' => $imagePath,
                 'scan_status' => ScanStatus::SUCCESS->value,
                 'is_valid' =>  $iaResult['reciclable'],
+                'is_crushed' => $iaResult['aplastado'],
                 'points_awarded' => $points,
                 'description' => $iaResult['detalle'],
                 'scanned_at' => now(),
             ]);
 
+            Log::info('Escaneo registrado', ['scan' => $scan->toArray()]);
+
             $history = new HistoryController();
-            $history->logHistory($validatedData['user_id'], null ,null, $iaResult['tipo'], null, 2, $scan->id, null, $points, null);
+            $historyResponse = $history->logHistory($validatedData['user_id'], null ,null, $iaResult['tipo'], null, 2, $scan->id, null, $points, null);
+
+            Log::info('Historial registrado', ['history' => $historyResponse instanceof History ? $historyResponse->toArray() : $historyResponse]);
 
             $response = [
                 ...$iaResult,
                 "tipo" => $validMaterialType->name,
             ];
 
+            Log::info('Escaneo exitoso', ['response' => $response]);
+
             return $this->apiResponse(true, 'Escaneo exitoso.', $response);
-    
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error al escanear', ['error' => $e->getMessage()]);
             return $this->apiResponse(false, 'Error al escanear.', null, $e->getMessage(), 500);
         }
     }
