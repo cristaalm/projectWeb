@@ -251,8 +251,9 @@ onMounted(() => {
           >
             <div class="d-flex align-center justify-space-between mb-4">
               <VBtn
-                icon
                 size="small"
+                variant="text"
+                class="text-h2"
                 @click="prevAlliance"
               >
                 &lt;
@@ -263,8 +264,9 @@ onMounted(() => {
               </span>
 
               <VBtn
-                icon
                 size="small"
+                variant="text"
+                class="text-h2"
                 @click="nextAlliance"
               >
                 &gt;
@@ -304,7 +306,7 @@ onMounted(() => {
               </p>
 
               <h6 class="text-sm font-weight-medium text-medium-emphasis">
-                Email
+                Gmail
               </h6>
               <p class="text-body-1 mb-4">
                 {{ currentAlliance.contact_email || 'No disponible' }}
