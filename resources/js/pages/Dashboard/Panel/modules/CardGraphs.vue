@@ -10,12 +10,12 @@ const vuetifyTheme = useTheme()
 const authStore = useAuthStore()
 const loading = ref(true) 
 const topAlliances = ref([])
-const selectedIndex = ref(0) // Estado para el ÍNDICE de la alianza seleccionada
+const selectedIndex = ref(0) 
 
 const fetchTopAlliances = async () => {
   loading.value = true
   topAlliances.value = []
-  selectedIndex.value = 0 // Reiniciar al cargar
+  selectedIndex.value = 0 
   try {
     const token = authStore.getAccessToken()
     console.log('CardGraphs: Obteniendo token...', token)
@@ -27,9 +27,7 @@ const fetchTopAlliances = async () => {
     console.log('CardGraphs: Respuesta de la API:', JSON.parse(JSON.stringify(response)))
 
     if (Array.isArray(response.data) && response.data.length > 0) {
-      // ******* CAMBIO AQUÍ: Ordenar los datos por cantidad de canjes de forma descendente *******
       topAlliances.value = response.data.sort((a, b) => b.quantity - a.quantity)
-      // El índice 0 ahora siempre apuntará al de mayor canjeo
       console.log('CardGraphs: Datos guardados y ordenados en topAlliances:', topAlliances.value)
     } else {
       console.error('CardGraphs: La API no devolvió un array o está vacío.', response)
@@ -41,47 +39,37 @@ const fetchTopAlliances = async () => {
   }
 }
 
-// --- Nuevas propiedades computadas y funciones ---
-
-// Propiedad computada para obtener los detalles de la alianza actual
 const currentAlliance = computed(() => {
   if (!topAlliances.value || topAlliances.value.length === 0) {
     return null
   }
-  // Obtener los datos basados en el índice seleccionado
   const allianceData = topAlliances.value[selectedIndex.value]
 
   if (!allianceData || !allianceData.alliance) {
     return null
   }
   
-  // Combinamos los detalles de la alianza y la cantidad de canjes
   return {
     ...allianceData.alliance,
     quantity: allianceData.quantity,
   }
 })
 
-// Función para ir a la siguiente alianza (con ciclo)
 const nextAlliance = () => {
   if (selectedIndex.value === topAlliances.value.length - 1) {
-    selectedIndex.value = 0 // Vuelve al inicio
+    selectedIndex.value = 0 
   } else {
     selectedIndex.value++
   }
 }
 
-// Función para ir a la alianza anterior (con ciclo)
 const prevAlliance = () => {
   if (selectedIndex.value === 0) {
-    selectedIndex.value = topAlliances.value.length - 1 // Vuelve al final
+    selectedIndex.value = topAlliances.value.length - 1 
   } else {
     selectedIndex.value--
   }
 }
-
-
-// --- Propiedades computadas existentes (modificadas) ---
 
 const donutSeries = computed(() => {
   return topAlliances.value.map(item => item.quantity)
@@ -104,7 +92,6 @@ const donutChartConfig = computed(() => {
   return {
     chart: {
       type: 'donut',
-      // Eliminamos los eventos de clic, la gráfica ya no es interactiva
     },
     stroke: {
       show: true,
@@ -158,7 +145,6 @@ const donutChartConfig = computed(() => {
       labels: {
         colors: onSurfaceColor, 
       },
-      // Dejamos el hover por defecto, pero quitamos la acción de clic
       onItemHover: {
         highlightDataSeries: true,
       },
@@ -182,7 +168,7 @@ const donutChartConfig = computed(() => {
       },
     },
     responsive: [{
-      breakpoint: 960, // Ajustado breakpoint para md
+      breakpoint: 960, 
       options: {
         chart: {
           width: '100%',
@@ -228,7 +214,7 @@ onMounted(() => {
 
     <VCardText>
       <template v-if="loading">
-        <!-- Esqueleto que simula ambas columnas --><VRow>
+        <VRow>
           <VCol
             cols="12"
             md="8"
@@ -245,8 +231,8 @@ onMounted(() => {
       </template>
 
       <template v-else-if="topAlliances.length > 0 && currentAlliance">
-        <!-- Layout de dos columnas --><VRow>
-          <!-- Columna de la Gráfica --><VCol
+        <VRow>
+          <VCol
             cols="12"
             md="8"
           >
@@ -258,12 +244,12 @@ onMounted(() => {
             />
           </VCol>
 
-          <!-- Columna de Información Detallada con Paginador --><VCol
+          <VCol
             cols="12"
             md="4"
             class="d-flex flex-column"
           >
-            <!-- Controles del Paginador --><div class="d-flex align-center justify-space-between mb-4">
+            <div class="d-flex align-center justify-space-between mb-4">
               <VBtn
                 icon
                 size="small"
@@ -285,46 +271,46 @@ onMounted(() => {
               </VBtn>
             </div>
 
-            <!-- Tarjeta de Detalles --><div
+            <div
               class="pa-4 rounded-lg w-100"
               style="border: 1px solid rgba(var(--v-theme-on-surface), 0.12);"
             >
-              <!-- Título --><h6 class="text-sm font-weight-medium text-medium-emphasis">
+              <h6 class="text-sm font-weight-medium text-medium-emphasis">
                 Alianza Comercial
               </h6>
               <p class="text-h6 font-weight-bold mb-4">
                 {{ currentAlliance.name }}
               </p>
 
-              <!-- Total de Canjes --><h6 class="text-sm font-weight-medium text-medium-emphasis">
+              <h6 class="text-sm font-weight-medium text-medium-emphasis">
                 Total de Canjes
               </h6>
               <p class="text-h6 mb-4">
                 {{ currentAlliance.quantity.toLocaleString('es-MX') }}
               </p>
 
-              <!-- Contacto --><h6 class="text-sm font-weight-medium text-medium-emphasis">
+              <h6 class="text-sm font-weight-medium text-medium-emphasis">
                 Nombre de Contacto
               </h6>
               <p class="text-body-1 mb-4">
                 {{ currentAlliance.contact_name || 'No disponible' }}
               </p>
 
-              <!-- Teléfono --><h6 class="text-sm font-weight-medium text-medium-emphasis">
+              <h6 class="text-sm font-weight-medium text-medium-emphasis">
                 Teléfono
               </h6>
               <p class="text-body-1 mb-4">
                 {{ currentAlliance.phone || 'No disponible' }}
               </p>
 
-              <!-- Email --><h6 class="text-sm font-weight-medium text-medium-emphasis">
+              <h6 class="text-sm font-weight-medium text-medium-emphasis">
                 Email
               </h6>
               <p class="text-body-1 mb-4">
                 {{ currentAlliance.contact_email || 'No disponible' }}
               </p>
 
-              <!-- Dirección --><h6 class="text-sm font-weight-medium text-medium-emphasis">
+              <h6 class="text-sm font-weight-medium text-medium-emphasis">
                 Dirección
               </h6>
               <p class="text-body-1 mb-0">
@@ -335,7 +321,7 @@ onMounted(() => {
         </VRow>
       </template>
 
-      <!-- Estado de Error o Sin Datos --><template v-else>
+      <template v-else>
         <div class="text-center pa-5 d-flex flex-column align-center justify-center" style="height: 500px;">
           <VIcon
             icon="mdi-chart-bar-off"
