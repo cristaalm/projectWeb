@@ -8,8 +8,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('getAll', [HistoryController::class, 'getAll']); // path: /api/history/getAll
         Route::get('getAllSystem', [HistoryController::class, 'getAllSystem']);
 
-        Route::get('totalPointsByShop/{alliance_id}', [HistoryController::class, 'totalPointsByShop']);
-
         Route::get('topAlliancesByRedemptions', [HistoryController::class, 'getTopAlliancesByRedemptions']);
 
     });

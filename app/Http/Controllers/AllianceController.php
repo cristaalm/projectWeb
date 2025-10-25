@@ -213,4 +213,29 @@ class AllianceController extends Controller
             return $this->apiResponse(false, 'Error al obtener el catalogo.', null, $e->getMessage(), 500);
         }
     }
+
+    public function cashCut(Request $request, int $alliance_id) 
+    {
+        try {
+            $request->merge([
+                'alliance_id' => $alliance_id,
+            ]);
+
+            $validateData = $request->validate([
+                'alliance_id' => 'required|exists:alliances,id',
+            ]);
+
+            $alliance = Alliance::where('id', $validateData['alliance_id'])->first();
+
+            $totalPoints = $alliance->total_points;
+            $cashCut = $totalPoints * 0.01;
+
+            $alliance->total_points = 0;
+            $alliance->save();
+
+            return $this->apiResponse(true, 'Total de puntos obtenido exitosamente.', ['total_points' => $totalPoints, 'cash_out' => $cashCut], null, 200);
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al obtener el historial.', null, $e->getMessage() . ' ' . $e->getLine(), 500);
+        }
+    }
 }

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('contact_email', 100);
             $table->string('phone', 20);
             $table->string('address', 255);
+            $table->integer('total_points')->default(0); 
             $table->unsignedBigInteger('type_shop_id');
             $table->boolean('logo')->default(false);
             $table->string('ext', 10)->nullable();

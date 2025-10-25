@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use App\Models\RewardsUser;
 use App\Models\User;
+use App\Models\Alliance;
 use App\Enums\VerificationStatus;
 use App\Enums\UserStatus;
 use App\Models\DeviceToken;
@@ -75,6 +76,10 @@ class RewardUserController extends Controller
 
             $user->total_points -= $reward->points_required * $validatedData['quantity'];
             $user->save();
+
+            $alliance = Alliance::findOrFail($reward->alliance_id);
+            $alliance->total_points += $reward->points_required * $validatedData['quantity'];
+            $alliance->save();
 
             $comerciant = $authUser->role_id == 4 ? $authUser : null;
             $comerciant_id = $comerciant ? $comerciant->id : null;

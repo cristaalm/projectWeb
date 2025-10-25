@@ -18,6 +18,7 @@ class Alliance extends Model
         'contact_email',
         'phone',
         'address',
+        'total_points',
         'logo',
         'type_shop_id',
         'ext',
@@ -27,6 +28,7 @@ class Alliance extends Model
     protected $casts = [
         'status' => AllianceStatus::class,
         'logo' => 'boolean',
+        'total_points' => 'integer',
     ];
 
     public function rewards(): HasMany

@@ -36,6 +36,7 @@ class UserWithIdentityResource extends JsonResource
                     'id' => $this->alliance->typeShop->id,
                     'name' => $this->alliance->typeShop->name,
                 ]) : null,
+                'total_points' => $this->alliance->total_points,
                 'ext' => $this->alliance->ext,
                 'created_at' => $this->alliance->created_at,
                 'updated_at' => $this->alliance->updated_at,

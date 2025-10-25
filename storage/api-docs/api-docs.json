@@ -926,6 +926,140 @@
                 ]
             }
         },
+        "/api/alianzas/cashCut/{alliance_id}": {
+            "get": {
+                "tags": [
+                    "Alianzas"
+                ],
+                "summary": "Hacer el corte de caja para un comercio (alianza)",
+                "description": "Hacer el corte de caja para un comercio (alianza)",
+                "operationId": "a2cc234da80f6b17eb6c8f3c691743bf",
+                "parameters": [
+                    {
+                        "name": "alliance_id",
+                        "in": "path",
+                        "description": "ID del comercio (alianza)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Corte de caja realizado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Corte de caja realizado exitosamente."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "total_points": {
+                                                    "type": "integer",
+                                                    "example": 8500
+                                                },
+                                                "cash_out": {
+                                                    "type": "integer",
+                                                    "example": 85
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token de autenticación no válido o no proporcionado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de autenticación no proporcionado."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado al hacer el corte de caja",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al obtener el historial."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/auth/passHash": {
             "post": {
                 "tags": [
@@ -3494,7 +3628,7 @@
                                                         "growthPercentage": {
                                                             "type": "number",
                                                             "format": "float",
-                                                            "example": 13.64
+                                                            "example": 13.6400000000000005684341886080801486968994140625
                                                         }
                                                     },
                                                     "type": "object"
@@ -3512,7 +3646,7 @@
                                                         "growthPercentage": {
                                                             "type": "number",
                                                             "format": "float",
-                                                            "example": 13.64
+                                                            "example": 13.6400000000000005684341886080801486968994140625
                                                         }
                                                     },
                                                     "type": "object"
@@ -3530,7 +3664,7 @@
                                                         "growthPercentage": {
                                                             "type": "number",
                                                             "format": "float",
-                                                            "example": 8.97
+                                                            "example": 8.9700000000000006394884621840901672840118408203125
                                                         }
                                                     },
                                                     "type": "object"
@@ -3548,7 +3682,7 @@
                                                         "growthPercentage": {
                                                             "type": "number",
                                                             "format": "float",
-                                                            "example": 10.34
+                                                            "example": 10.339999999999999857891452847979962825775146484375
                                                         }
                                                     },
                                                     "type": "object"
@@ -4066,154 +4200,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Error al obtener los comercios con más canjeos."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "string",
-                                            "example": "Error interno del servidor."
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 500
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/history/totalPointsByShop/{alliance_id}": {
-            "get": {
-                "tags": [
-                    "Historial"
-                ],
-                "summary": "Obtener el total de puntos por comercio (alianza) en un rango de fechas",
-                "description": "Suma el total de puntos del historial con `type_history = 1` para un comercio específico (alliance_id) dentro de un rango de fechas.",
-                "operationId": "67cbf08f4b47ceaa2a4ce151ee4437ac",
-                "parameters": [
-                    {
-                        "name": "alliance_id",
-                        "in": "path",
-                        "description": "ID del comercio (alianza)",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 3
-                        }
-                    },
-                    {
-                        "name": "date_start",
-                        "in": "query",
-                        "description": "Fecha de inicio del rango",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "date",
-                            "example": "2025-10-01"
-                        }
-                    },
-                    {
-                        "name": "date_end",
-                        "in": "query",
-                        "description": "Fecha de fin del rango",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "date",
-                            "example": "2025-10-31"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Total de puntos obtenido correctamente",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Total de puntos obtenido exitosamente."
-                                        },
-                                        "data": {
-                                            "description": "Suma total de puntos en el rango consultado",
-                                            "type": "integer",
-                                            "example": 1520
-                                        },
-                                        "errors": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 200
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Token de autenticación no válido o no proporcionado",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Token de autenticación no proporcionado."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 401
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error inesperado al obtener el total de puntos",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Error al obtener el historial."
                                         },
                                         "data": {
                                             "type": "null",
@@ -6120,7 +6106,7 @@
                                 ],
                                 "properties": {
                                     "user_id": {
-                                        "description": "ID del usuario destino de la notificación",
+                                        "description": "ID del usuario autenticado",
                                         "type": "integer",
                                         "example": 6
                                     },
@@ -6188,38 +6174,6 @@
                                         "code": {
                                             "type": "integer",
                                             "example": 200
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "No autorizado: solo propio usuario, comercio o admin",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "No autorizado para enviar notificaciones: solo el propio usuario, comercio o admin."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "code": {
-                                            "type": "integer",
-                                            "example": 403
                                         }
                                     },
                                     "type": "object"
@@ -9403,7 +9357,7 @@
                 "tags": [
                     "Usuarios"
                 ],
-                "summary": "Identificar al usuario por código de barras",
+                "summary": "Identificar al usuario",
                 "operationId": "241136353a4c7aafab61ca87a2d0b7c5",
                 "requestBody": {
                     "required": true,
@@ -9415,7 +9369,7 @@
                                 ],
                                 "properties": {
                                     "code": {
-                                        "description": "Código de identificación de 13 dígitos",
+                                        "description": "Código de identificación de 13 digitos",
                                         "type": "string",
                                         "example": "4075224740324"
                                     }
@@ -9427,7 +9381,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Se identificó al usuario exitosamente.",
+                        "description": "Se identifico al usuario exitosamente.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -9462,15 +9416,15 @@
                             }
                         }
                     },
-                    "401": {
-                        "description": "Token inválido, expirado, no proporcionado o que no pertenece al usuario identificado",
+                    "404": {
+                        "description": "El codigo esta mal o el usuario no existe",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
                                             "type": "boolean",
-                                            "example": false
+                                            "example": true
                                         },
                                         "message": {
                                             "type": "string",
@@ -9482,11 +9436,11 @@
                                         },
                                         "errors": {
                                             "type": "string",
-                                            "example": "Necesita iniciar sesión."
+                                            "example": "Usuario no encontrado."
                                         },
                                         "status": {
                                             "type": "integer",
-                                            "example": 401
+                                            "example": 404
                                         }
                                     },
                                     "type": "object"
@@ -9495,7 +9449,7 @@
                         }
                     },
                     "403": {
-                        "description": "Cuenta de usuario no activa",
+                        "description": "Cuenta desactivada",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -9558,12 +9512,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "$ref": "#/components/securitySchemes/bearerAuth"
-                    }
-                ]
+                }
             }
         },
         "/api/users/tourComplete/{userId}": {

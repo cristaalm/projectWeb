@@ -452,4 +452,69 @@ class AllianceDocumentation
         ]
     )]
     public function updateLogo(Request $request, $id) {}
+
+    #[OA\Get(
+        path: "/api/alianzas/cashCut/{alliance_id}",
+        tags: ["Alianzas"],
+        summary: "Hacer el corte de caja para un comercio (alianza)",
+        description: "Hacer el corte de caja para un comercio (alianza)",
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "alliance_id",
+                description: "ID del comercio (alianza)",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "integer", example: 3)
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Corte de caja realizado correctamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Corte de caja realizado exitosamente."),
+                        new OA\Property(property: "data", properties: [
+                            new OA\Property(property: "total_points", type: "integer", example: 8500),
+                            new OA\Property(property: "cash_out", type: "integer", example: 85),
+                        ]),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: "Token de autenticación no válido o no proporcionado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Token de autenticación no proporcionado."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 401),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado al hacer el corte de caja",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al obtener el historial."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function totalPointsByShop() {}
 }
