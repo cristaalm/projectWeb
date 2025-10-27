@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('history', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('user_id')->unsigned();
+            $table->bigInteger('user_id')->unsigned()->nullable();
             $table->bigInteger('comerciant_id')->unsigned()->nullable(); // en caso de canjeo por medio del comerciante // osea type_history = 3
             $table->tinyInteger('type_history')->unsigned(); // canjeo = 1, suma = 2, modificación de puntos = 3 
             $table->string('description')->nullable(); // solo en caso de tipo = 3

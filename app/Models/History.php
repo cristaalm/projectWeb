@@ -18,6 +18,7 @@ class History extends Model
         'type_history',
         'scan_id',
         'material_type_id',
+        'description',
         'reward_id',
         'points',
         'quantity',

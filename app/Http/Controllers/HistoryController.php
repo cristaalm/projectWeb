@@ -10,6 +10,7 @@ use App\Models\Alliance;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class HistoryController extends Controller
 {
@@ -44,7 +45,13 @@ class HistoryController extends Controller
             }
 
             if ($user->role_id == 4) {
-                $historyQuery->where('comerciant_id', $user->id);
+                $historyQuery->where(function ($query) use ($user) {
+                    $query->where('comerciant_id', $user->id)
+                          ->orWhere(function ($query) use ($user) {
+                              $query->where('type_history', 4)
+                                    ->where('alliance_id', $user->alliance_id);
+                          });
+                });
                 $historyQuery->with('user');
             } else {
                 $historyQuery->where('user_id', $user->id);
@@ -97,21 +104,24 @@ class HistoryController extends Controller
 
         try {
             $history = History::create([
-                'user_id' => $user_id,
-                'comerciant_id' => $comerciant_id,
-                'alliance_id' => $alliance_id,
-                'material_type_id' => $material_type_id,
-                'reward_id' => $reward_id,
+                'user_id' => $user_id ?? null,
+                'comerciant_id' => $comerciant_id ?? null,
+                'alliance_id' => $alliance_id ?? null,
+                'material_type_id' => $material_type_id ?? null,
+                'reward_id' => $reward_id ?? null,
                 'type_history' => $type_history,
-                'scan_id' => $scan_id,
-                'quantity' => $quantity,
-                'points' => $points,
-                'description' => $description,
+                'scan_id' => $scan_id ?? null,
+                'quantity' => $quantity ?? null,
+                'points' => $points ?? null,
+                'description' => $description ?? null,
             ]);
+
+            Log::error('Historial registrado exitosamente: ' . $history->id);
 
             return $history;
             
         } catch (\Exception $e) {
+            Log::error('Error al registrar el historial: ' . $e->getMessage());
             return $this->apiResponse(false, 'Error al registrar el historial.', null, $e->getMessage(), 500);
         }
     }

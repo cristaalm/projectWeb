@@ -233,6 +233,9 @@ class AllianceController extends Controller
             $alliance->total_points = 0;
             $alliance->save();
 
+            $history = new HistoryController();
+            $history->logHistory(null, null, $alliance->id, null, null, 4, null, null, $totalPoints, null);
+
             return $this->apiResponse(true, 'Total de puntos obtenido exitosamente.', ['total_points' => $totalPoints, 'cash_out' => $cashCut], null, 200);
         } catch (\Exception $e) {
             return $this->apiResponse(false, 'Error al obtener el historial.', null, $e->getMessage() . ' ' . $e->getLine(), 500);
