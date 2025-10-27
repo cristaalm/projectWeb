@@ -944,6 +944,16 @@
                             "type": "integer",
                             "example": 3
                         }
+                    },
+                    {
+                        "name": "only_return",
+                        "in": "query",
+                        "description": "Indica si se debe retornar solo el total de puntos (true) retornarlos y hacer el corte (false)",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "example": false
+                        }
                     }
                 ],
                 "responses": {

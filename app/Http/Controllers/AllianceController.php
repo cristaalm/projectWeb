@@ -9,6 +9,7 @@ use App\Models\Alliance;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class AllianceController extends Controller
 {
@@ -214,31 +215,55 @@ class AllianceController extends Controller
         }
     }
 
-    public function cashCut(Request $request, int $alliance_id) 
+    public function cashCut(Request $request, int $alliance_id)
     {
         try {
             $request->merge([
                 'alliance_id' => $alliance_id,
             ]);
 
-            $validateData = $request->validate([
+            $validated = $request->validate([
                 'alliance_id' => 'required|exists:alliances,id',
+                'only_return' => 'nullable|string',
             ]);
-
-            $alliance = Alliance::where('id', $validateData['alliance_id'])->first();
-
+            
+            $onlyReturn = filter_var($request->only_return, FILTER_VALIDATE_BOOLEAN);
+        
+            $alliance = Alliance::findOrFail($validated['alliance_id']);
             $totalPoints = $alliance->total_points;
             $cashCut = $totalPoints * 0.01;
-
-            $alliance->total_points = 0;
-            $alliance->save();
-
-            $history = new HistoryController();
-            $history->logHistory(null, null, $alliance->id, null, null, 4, null, null, $totalPoints, null);
-
-            return $this->apiResponse(true, 'Total de puntos obtenido exitosamente.', ['total_points' => $totalPoints, 'cash_out' => $cashCut], null, 200);
+        
+            if (!$onlyReturn) {
+                Log::info('Se hizo el corte de caja, para la alianza: ' . $alliance->id);
+        
+                DB::beginTransaction();
+                try {
+                    $alliance->total_points = 0;
+                    $alliance->save();
+        
+                    $history = new HistoryController();
+                    $history->logHistory(null, null, $alliance->id, null, null, 4, null, null, $totalPoints, null);
+        
+                    DB::commit();
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    return $this->apiResponse(false, 'Error al procesar el corte de caja.', null, $e->getMessage(), 500);
+                }
+            } else {
+                Log::info('Solo se retornaron los puntos de la alianza: ' . $alliance->id);
+            }
+        
+            return $this->apiResponse(
+                true,
+                'Total de puntos obtenido exitosamente.',
+                ['total_points' => $totalPoints, 'cash_out' => $cashCut],
+                null,
+                200
+            );
+        } catch (ValidationException $e) {
+            return $this->apiResponse(false, 'Error de validación.', null, $e->errors(), 422);
         } catch (\Exception $e) {
-            return $this->apiResponse(false, 'Error al obtener el historial.', null, $e->getMessage() . ' ' . $e->getLine(), 500);
+            return $this->apiResponse(false, 'Error al procesar el corte de caja.', null, $e->getMessage(), 500);
         }
     }
 }

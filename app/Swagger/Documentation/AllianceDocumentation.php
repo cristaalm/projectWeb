@@ -467,6 +467,13 @@ class AllianceDocumentation
                 required: true,
                 schema: new OA\Schema(type: "integer", example: 3)
             ),
+            new OA\Parameter(
+                name: "only_return",
+                description: "Indica si se debe retornar solo el total de puntos (true) retornarlos y hacer el corte (false)",
+                in: "query",
+                required: false,
+                schema: new OA\Schema(type: "boolean", example: false)
+            ),
         ],
         responses: [
             new OA\Response(
