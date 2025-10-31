@@ -33,6 +33,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'total_points',
         'verification_status',
         'avatar',
+        'badge', // campo para guardar el estado de las insignias
+        'points_month', // puntos obtenidos en el mes
         'two_factor_status',
         'code_identity',
         'status',
@@ -56,6 +58,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'total_points' => 'integer',
         'tour' => 'boolean',
         'avatar' => 'string',
+        'badge' => 'array',
+        'points_month' => 'integer',
         'google2fa_secret' => 'string',
     ];
 

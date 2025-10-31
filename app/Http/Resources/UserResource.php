@@ -9,6 +9,17 @@ class UserResource extends JsonResource
 {
     public function toArray(Request $request)
     {
+
+        $defaultBadges = [
+            'Eco Warrior' => false,
+            'Recycler Pro' => false,
+            'Green Hero' => false,
+            'Planet Saver' => false,
+        ];
+
+        $badges = $this->badge ?? [];
+        $mergedBadges = array_merge($defaultBadges, $badges);
+
         return [
             'id' => $this->id,
             'alliance_id' => $this->alliance_id,
@@ -19,6 +30,7 @@ class UserResource extends JsonResource
             'phone' => $this->phone,
             'curp' => $this->curp,
             'total_points' => $this->total_points,
+            'points_month' => $this->points_month,
             'tour' => $this->tour,
             'verification_status' => $this->verification_status,
             'two_factor_status' => $this->two_factor_status,
@@ -26,6 +38,9 @@ class UserResource extends JsonResource
             'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+
+            'badge' => $mergedBadges,
+
             'alliance' => $this->alliance_id ? $this->whenLoaded('alliance', [
                 'id' => $this->alliance->id,
                 'name' => $this->alliance->name,

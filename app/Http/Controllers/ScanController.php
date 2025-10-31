@@ -94,6 +94,7 @@ class ScanController extends Controller
             Storage::disk('public')->putFileAs($path, $image, $imageName);
 
             $user->total_points += $points;
+            $user->points_month += $points;
             $user->save();
 
             $scan = Scan::create([

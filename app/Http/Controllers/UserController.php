@@ -544,4 +544,61 @@ class UserController extends Controller
             return $this->apiResponse(false, 'Ocurrio un error al intentar completar el tour del usuario.', null, $e->getMessage(), 500);
         }
     }
+
+    public function updateBadge(Request $request)
+    {
+        try {
+            $validateData = $request->validate([
+                'user_id' => 'required|integer|exists:users,id',
+                'badge' => 'required|string|in:Eco Warrior,Recycler Pro,Green Hero,Planet Saver',
+            ]);
+    
+            $user = User::findOrFail($validateData['user_id']);
+    
+            // Requisitos de puntos por insignia
+            $requirements = [
+                'Eco Warrior' => 100,
+                'Recycler Pro' => 500,
+                'Green Hero' => 1000,
+                'Planet Saver' => 2500,
+            ];
+    
+            $badgeName = $validateData['badge'];
+            $requiredPoints = $requirements[$badgeName];
+    
+            // Verificar si cumple con los puntos del mes
+            if ($user->points_month < $requiredPoints) {
+                return $this->apiResponse(false, "No cumples con los puntos necesarios para obtener la insignia '$badgeName'. Necesitas al menos $requiredPoints puntos este mes.", null, null, 403);
+            }
+    
+            // Inicializar badges con valores predeterminados
+            $defaultBadges = [
+                'Eco Warrior' => false,
+                'Recycler Pro' => false,
+                'Green Hero' => false,
+                'Planet Saver' => false,
+            ];
+    
+            $badges = array_merge($defaultBadges, $user->badge ?? []);
+    
+            // Si ya está desbloqueada, retornar estado actual
+            if ($badges[$badgeName] === true) {
+                return $this->apiResponse(true, "Ya tienes la insignia '$badgeName'.", $badges, null, 200);
+            }
+    
+            // Desbloquear la insignia
+            $badges[$badgeName] = true;
+    
+            // Guardar en el usuario
+            $user->badge = $badges;
+            $user->save();
+    
+            return $this->apiResponse(true, "¡Felicidades! Has obtenido la insignia '$badgeName'.", $badges, null, 200);
+    
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return $this->apiResponse(false, 'Datos inválidos.', null, $e->errors(), 422);
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Ocurrió un error al intentar actualizar la insignia del usuario.', null, $e->getMessage(), 500);
+        }
+    }
 }

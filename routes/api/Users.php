@@ -15,6 +15,7 @@ Route::prefix('users')->group(function () {
         Route::post('create', [UserController::class, 'create']);
         Route::post('updateAccount', [UserController::class, 'updateAccount']);
         Route::post('resetPassword', [UserController::class, 'resetPassword']);
+        Route::post('update-badge', [UserController::class, 'updateBadge']);
         Route::post('updateAvatar/{userId}', [UserController::class, 'updateAvatar']);
         Route::post('tourComplete/{userId}', [UserController::class, 'tourComplete']);
         Route::post('updateField/{field}/{userId}', [UserController::class, 'updateField'])

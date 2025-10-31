@@ -725,4 +725,112 @@ class UsersDocumentation
         ]
     )]
     public function tourComplete(Request $request, int $userId) {}
+
+    #[OA\Post(
+        path: '/api/users/update-badge',
+        summary: 'Actualizar una insignia para un usuario',
+        description: 'Permite intentar desbloquear una insignia si el usuario cumple con los puntos mensuales requeridos. Las insignias disponibles son: Eco Warrior (100), Recycler Pro (500), Green Hero (1000), Planet Saver (2500). Se inicializa automáticamente si el campo badge es nulo.',
+        tags: ['Usuarios'],
+        security: [['bearerAuth' => []]]
+    )]
+    #[OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['user_id', 'badge'],
+            properties: [
+                new OA\Property(property: 'user_id', type: 'integer', example: 5, description: 'ID del usuario'),
+                new OA\Property(
+                    property: 'badge',
+                    type: 'string',
+                    enum: ['Eco Warrior', 'Recycler Pro', 'Green Hero', 'Planet Saver'],
+                    example: 'Recycler Pro',
+                    description: 'Nombre de la insignia a desbloquear'
+                )
+            ]
+        )
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Insignia actualizada exitosamente',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'success', type: 'boolean', example: true),
+                new OA\Property(property: 'message', type: 'string', example: '¡Felicidades! Has obtenido la insignia \'Recycler Pro\'.'),
+                new OA\Property(
+                    property: 'data',
+                    type: 'object',
+                    description: 'Estado actualizado de todas las insignias',
+                    properties: [
+                        new OA\Property(property: 'Eco Warrior', type: 'boolean', example: true),
+                        new OA\Property(property: 'Recycler Pro', type: 'boolean', example: false),
+                        new OA\Property(property: 'Green Hero', type: 'boolean', example: false),
+                        new OA\Property(property: 'Planet Saver', type: 'boolean', example: false),
+                    ],
+                    example: [
+                        'Eco Warrior' => true,
+                        'Recycler Pro' => false,
+                        'Green Hero' => false,
+                        'Planet Saver' => false,
+                    ]
+                )
+            ],
+            type: 'object'
+        )
+    )]
+    #[OA\Response(
+        response: 403,
+        description: 'No cumple con los requisitos de puntos',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'success', type: 'boolean', example: false),
+                new OA\Property(
+                    property: 'message',
+                    type: 'string',
+                    example: 'No cumples con los puntos necesarios para obtener la insignia \'Recycler Pro\'. Necesitas al menos 500 puntos este mes.'
+                )
+            ],
+            type: 'object'
+        )
+    )]
+    #[OA\Response(
+        response: 404,
+        description: 'Usuario no encontrado',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'success', type: 'boolean', example: false),
+                new OA\Property(property: 'message', type: 'string', example: 'Usuario no encontrado.')
+            ],
+            type: 'object'
+        )
+    )]
+    #[OA\Response(
+        response: 422,
+        description: 'Datos inválidos',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'success', type: 'boolean', example: false),
+                new OA\Property(property: 'message', type: 'string', example: 'Datos inválidos.'),
+                new OA\Property(
+                    property: 'errors',
+                    type: 'object',
+                    additionalProperties: true,
+                    example: ['badge' => ['El campo badge debe ser una de las opciones permitidas.']]
+                )
+            ],
+            type: 'object'
+        )
+    )]
+    #[OA\Response(
+        response: 500,
+        description: 'Error interno del servidor',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'success', type: 'boolean', example: false),
+                new OA\Property(property: 'message', type: 'string', example: 'Ocurrió un error al intentar actualizar el badge del usuario.'),
+                new OA\Property(property: 'errors', type: 'string', example: 'PDOException: SQL error...')
+            ],
+            type: 'object'
+        )
+    )]
+    public function updateBadge(Request $request){}
 }

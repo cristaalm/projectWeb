@@ -22,8 +22,10 @@ return new class extends Migration
             $table->boolean('tour')->default(false);
             $table->string('avatar')->nullable();
             $table->string('password'); 
+            $table->json('badge')->nullable();
             $table->timestamp('email_verified_at')->nullable(); 
             $table->integer('total_points')->default(0); 
+            $table->integer('points_month')->default(0); 
             $table->tinyInteger('verification_status')->default(3); 
             $table->tinyInteger('two_factor_status')->default(0); 
             $table->string('google2fa_secret', 100)->nullable();

@@ -9745,6 +9745,196 @@
                     }
                 ]
             }
+        },
+        "/api/users/update-badge": {
+            "post": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Actualizar una insignia para un usuario",
+                "description": "Permite intentar desbloquear una insignia si el usuario cumple con los puntos mensuales requeridos. Las insignias disponibles son: Eco Warrior (100), Recycler Pro (500), Green Hero (1000), Planet Saver (2500). Se inicializa automáticamente si el campo badge es nulo.",
+                "operationId": "9e10614edabdb0d46194bc4201415d9d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id",
+                                    "badge"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "description": "ID del usuario",
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "badge": {
+                                        "description": "Nombre de la insignia a desbloquear",
+                                        "type": "string",
+                                        "enum": [
+                                            "Eco Warrior",
+                                            "Recycler Pro",
+                                            "Green Hero",
+                                            "Planet Saver"
+                                        ],
+                                        "example": "Recycler Pro"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Insignia actualizada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "¡Felicidades! Has obtenido la insignia 'Recycler Pro'."
+                                        },
+                                        "data": {
+                                            "description": "Estado actualizado de todas las insignias",
+                                            "properties": {
+                                                "Eco Warrior": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "Recycler Pro": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "Green Hero": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "Planet Saver": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                }
+                                            },
+                                            "type": "object",
+                                            "example": {
+                                                "Eco Warrior": true,
+                                                "Recycler Pro": false,
+                                                "Green Hero": false,
+                                                "Planet Saver": false
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No cumple con los requisitos de puntos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No cumples con los puntos necesarios para obtener la insignia 'Recycler Pro'. Necesitas al menos 500 puntos este mes."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Usuario no encontrado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Datos inválidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Datos inválidos."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "badge": [
+                                                    "El campo badge debe ser una de las opciones permitidas."
+                                                ]
+                                            },
+                                            "additionalProperties": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error al intentar actualizar el badge del usuario."
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "PDOException: SQL error..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
