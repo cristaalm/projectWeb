@@ -808,7 +808,8 @@ class UsersDocumentation
                                 type: "object",
                                 properties: [
                                     new OA\Property(property: "day", type: "string", example: "Lunes", description: "Nombre del día en español"),
-                                    new OA\Property(property: "scans_count", type: "integer", example: 3, description: "Cantidad de escaneos válidos realizados ese día")
+                                    new OA\Property(property: "scans_count", type: "integer", example: 3, description: "Cantidad de escaneos válidos realizados ese día"),
+                                    new OA\Property(property: "date", type: "string", example: "12/02/2023", description: "Fecha del día en formato dd/mm/yyyy")
                                 ]
                             )
                         ),
