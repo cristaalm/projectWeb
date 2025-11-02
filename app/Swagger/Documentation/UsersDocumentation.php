@@ -726,111 +726,247 @@ class UsersDocumentation
     )]
     public function tourComplete(Request $request, int $userId) {}
 
+    #[OA\Get(
+        path: "/api/users/getStreak",
+        tags: ["Usuarios"],
+        summary: "Obtener la racha actual de escaneos diarios",
+        description: "Devuelve el número de días consecutivos en los que el usuario ha realizado al menos un escaneo válido. La racha no se reinicia si el usuario aún no ha escaneado hoy. También indica si la racha está activa (si ya escaneó hoy).",
+        security: [["bearerAuth" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Racha calculada exitosamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Racha calculada exitosamente."),
+                        new OA\Property(
+                            property: "data",
+                            type: "object",
+                            properties: [
+                                new OA\Property(property: "streak", type: "integer", example: 5, description: "Número de días consecutivos con al menos un escaneo válido"),
+                                new OA\Property(property: "is_active", type: "boolean", example: true, description: "Indica si el usuario ya realizó al menos un escaneo hoy")
+                            ]
+                        ),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200)
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: "Token de autenticación no válido o no proporcionado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Token de autenticación no proporcionado."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 401),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado al calcular la racha",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al calcular la racha."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function getStreak(Request $request) {}
+
+    #[OA\Get(
+        path: "/api/users/getScansByDayOfWeek",
+        tags: ["Usuarios"],
+        summary: "Obtener cantidad de escaneos por día de la semana",
+        description: "Devuelve un listado con la cantidad de escaneos válidos realizados por el usuario en cada día de la semana (lunes a domingo), basado en la semana actual (del lunes al domingo). Si un día no tiene escaneos, su conteo será 0.",
+        security: [["bearerAuth" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Escaneos por día obtenidos exitosamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Escaneos por día de la semana."),
+                        new OA\Property(
+                            property: "data",
+                            type: "array",
+                            items: new OA\Items(
+                                type: "object",
+                                properties: [
+                                    new OA\Property(property: "day", type: "string", example: "Lunes", description: "Nombre del día en español"),
+                                    new OA\Property(property: "scans_count", type: "integer", example: 3, description: "Cantidad de escaneos válidos realizados ese día")
+                                ]
+                            )
+                        ),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200)
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: "Token de autenticación no válido o no proporcionado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Token de autenticación no proporcionado."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 401),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado al obtener los escaneos por día",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al obtener los escaneos por día."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function getScansByDayOfWeek(Request $request) {}
+
     #[OA\Post(
         path: '/api/users/update-badge',
         summary: 'Actualizar una insignia para un usuario',
         description: 'Permite intentar desbloquear una insignia si el usuario cumple con los puntos mensuales requeridos. Las insignias disponibles son: Eco Warrior (100), Recycler Pro (500), Green Hero (1000), Planet Saver (2500). Se inicializa automáticamente si el campo badge es nulo.',
         tags: ['Usuarios'],
-        security: [['bearerAuth' => []]]
-    )]
-    #[OA\RequestBody(
-        required: true,
-        content: new OA\JsonContent(
-            required: ['user_id', 'badge'],
-            properties: [
-                new OA\Property(property: 'user_id', type: 'integer', example: 5, description: 'ID del usuario'),
-                new OA\Property(
-                    property: 'badge',
-                    type: 'string',
-                    enum: ['Eco Warrior', 'Recycler Pro', 'Green Hero', 'Planet Saver'],
-                    example: 'Recycler Pro',
-                    description: 'Nombre de la insignia a desbloquear'
-                )
-            ]
-        )
-    )]
-    #[OA\Response(
-        response: 200,
-        description: 'Insignia actualizada exitosamente',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(property: 'success', type: 'boolean', example: true),
-                new OA\Property(property: 'message', type: 'string', example: '¡Felicidades! Has obtenido la insignia \'Recycler Pro\'.'),
-                new OA\Property(
-                    property: 'data',
+        security: [['bearerAuth' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['user_id', 'badge'],
+                properties: [
+                    new OA\Property(property: 'user_id', type: 'integer', example: 5, description: 'ID del usuario'),
+                    new OA\Property(
+                        property: 'badge',
+                        type: 'string',
+                        enum: ['Eco Warrior', 'Recycler Pro', 'Green Hero', 'Planet Saver'],
+                        example: 'Recycler Pro',
+                        description: 'Nombre de la insignia a desbloquear'
+                    )
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Insignia actualizada exitosamente',
+                content: new OA\JsonContent(
                     type: 'object',
-                    description: 'Estado actualizado de todas las insignias',
                     properties: [
-                        new OA\Property(property: 'Eco Warrior', type: 'boolean', example: true),
-                        new OA\Property(property: 'Recycler Pro', type: 'boolean', example: false),
-                        new OA\Property(property: 'Green Hero', type: 'boolean', example: false),
-                        new OA\Property(property: 'Planet Saver', type: 'boolean', example: false),
-                    ],
-                    example: [
-                        'Eco Warrior' => true,
-                        'Recycler Pro' => false,
-                        'Green Hero' => false,
-                        'Planet Saver' => false,
+                        new OA\Property(property: 'success', type: 'boolean', example: true),
+                        new OA\Property(property: 'message', type: 'string', example: '¡Felicidades! Has obtenido la insignia \'Recycler Pro\'.'),
+                        new OA\Property(
+                            property: 'data',
+                            type: 'object',
+                            description: 'Estado actualizado de todas las insignias',
+                            properties: [
+                                new OA\Property(property: 'Eco Warrior', type: 'boolean', example: true),
+                                new OA\Property(property: 'Recycler Pro', type: 'boolean', example: false),
+                                new OA\Property(property: 'Green Hero', type: 'boolean', example: false),
+                                new OA\Property(property: 'Planet Saver', type: 'boolean', example: false),
+                            ],
+                            example: [
+                                'Eco Warrior' => true,
+                                'Recycler Pro' => false,
+                                'Green Hero' => false,
+                                'Planet Saver' => false,
+                            ]
+                        ),
+                        new OA\Property(property: 'errors', type: 'null', example: null),
+                        new OA\Property(property: 'status', type: 'integer', example: 200)
                     ]
                 )
-            ],
-            type: 'object'
-        )
-    )]
-    #[OA\Response(
-        response: 403,
-        description: 'No cumple con los requisitos de puntos',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(property: 'success', type: 'boolean', example: false),
-                new OA\Property(
-                    property: 'message',
-                    type: 'string',
-                    example: 'No cumples con los puntos necesarios para obtener la insignia \'Recycler Pro\'. Necesitas al menos 500 puntos este mes.'
-                )
-            ],
-            type: 'object'
-        )
-    )]
-    #[OA\Response(
-        response: 404,
-        description: 'Usuario no encontrado',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(property: 'success', type: 'boolean', example: false),
-                new OA\Property(property: 'message', type: 'string', example: 'Usuario no encontrado.')
-            ],
-            type: 'object'
-        )
-    )]
-    #[OA\Response(
-        response: 422,
-        description: 'Datos inválidos',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(property: 'success', type: 'boolean', example: false),
-                new OA\Property(property: 'message', type: 'string', example: 'Datos inválidos.'),
-                new OA\Property(
-                    property: 'errors',
+            ),
+            new OA\Response(
+                response: 403,
+                description: 'No cumple con los requisitos de puntos',
+                content: new OA\JsonContent(
                     type: 'object',
-                    additionalProperties: true,
-                    example: ['badge' => ['El campo badge debe ser una de las opciones permitidas.']]
+                    properties: [
+                        new OA\Property(property: 'success', type: 'boolean', example: false),
+                        new OA\Property(
+                            property: 'message',
+                            type: 'string',
+                            example: 'No cumples con los puntos necesarios para obtener la insignia \'Recycler Pro\'. Necesitas al menos 500 puntos este mes.'
+                        ),
+                        new OA\Property(property: 'data', type: 'null', example: null),
+                        new OA\Property(property: 'errors', type: 'null', example: null),
+                        new OA\Property(property: 'status', type: 'integer', example: 403)
+                    ]
                 )
-            ],
-            type: 'object'
-        )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Usuario no encontrado',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'success', type: 'boolean', example: false),
+                        new OA\Property(property: 'message', type: 'string', example: 'Usuario no encontrado.'),
+                        new OA\Property(property: 'data', type: 'null', example: null),
+                        new OA\Property(property: 'errors', type: 'null', example: null),
+                        new OA\Property(property: 'status', type: 'integer', example: 404)
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Datos inválidos',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'success', type: 'boolean', example: false),
+                        new OA\Property(property: 'message', type: 'string', example: 'Datos inválidos.'),
+                        new OA\Property(
+                            property: 'errors',
+                            type: 'object',
+                            additionalProperties: true,
+                            example: ['badge' => ['El campo badge debe ser una de las opciones permitidas.']]
+                        ),
+                        new OA\Property(property: 'status', type: 'integer', example: 422)
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: 'Error interno del servidor',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'success', type: 'boolean', example: false),
+                        new OA\Property(property: 'message', type: 'string', example: 'Ocurrió un error al intentar actualizar el badge del usuario.'),
+                        new OA\Property(property: 'data', type: 'null', example: null),
+                        new OA\Property(property: 'errors', type: 'string', example: 'PDOException: SQL error...'),
+                        new OA\Property(property: 'status', type: 'integer', example: 500)
+                    ]
+                )
+            )
+        ]
     )]
-    #[OA\Response(
-        response: 500,
-        description: 'Error interno del servidor',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(property: 'success', type: 'boolean', example: false),
-                new OA\Property(property: 'message', type: 'string', example: 'Ocurrió un error al intentar actualizar el badge del usuario.'),
-                new OA\Property(property: 'errors', type: 'string', example: 'PDOException: SQL error...')
-            ],
-            type: 'object'
-        )
-    )]
-    public function updateBadge(Request $request){}
+    public function updateBadge(Request $request) {}
 }

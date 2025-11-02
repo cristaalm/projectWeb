@@ -9746,6 +9746,257 @@
                 ]
             }
         },
+        "/api/users/getStreak": {
+            "get": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Obtener la racha actual de escaneos diarios",
+                "description": "Devuelve el número de días consecutivos en los que el usuario ha realizado al menos un escaneo válido. La racha no se reinicia si el usuario aún no ha escaneado hoy. También indica si la racha está activa (si ya escaneó hoy).",
+                "operationId": "c84f9c34d30a036fa8e340ee40347aa8",
+                "responses": {
+                    "200": {
+                        "description": "Racha calculada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Racha calculada exitosamente."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "streak": {
+                                                    "description": "Número de días consecutivos con al menos un escaneo válido",
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "is_active": {
+                                                    "description": "Indica si el usuario ya realizó al menos un escaneo hoy",
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token de autenticación no válido o no proporcionado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de autenticación no proporcionado."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado al calcular la racha",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al calcular la racha."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/users/getScansByDayOfWeek": {
+            "get": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Obtener cantidad de escaneos por día de la semana",
+                "description": "Devuelve un listado con la cantidad de escaneos válidos realizados por el usuario en cada día de la semana (lunes a domingo), basado en la semana actual (del lunes al domingo). Si un día no tiene escaneos, su conteo será 0.",
+                "operationId": "57e54d6040fe95d790a9aaab3402125e",
+                "responses": {
+                    "200": {
+                        "description": "Escaneos por día obtenidos exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Escaneos por día de la semana."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "day": {
+                                                        "description": "Nombre del día en español",
+                                                        "type": "string",
+                                                        "example": "Lunes"
+                                                    },
+                                                    "scans_count": {
+                                                        "description": "Cantidad de escaneos válidos realizados ese día",
+                                                        "type": "integer",
+                                                        "example": 3
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token de autenticación no válido o no proporcionado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de autenticación no proporcionado."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado al obtener los escaneos por día",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al obtener los escaneos por día."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/users/update-badge": {
             "post": {
                 "tags": [
@@ -9828,6 +10079,14 @@
                                                 "Green Hero": false,
                                                 "Planet Saver": false
                                             }
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
                                         }
                                     },
                                     "type": "object"
@@ -9848,6 +10107,18 @@
                                         "message": {
                                             "type": "string",
                                             "example": "No cumples con los puntos necesarios para obtener la insignia 'Recycler Pro'. Necesitas al menos 500 puntos este mes."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 403
                                         }
                                     },
                                     "type": "object"
@@ -9868,6 +10139,18 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Usuario no encontrado."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
                                         }
                                     },
                                     "type": "object"
@@ -9897,6 +10180,10 @@
                                                 ]
                                             },
                                             "additionalProperties": true
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 422
                                         }
                                     },
                                     "type": "object"
@@ -9918,9 +10205,17 @@
                                             "type": "string",
                                             "example": "Ocurrió un error al intentar actualizar el badge del usuario."
                                         },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
                                         "errors": {
                                             "type": "string",
                                             "example": "PDOException: SQL error..."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
                                         }
                                     },
                                     "type": "object"

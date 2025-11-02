@@ -9,6 +9,8 @@ Route::prefix('users')->group(function () {
 
         // Controller user
         Route::get('getAll', [UserController::class, 'getAll']);
+        Route::get('getScansByDayOfWeek', [UserController::class, 'getScansByDayOfWeek']);
+        Route::get('getStreak', [UserController::class, 'getStreak']);
 
         Route::post('toggleStatusAccount', [UserController::class, 'toggleStatusAccount']);
         Route::post('modifyPoints', [UserController::class, 'modifyPoints']);

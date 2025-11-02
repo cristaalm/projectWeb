@@ -601,4 +601,127 @@ class UserController extends Controller
             return $this->apiResponse(false, 'Ocurrió un error al intentar actualizar la insignia del usuario.', null, $e->getMessage(), 500);
         }
     }
+
+    public function getStreak(Request $request)
+    {
+        try {
+            // Asumimos que el usuario está autenticado (desde Sanctum)
+            $user = $request->user();
+
+            // O si usas user_id en el request:
+            // $request->validate(['user_id' => 'required|exists:users,id']);
+            // $user = User::findOrFail($request->user_id);
+
+            // Definir zona horaria (ajusta si es necesario)
+            $timezone = 'America/Mexico_City'; // Cambia si usas otra
+
+            // Fecha actual (sin hora) en la zona horaria del usuario
+            $today = Carbon::now($timezone)->startOfDay();
+
+            // Buscar todos los escaneos válidos del usuario (ordenados por fecha descendente)
+            $scans = $user->scans()
+                ->where('is_valid', true)
+                ->whereNotNull('scanned_at')
+                ->orderBy('scanned_at', 'desc')
+                ->get()
+                ->map(function ($scan) use ($timezone) {
+                    // Convertir scanned_at a la zona horaria y obtener solo la fecha
+                    return Carbon::parse($scan->scanned_at)->timezone($timezone)->startOfDay();
+                })
+                ->unique() // Eliminar duplicados por día
+                ->values(); // Reindexar
+
+            // Si no hay escaneos, racha es 0
+            if ($scans->isEmpty()) {
+                return $this->apiResponse(true, 'Sin escaneos registrados.', [
+                    'streak' => 0,
+                    'is_active' => false,
+                ]);
+            }
+
+            // Verificar si hay escaneo hoy (para is_active)
+            $hasScanToday = $user->scans()
+                ->where('is_valid', true)
+                ->whereNotNull('scanned_at')
+                ->whereDate('scanned_at', $today)
+                ->exists();
+
+            $is_active = $hasScanToday;
+
+            // Iniciar conteo de racha
+            $streak = 0;
+            $expectedDate = $today;
+
+            foreach ($scans as $scanDate) {
+                // Si el escaneo coincide con la fecha esperada
+                if ($scanDate->equalTo($expectedDate)) {
+                    $streak++;
+                    $expectedDate = $expectedDate->copy()->subDay(); // día anterior
+                } else {
+                    // Si no es consecutivo, rompe la racha
+                    break;
+                }
+            }
+
+            return $this->apiResponse(true, 'Racha calculada exitosamente.', [
+                'streak' => $streak,
+                'is_active' => $is_active,
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al calcular la racha.', null, $e->getMessage(), 500);
+        }
+    }
+
+    public function getScansByDayOfWeek(Request $request)
+    {
+        try {
+            // Obtener usuario autenticado
+            $user = $request->user();
+    
+            // Zona horaria (ajusta según tu proyecto)
+            $timezone = 'America/Mexico_City';
+    
+            // Definir los nombres de los días en español
+            $daysInSpanish = [
+                'Lunes',
+                'Martes',
+                'Miércoles',
+                'Jueves',
+                'Viernes',
+                'Sábado',
+                'Domingo'
+            ];
+    
+            // Iniciar desde el lunes de esta semana
+            $mondayThisWeek = Carbon::now($timezone)->startOfWeek(Carbon::MONDAY);
+            
+            // Construir respuesta con todos los días
+            $result = [];
+    
+            foreach (range(0, 6) as $offset) { // 0 = Lunes, 6 = Domingo
+                $currentDay = $mondayThisWeek->copy()->addDays($offset); // Fecha real del día
+                $dayName = $daysInSpanish[$offset];
+                $dateFormatted = $currentDay->format('d/m/Y'); // dd/MM/yyyy
+    
+                // Contar escaneos válidos para este día
+                $count = $user->scans()
+                    ->where('is_valid', true)
+                    ->whereNotNull('scanned_at')
+                    ->whereDate('scanned_at', $currentDay)
+                    ->count();
+    
+                $result[] = [
+                    'day' => $dayName,
+                    'date' => $dateFormatted,
+                    'scans_count' => $count
+                ];
+            }
+    
+            return $this->apiResponse(true, 'Escaneos por día de la semana.', $result);
+    
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al obtener los escaneos por día.', null, $e->getMessage(), 500);
+        }
+    }
 }
