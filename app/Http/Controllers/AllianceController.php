@@ -6,10 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use App\Models\Alliance;
+use App\Models\User;
+use App\Models\Reward;
+use App\Models\History;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class AllianceController extends Controller
 {
@@ -264,6 +268,178 @@ class AllianceController extends Controller
             return $this->apiResponse(false, 'Error de validación.', null, $e->errors(), 422);
         } catch (\Exception $e) {
             return $this->apiResponse(false, 'Error al procesar el corte de caja.', null, $e->getMessage(), 500);
+        }
+    }
+
+    public function getStatsByShop(Request $request, int $alliance_id) 
+    {
+        try {
+
+            $alliance = Alliance::findOrFail($alliance_id);
+
+            $stats = [
+                "total_income" => 0,
+                "total_points_awarded" => 0,
+                "average_total_income" => 0,
+                "total_customers_served" => 0,
+            ];
+
+            // TOTAL_INCOME
+            try {
+                $total = History::where('alliance_id', $alliance_id)->where('type_history', 4)->sum('points');
+                $total_income = $total * 0.01;
+                $stats['total_income'] = abs($total_income);
+            } catch (\Exception $e) {
+                return $this->apiResponse(false, 'Error al obtener el total de ingresos.', null, $e->getMessage(), 500);
+            }
+
+            // TOTAL_POINTS_AWARDED
+
+            try {
+                $total_points_awarded = History::where('alliance_id', $alliance_id)->where('type_history', 1)->sum('points');
+                $stats['total_points_awarded'] = abs($total_points_awarded);
+            } catch (\Exception $e) {
+                return $this->apiResponse(false, 'Error al obtener el total de puntos otorgados.', null, $e->getMessage(), 500);
+            }
+
+            // AVERAGE_TOTAL_INCOME
+
+            try {
+                $average_total_income = History::where('alliance_id', $alliance_id)->where('type_history', 4)->avg('points');
+                $average_total_income = $average_total_income * 0.01;
+                $stats['average_total_income'] = abs($average_total_income);
+            } catch (\Exception $e) {
+                return $this->apiResponse(false, 'Error al obtener el promedio de ingresos.', null, $e->getMessage(), 500);
+            }
+
+            // TOTAL_CUSTOMERS_SERVED
+            try {
+                $total_customers_served = History::where('alliance_id', $alliance_id)->where('type_history', 1)->count();
+                $stats['total_customers_served'] = $total_customers_served;
+            } catch (\Exception $e) {
+                return $this->apiResponse(false, 'Error al obtener el total de clientes atendidos.', null, $e->getMessage(), 500);
+            }
+
+            return $this->apiResponse(true, 'Estadisticas obtenidas exitosamente.', $stats, null, 200);
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al obtener las estadisticas.', null, $e->getMessage(), 500);
+        }
+    }
+
+    public function getActivityByDayOfWeek(Request $request, int $alliance_id)
+    {
+        try {
+            // Validar existencia de alianza
+            $alliance = Alliance::findOrFail($alliance_id);
+
+            $timezone = 'America/Mexico_City';
+
+            // Definir nombres de días en español
+            $daysInSpanish = [
+                'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'
+            ];
+
+            // === SEMANA ACTUAL: Lunes a Domingo ===
+            $mondayThisWeek = Carbon::now($timezone)->startOfWeek(Carbon::MONDAY);
+            $sundayThisWeek = $mondayThisWeek->copy()->addDays(6);
+
+            $statsToWeek = [];
+
+            foreach (range(0, 6) as $offset) {
+                $currentDay = $mondayThisWeek->copy()->addDays($offset);
+                $dayName = $daysInSpanish[$offset];
+                $dateFormatted = $currentDay->format('d/m/Y');
+
+                $count = $alliance->history()
+                    ->where('type_history', 1)
+                    ->whereDate('created_at', $currentDay)
+                    ->count();
+
+                $statsToWeek[] = [
+                    'day' => $dayName,
+                    'date' => $dateFormatted,
+                    'total_activity' => $count
+                ];
+            }
+
+            // === SEMANA PASADA: Lunes anterior a Domingo anterior ===
+            $mondayLastWeek = $mondayThisWeek->copy()->subWeek();
+            $sundayLastWeek = $sundayThisWeek->copy()->subWeek();
+
+            // Contar canjes (type_history = 1) en semana pasada
+            $salesLastWeek = $alliance->history()
+                ->where('type_history', 1)
+                ->whereBetween('created_at', [$mondayLastWeek, $sundayLastWeek])
+                ->get();
+
+            $totalSales = $salesLastWeek->count(); // Número de canjes
+            $totalPoints = $salesLastWeek->sum('points'); // Suma de puntos en esos canjes
+
+            // Respuesta final
+            $response = [
+                'statsToWeek' => $statsToWeek,
+                'totalSales' => abs((int) $totalSales),
+                'totalPoints' => abs((int) $totalPoints),
+            ];
+
+            return $this->apiResponse(true, 'Actividad del comercio por día de la semana y métricas de la semana pasada.', $response);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->apiResponse(false, 'El comercio que intenta consultar no existe.', null, null, 404);
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al obtener la actividad del comercio.', null, $e->getMessage(), 500);
+        }
+    }
+
+    public function getTopRewardsByAlliance(Request $request, int $alliance_id)
+    {
+        try {
+            // Validar que la alianza exista
+            $alliance = Alliance::find($alliance_id);
+            if (! $alliance) {
+                return $this->apiResponse(false, 'La alianza especificada no existe.', null, null, 404);
+            }
+
+            // Obtener los IDs de recompensas más canjeadas (type_history = 1)
+            $topRewardStats = History::where('alliance_id', $alliance_id)
+                ->where('type_history', 1) // Canjes de recompensas
+                ->whereNotNull('reward_id')
+                ->selectRaw('reward_id, count(*) as total_claimed')
+                ->groupBy('reward_id')
+                ->orderByDesc('total_claimed')
+                ->limit(3)
+                ->get();
+
+            if ($topRewardStats->isEmpty()) {
+                return $this->apiResponse(true, 'No hay canjes registrados para esta alianza.', [], null, 200);
+            }
+
+            // Obtener los IDs de recompensa
+            $rewardIds = $topRewardStats->pluck('reward_id')->toArray();
+
+            // Obtener los detalles completos de las recompensas (incluyendo soft deleted)
+            $rewards = Reward::withTrashed()
+                ->whereIn('id', $rewardIds)
+                ->get()
+                ->keyBy('id'); // Para acceso rápido por ID
+
+            // Construir resultado final
+            $result = $topRewardStats->map(function ($item) use ($rewards) {
+                $reward = $rewards[$item->reward_id] ?? null;
+
+                return [
+                    'reward_id' => $item->reward_id,
+                    'reward_name' => $reward ? $reward->name : 'Recompensa eliminada',
+                    'total_claimed' => (int) $item->total_claimed,
+                ];
+            })->sortBy([['total_claimed', 'desc'], ['reward_name', 'asc']]) // Por si hay mismo conteo, ordena alfabéticamente
+            ->values()
+            ->toArray();
+
+            return $this->apiResponse(true, 'Recompensas más canjeadas obtenidas exitosamente.', $result);
+
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al obtener las recompensas más canjeadas.', null, $e->getMessage(), 500);
         }
     }
 }

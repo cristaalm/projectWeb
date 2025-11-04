@@ -1070,6 +1070,490 @@
                 ]
             }
         },
+        "/api/alianzas/stats/{alliance_id}": {
+            "get": {
+                "tags": [
+                    "Alianzas"
+                ],
+                "summary": "Obtener estadísticas de rendimiento para una alianza",
+                "description": "Devuelve un conjunto de métricas clave para una alianza específica, incluyendo ingresos totales, promedio de ingresos, puntos otorgados y clientes atendidos. Los ingresos se calculan a partir del historial tipo 4 (corte de caja) y los puntos otorgados del historial tipo 1.",
+                "operationId": "cc6faed2cda427bcf37691bc879cd1a1",
+                "parameters": [
+                    {
+                        "name": "alliance_id",
+                        "in": "path",
+                        "description": "ID de la alianza (comercio) para obtener sus estadísticas",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Estadísticas obtenidas exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Estadisticas obtenidas exitosamente."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "total_income": {
+                                                    "description": "Ingresos totales en dólares (calculado como total de puntos tipo 4 * 0.01)",
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 85.5
+                                                },
+                                                "total_points_awarded": {
+                                                    "description": "Puntos totales otorgados a usuarios (tipo 1 en historial)",
+                                                    "type": "integer",
+                                                    "example": 8500
+                                                },
+                                                "average_total_income": {
+                                                    "description": "Promedio de ingresos por corte de caja",
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 28.5
+                                                },
+                                                "total_customers_served": {
+                                                    "description": "Cantidad total de clientes atendidos (número de registros tipo 1)",
+                                                    "type": "integer",
+                                                    "example": 120
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Alianza no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al obtener las estadisticas."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "No query results for model [App\\Models\\Alliance] 5"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno al calcular estadísticas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al obtener el total de ingresos."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "SQLSTATE[42S02]: Base table or view not found: ..."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/alianzas/activityByDayOfWeek/{alliance_id}": {
+            "get": {
+                "tags": [
+                    "Alianzas"
+                ],
+                "summary": "Obtener actividad semanal de un comercio y métricas de la semana pasada",
+                "description": "Devuelve dos conjuntos de datos: (1) la actividad diaria (canjes tipo 1) de la semana actual, por día (lunes a domingo), con nombre y fecha; y (2) métricas agregadas de la semana anterior: número total de canjes (ventas) y puntos totales otorgados.",
+                "operationId": "09e03d8241ff581590d69d8acea9ab82",
+                "parameters": [
+                    {
+                        "name": "alliance_id",
+                        "in": "path",
+                        "description": "ID del comercio (alianza) para obtener su historial de actividad",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Actividad y métricas obtenidas exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Actividad del comercio por día de la semana y métricas de la semana pasada."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "statsToWeek": {
+                                                    "description": "Actividad diaria de la semana actual (lunes a domingo)",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "day": {
+                                                                "description": "Nombre del día en español",
+                                                                "type": "string",
+                                                                "example": "Lunes"
+                                                            },
+                                                            "date": {
+                                                                "description": "Fecha en formato dd/mm/yyyy",
+                                                                "type": "string",
+                                                                "format": "date",
+                                                                "example": "08/09/2025"
+                                                            },
+                                                            "total_activity": {
+                                                                "description": "Cantidad de actividades (tipo 1) registradas ese día",
+                                                                "type": "integer",
+                                                                "example": 15
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "example": [
+                                                        {
+                                                            "day": "Lunes",
+                                                            "date": "08/09/2025",
+                                                            "total_activity": 12
+                                                        },
+                                                        {
+                                                            "day": "Martes",
+                                                            "date": "09/09/2025",
+                                                            "total_activity": 18
+                                                        },
+                                                        {
+                                                            "day": "Miércoles",
+                                                            "date": "10/09/2025",
+                                                            "total_activity": 10
+                                                        },
+                                                        {
+                                                            "day": "Jueves",
+                                                            "date": "11/09/2025",
+                                                            "total_activity": 20
+                                                        },
+                                                        {
+                                                            "day": "Viernes",
+                                                            "date": "12/09/2025",
+                                                            "total_activity": 25
+                                                        },
+                                                        {
+                                                            "day": "Sábado",
+                                                            "date": "13/09/2025",
+                                                            "total_activity": 30
+                                                        },
+                                                        {
+                                                            "day": "Domingo",
+                                                            "date": "14/09/2025",
+                                                            "total_activity": 14
+                                                        }
+                                                    ]
+                                                },
+                                                "totalSales": {
+                                                    "description": "Número total de canjes (registros tipo 1) realizados durante la semana anterior",
+                                                    "type": "integer",
+                                                    "example": 45
+                                                },
+                                                "totalPoints": {
+                                                    "description": "Suma total de puntos otorgados en los canjes de la semana anterior",
+                                                    "type": "integer",
+                                                    "example": 24585
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Comercio no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "El comercio que intenta consultar no existe."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "No query results for model [App\\Models\\Alliance] 999"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado al obtener la actividad",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al obtener la actividad del comercio."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "SQLSTATE[42S02]: Base table not found..."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/alianzas/top-rewards/{alliance_id}": {
+            "get": {
+                "tags": [
+                    "Alianzas"
+                ],
+                "summary": "Obtener las 3 recompensas más canjeadas de una alianza",
+                "description": "Devuelve un listado de las 3 recompensas más canjeadas (por número de canjes) para una alianza específica. Los datos se basan en registros del historial con type_history = 1. El resultado está ordenado por cantidad descendente y luego alfabéticamente por nombre en caso de empate.",
+                "operationId": "9e8b076ea12ab89027a3247c4d71c75f",
+                "parameters": [
+                    {
+                        "name": "alliance_id",
+                        "in": "path",
+                        "description": "ID de la alianza para analizar sus recompensas más canjeadas",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de recompensas más canjeadas obtenida exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "reward_id": {
+                                                "type": "integer",
+                                                "example": 15
+                                            },
+                                            "reward_name": {
+                                                "type": "string",
+                                                "example": "Café cortesía"
+                                            },
+                                            "total_claimed": {
+                                                "description": "Número total de veces que se ha canjeado esta recompensa",
+                                                "type": "integer",
+                                                "example": 35
+                                            }
+                                        },
+                                        "type": "object",
+                                        "example": [
+                                            {
+                                                "reward_id": 15,
+                                                "reward_name": "Café cortesía",
+                                                "total_claimed": 35
+                                            },
+                                            {
+                                                "reward_id": 25,
+                                                "reward_name": "Descuento 10%",
+                                                "total_claimed": 10
+                                            },
+                                            {
+                                                "reward_id": 87,
+                                                "reward_name": "Entrada gratis al cine",
+                                                "total_claimed": 5
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Alianza no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "La alianza especificada no existe."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al obtener las recompensas más canjeadas."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/auth/passHash": {
             "post": {
                 "tags": [
@@ -9906,6 +10390,11 @@
                                                         "description": "Cantidad de escaneos válidos realizados ese día",
                                                         "type": "integer",
                                                         "example": 3
+                                                    },
+                                                    "date": {
+                                                        "description": "Fecha del día en formato dd/mm/yyyy",
+                                                        "type": "string",
+                                                        "example": "12/02/2023"
                                                     }
                                                 },
                                                 "type": "object"

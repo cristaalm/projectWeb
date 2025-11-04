@@ -602,75 +602,75 @@ class UserController extends Controller
         }
     }
 
-public function getStreak(Request $request)
-{
-    try {
-        $user = $request->user();
-        $timezone = 'America/Mexico_City';
+    public function getStreak(Request $request)
+    {
+        try {
+            $user = $request->user();
+            $timezone = 'America/Mexico_City';
 
-        $today = Carbon::now($timezone)->startOfDay();
-        $yesterday = $today->copy()->subDay();
+            $today = Carbon::now($timezone)->startOfDay();
+            $yesterday = $today->copy()->subDay();
 
-        // Verificar si hay escaneo hoy
-        $hasScanToday = $user->scans()
-            ->where('is_valid', true)
-            ->whereNotNull('scanned_at')
-            ->whereDate('scanned_at', $today)
-            ->exists();
+            // Verificar si hay escaneo hoy
+            $hasScanToday = $user->scans()
+                ->where('is_valid', true)
+                ->whereNotNull('scanned_at')
+                ->whereDate('scanned_at', $today)
+                ->exists();
 
-        // Obtener fechas únicas de escaneos válidos como objetos Carbon
-        $scanDates = $user->scans()
-            ->where('is_valid', true)
-            ->whereNotNull('scanned_at')
-            ->get()
-            ->map(function ($scan) use ($timezone) {
-                return Carbon::parse($scan->scanned_at)->timezone($timezone)->startOfDay();
-            })
-            ->unique()
-            ->sort() // Orden ascendente
-            ->values();
+            // Obtener fechas únicas de escaneos válidos como objetos Carbon
+            $scanDates = $user->scans()
+                ->where('is_valid', true)
+                ->whereNotNull('scanned_at')
+                ->get()
+                ->map(function ($scan) use ($timezone) {
+                    return Carbon::parse($scan->scanned_at)->timezone($timezone)->startOfDay();
+                })
+                ->unique()
+                ->sort() // Orden ascendente
+                ->values();
 
-        if ($scanDates->isEmpty()) {
-            return $this->apiResponse(true, 'Sin escaneos registrados.', [
-                'streak' => 0,
-                'is_active' => false,
-            ]);
-        }
-
-        // Última fecha con escaneo
-        $lastScanDate = $scanDates->last();
-
-        if (! $lastScanDate->equalTo($today) && ! $lastScanDate->equalTo($yesterday)) {
-            return $this->apiResponse(true, 'Racha calculada exitosamente.', [
-                'streak' => 0,
-                'is_active' => false,
-            ]);
-        }
-
-        $streak = 0;
-        $expectedDate = $hasScanToday ? $today : $yesterday;
-
-        // Contar hacia atrás mientras haya escaneos consecutivos
-        while (true) {
-            $found = $scanDates->contains(fn($date) => $date->equalTo($expectedDate));
-
-            if (!$found) {
-                break;
+            if ($scanDates->isEmpty()) {
+                return $this->apiResponse(true, 'Sin escaneos registrados.', [
+                    'streak' => 0,
+                    'is_active' => false,
+                ]);
             }
 
-            $streak++;
-            $expectedDate = $expectedDate->copy()->subDay();
+            // Última fecha con escaneo
+            $lastScanDate = $scanDates->last();
+
+            if (! $lastScanDate->equalTo($today) && ! $lastScanDate->equalTo($yesterday)) {
+                return $this->apiResponse(true, 'Racha calculada exitosamente.', [
+                    'streak' => 0,
+                    'is_active' => false,
+                ]);
+            }
+
+            $streak = 0;
+            $expectedDate = $hasScanToday ? $today : $yesterday;
+
+            // Contar hacia atrás mientras haya escaneos consecutivos
+            while (true) {
+                $found = $scanDates->contains(fn($date) => $date->equalTo($expectedDate));
+
+                if (!$found) {
+                    break;
+                }
+
+                $streak++;
+                $expectedDate = $expectedDate->copy()->subDay();
+            }
+
+            return $this->apiResponse(true, 'Racha calculada exitosamente.', [
+                'streak' => $streak,
+                'is_active' => $hasScanToday,
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al calcular la racha.', null, $e->getMessage(), 500);
         }
-
-        return $this->apiResponse(true, 'Racha calculada exitosamente.', [
-            'streak' => $streak,
-            'is_active' => $hasScanToday,
-        ]);
-
-    } catch (\Exception $e) {
-        return $this->apiResponse(false, 'Error al calcular la racha.', null, $e->getMessage(), 500);
     }
-}
 
     public function getScansByDayOfWeek(Request $request)
     {

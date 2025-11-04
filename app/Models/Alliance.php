@@ -36,6 +36,11 @@ class Alliance extends Model
         return $this->hasMany(Reward::class);
     }
 
+    public function history(): HasMany
+    {
+        return $this->hasMany(History::class);
+    }
+
     public function typeShop(): BelongsTo
     {
         return $this->belongsTo(TypeShop::class);
