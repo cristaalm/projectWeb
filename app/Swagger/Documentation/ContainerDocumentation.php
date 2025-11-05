@@ -31,6 +31,53 @@ use App\Swagger\Schemas\ContainerSchema;
 #[OA\Tag(name: 'Contenedores', description: 'Endpoints para gestión de contenedores')]
 class ContainerDocumentation
 {
+
+    #[OA\Get(
+        path: "/api/containers/catalog",
+        tags: ["Contenedores"],
+        summary: "Obtener catalogo de contenedores",
+        security: [["bearerAuth" => []]],
+        description: "Obtiene un listado de contenedores activos.",
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Listado de contenedores obtenido exitosamente.",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Listado de contenedores obtenido exitosamente."),
+                        new OA\Property(property: "data", type: "array", items: new OA\Items(
+                            type: "object",
+                            properties: [
+                                new OA\Property(property: "id", type: "integer", example: 1),
+                                new OA\Property(property: "name", type: "string", example: "Contenedor Ejemplo"),
+                                new OA\Property(property: "location", type: "string", example: "Bogotá"),
+                            ]
+                        )),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado al obtener el catalogo de contenedores",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al obtener el catalogo de contenedores."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function catalog(Request $request) {}
+    
     #[OA\Get(
         path: "/api/containers/getAll",
         tags: ["Contenedores"],
@@ -363,50 +410,4 @@ class ContainerDocumentation
         ]
     )]
     public function delete(Request $request, $id) {}
-
-    #[OA\Get(
-        path: "/api/containers/catalog",
-        tags: ["Contenedores"],
-        summary: "Obtener catalogo de contenedores",
-        security: [["bearerAuth" => []]],
-        description: "Obtiene un listado de contenedores activos.",
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: "Listado de contenedores obtenido exitosamente.",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
-                        new OA\Property(property: "message", type: "string", example: "Listado de contenedores obtenido exitosamente."),
-                        new OA\Property(property: "data", type: "array", items: new OA\Items(
-                            type: "object",
-                            properties: [
-                                new OA\Property(property: "id", type: "integer", example: 1),
-                                new OA\Property(property: "name", type: "string", example: "Contenedor Ejemplo"),
-                                new OA\Property(property: "location", type: "string", example: "Bogotá"),
-                            ]
-                        )),
-                        new OA\Property(property: "errors", type: "null", example: null),
-                        new OA\Property(property: "status", type: "integer", example: 200),
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 500,
-                description: "Error inesperado al obtener el catalogo de contenedores",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Error al obtener el catalogo de contenedores."),
-                        new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
-                        new OA\Property(property: "status", type: "integer", example: 500),
-                    ]
-                )
-            ),
-        ]
-    )]
-    public function catalog(Request $request) {}
 }

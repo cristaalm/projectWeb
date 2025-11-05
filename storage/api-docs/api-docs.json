@@ -190,6 +190,634 @@
                 ]
             }
         },
+        "/api/alianzas/cashCut/{alliance_id}": {
+            "get": {
+                "tags": [
+                    "Alianzas"
+                ],
+                "summary": "Hacer el corte de caja para un comercio (alianza)",
+                "description": "Hacer el corte de caja para un comercio (alianza)",
+                "operationId": "a2cc234da80f6b17eb6c8f3c691743bf",
+                "parameters": [
+                    {
+                        "name": "alliance_id",
+                        "in": "path",
+                        "description": "ID del comercio (alianza)",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    },
+                    {
+                        "name": "only_return",
+                        "in": "query",
+                        "description": "Indica si se debe retornar solo el total de puntos (true) retornarlos y hacer el corte (false)",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "example": false
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Corte de caja realizado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Corte de caja realizado exitosamente."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "total_points": {
+                                                    "type": "integer",
+                                                    "example": 8500
+                                                },
+                                                "cash_out": {
+                                                    "type": "integer",
+                                                    "example": 85
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token de autenticación no válido o no proporcionado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de autenticación no proporcionado."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado al hacer el corte de caja",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al obtener el historial."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/alianzas/stats/{alliance_id}": {
+            "get": {
+                "tags": [
+                    "Alianzas"
+                ],
+                "summary": "Obtener estadísticas de rendimiento para una alianza",
+                "description": "Devuelve un conjunto de métricas clave para una alianza específica, incluyendo ingresos totales, promedio de ingresos, puntos otorgados y clientes atendidos. Los ingresos se calculan a partir del historial tipo 4 (corte de caja) y los puntos otorgados del historial tipo 1.",
+                "operationId": "cc6faed2cda427bcf37691bc879cd1a1",
+                "parameters": [
+                    {
+                        "name": "alliance_id",
+                        "in": "path",
+                        "description": "ID de la alianza (comercio) para obtener sus estadísticas",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Estadísticas obtenidas exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Estadisticas obtenidas exitosamente."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "total_income": {
+                                                    "description": "Ingresos totales en dólares (calculado como total de puntos tipo 4 * 0.01)",
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 85.5
+                                                },
+                                                "total_points_awarded": {
+                                                    "description": "Puntos totales otorgados a usuarios (tipo 1 en historial)",
+                                                    "type": "integer",
+                                                    "example": 8500
+                                                },
+                                                "average_total_income": {
+                                                    "description": "Promedio de ingresos por corte de caja",
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 28.5
+                                                },
+                                                "total_customers_served": {
+                                                    "description": "Cantidad total de clientes atendidos (número de registros tipo 1)",
+                                                    "type": "integer",
+                                                    "example": 120
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Alianza no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al obtener las estadisticas."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "No query results for model [App\\Models\\Alliance] 5"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno al calcular estadísticas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al obtener el total de ingresos."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "SQLSTATE[42S02]: Base table or view not found: ..."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/alianzas/activityByDayOfWeek/{alliance_id}": {
+            "get": {
+                "tags": [
+                    "Alianzas"
+                ],
+                "summary": "Obtener actividad semanal de un comercio y métricas de la semana pasada",
+                "description": "Devuelve dos conjuntos de datos: (1) la actividad diaria (canjes tipo 1) de la semana actual, por día (lunes a domingo), con nombre y fecha; y (2) métricas agregadas de la semana anterior: número total de canjes (ventas) y puntos totales otorgados.",
+                "operationId": "09e03d8241ff581590d69d8acea9ab82",
+                "parameters": [
+                    {
+                        "name": "alliance_id",
+                        "in": "path",
+                        "description": "ID del comercio (alianza) para obtener su historial de actividad",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Actividad y métricas obtenidas exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Actividad del comercio por día de la semana y métricas de la semana pasada."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "statsToWeek": {
+                                                    "description": "Actividad diaria de la semana actual (lunes a domingo)",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "day": {
+                                                                "description": "Nombre del día en español",
+                                                                "type": "string",
+                                                                "example": "Lunes"
+                                                            },
+                                                            "date": {
+                                                                "description": "Fecha en formato dd/mm/yyyy",
+                                                                "type": "string",
+                                                                "format": "date",
+                                                                "example": "08/09/2025"
+                                                            },
+                                                            "total_activity": {
+                                                                "description": "Cantidad de actividades (tipo 1) registradas ese día",
+                                                                "type": "integer",
+                                                                "example": 15
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "example": [
+                                                        {
+                                                            "day": "Lunes",
+                                                            "date": "08/09/2025",
+                                                            "total_activity": 12
+                                                        },
+                                                        {
+                                                            "day": "Martes",
+                                                            "date": "09/09/2025",
+                                                            "total_activity": 18
+                                                        },
+                                                        {
+                                                            "day": "Miércoles",
+                                                            "date": "10/09/2025",
+                                                            "total_activity": 10
+                                                        },
+                                                        {
+                                                            "day": "Jueves",
+                                                            "date": "11/09/2025",
+                                                            "total_activity": 20
+                                                        },
+                                                        {
+                                                            "day": "Viernes",
+                                                            "date": "12/09/2025",
+                                                            "total_activity": 25
+                                                        },
+                                                        {
+                                                            "day": "Sábado",
+                                                            "date": "13/09/2025",
+                                                            "total_activity": 30
+                                                        },
+                                                        {
+                                                            "day": "Domingo",
+                                                            "date": "14/09/2025",
+                                                            "total_activity": 14
+                                                        }
+                                                    ]
+                                                },
+                                                "totalSales": {
+                                                    "description": "Número total de canjes (registros tipo 1) realizados durante la semana anterior",
+                                                    "type": "integer",
+                                                    "example": 45
+                                                },
+                                                "totalPoints": {
+                                                    "description": "Suma total de puntos otorgados en los canjes de la semana anterior",
+                                                    "type": "integer",
+                                                    "example": 24585
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Comercio no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "El comercio que intenta consultar no existe."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "No query results for model [App\\Models\\Alliance] 999"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado al obtener la actividad",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al obtener la actividad del comercio."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "SQLSTATE[42S02]: Base table not found..."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/alianzas/top-rewards/{alliance_id}": {
+            "get": {
+                "tags": [
+                    "Alianzas"
+                ],
+                "summary": "Obtener las 3 recompensas más canjeadas de una alianza",
+                "description": "Devuelve un listado de las 3 recompensas más canjeadas (por número de canjes) para una alianza específica. Los datos se basan en registros del historial con type_history = 1. El resultado está ordenado por cantidad descendente y luego alfabéticamente por nombre en caso de empate.",
+                "operationId": "9e8b076ea12ab89027a3247c4d71c75f",
+                "parameters": [
+                    {
+                        "name": "alliance_id",
+                        "in": "path",
+                        "description": "ID de la alianza para analizar sus recompensas más canjeadas",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de recompensas más canjeadas obtenida exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "reward_id": {
+                                                "type": "integer",
+                                                "example": 15
+                                            },
+                                            "reward_name": {
+                                                "type": "string",
+                                                "example": "Café cortesía"
+                                            },
+                                            "total_claimed": {
+                                                "description": "Número total de veces que se ha canjeado esta recompensa",
+                                                "type": "integer",
+                                                "example": 35
+                                            }
+                                        },
+                                        "type": "object",
+                                        "example": [
+                                            {
+                                                "reward_id": 15,
+                                                "reward_name": "Café cortesía",
+                                                "total_claimed": 35
+                                            },
+                                            {
+                                                "reward_id": 25,
+                                                "reward_name": "Descuento 10%",
+                                                "total_claimed": 10
+                                            },
+                                            {
+                                                "reward_id": 87,
+                                                "reward_name": "Entrada gratis al cine",
+                                                "total_claimed": 5
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Alianza no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "La alianza especificada no existe."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al obtener las recompensas más canjeadas."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/alianzas/create": {
             "post": {
                 "tags": [
@@ -926,39 +1554,17 @@
                 ]
             }
         },
-        "/api/alianzas/cashCut/{alliance_id}": {
+        "/api/auth/generateQR2FA": {
             "get": {
                 "tags": [
-                    "Alianzas"
+                    "Autenticación"
                 ],
-                "summary": "Hacer el corte de caja para un comercio (alianza)",
-                "description": "Hacer el corte de caja para un comercio (alianza)",
-                "operationId": "a2cc234da80f6b17eb6c8f3c691743bf",
-                "parameters": [
-                    {
-                        "name": "alliance_id",
-                        "in": "path",
-                        "description": "ID del comercio (alianza)",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 3
-                        }
-                    },
-                    {
-                        "name": "only_return",
-                        "in": "query",
-                        "description": "Indica si se debe retornar solo el total de puntos (true) retornarlos y hacer el corte (false)",
-                        "required": false,
-                        "schema": {
-                            "type": "boolean",
-                            "example": false
-                        }
-                    }
-                ],
+                "summary": "Generar QR y secreto para configurar 2FA",
+                "description": "Genera un código QR y un secreto para que el usuario configure la autenticación de dos factores en su app (Google Authenticator, Authy, etc.).",
+                "operationId": "c295dbc06a2eeeab0d76e7ce0bd11c6a",
                 "responses": {
                     "200": {
-                        "description": "Corte de caja realizado correctamente",
+                        "description": "QR generado correctamente",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -969,17 +1575,21 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Corte de caja realizado exitosamente."
+                                            "example": "QR code generado correctamente."
                                         },
                                         "data": {
                                             "properties": {
-                                                "total_points": {
-                                                    "type": "integer",
-                                                    "example": 8500
+                                                "two_factor_status": {
+                                                    "type": "boolean",
+                                                    "example": false
                                                 },
-                                                "cash_out": {
-                                                    "type": "integer",
-                                                    "example": 85
+                                                "qr_code_url": {
+                                                    "type": "string",
+                                                    "example": "otpauth://totp/AppName:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=AppName"
+                                                },
+                                                "secret": {
+                                                    "type": "string",
+                                                    "example": "JBSWY3DPEHPK3PXP"
                                                 }
                                             },
                                             "type": "object"
@@ -998,101 +1608,8 @@
                             }
                         }
                     },
-                    "401": {
-                        "description": "Token de autenticación no válido o no proporcionado",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Token de autenticación no proporcionado."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 401
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error inesperado al hacer el corte de caja",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Error al obtener el historial."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "string",
-                                            "example": "Error interno del servidor."
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 500
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/alianzas/stats/{alliance_id}": {
-            "get": {
-                "tags": [
-                    "Alianzas"
-                ],
-                "summary": "Obtener estadísticas de rendimiento para una alianza",
-                "description": "Devuelve un conjunto de métricas clave para una alianza específica, incluyendo ingresos totales, promedio de ingresos, puntos otorgados y clientes atendidos. Los ingresos se calculan a partir del historial tipo 4 (corte de caja) y los puntos otorgados del historial tipo 1.",
-                "operationId": "cc6faed2cda427bcf37691bc879cd1a1",
-                "parameters": [
-                    {
-                        "name": "alliance_id",
-                        "in": "path",
-                        "description": "ID de la alianza (comercio) para obtener sus estadísticas",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 3
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Estadísticas obtenidas exitosamente",
+                    "409": {
+                        "description": "2FA ya está habilitada",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1103,31 +1620,13 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Estadisticas obtenidas exitosamente."
+                                            "example": "La autenticación de dos factores ya está habilitada."
                                         },
                                         "data": {
                                             "properties": {
-                                                "total_income": {
-                                                    "description": "Ingresos totales en dólares (calculado como total de puntos tipo 4 * 0.01)",
-                                                    "type": "number",
-                                                    "format": "float",
-                                                    "example": 85.5
-                                                },
-                                                "total_points_awarded": {
-                                                    "description": "Puntos totales otorgados a usuarios (tipo 1 en historial)",
-                                                    "type": "integer",
-                                                    "example": 8500
-                                                },
-                                                "average_total_income": {
-                                                    "description": "Promedio de ingresos por corte de caja",
-                                                    "type": "number",
-                                                    "format": "float",
-                                                    "example": 28.5
-                                                },
-                                                "total_customers_served": {
-                                                    "description": "Cantidad total de clientes atendidos (número de registros tipo 1)",
-                                                    "type": "integer",
-                                                    "example": 120
+                                                "two_factor_status": {
+                                                    "type": "boolean",
+                                                    "example": true
                                                 }
                                             },
                                             "type": "object"
@@ -1138,39 +1637,7 @@
                                         },
                                         "status": {
                                             "type": "integer",
-                                            "example": 200
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Alianza no encontrada",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Error al obtener las estadisticas."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "string",
-                                            "example": "No query results for model [App\\Models\\Alliance] 5"
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 404
+                                            "example": 409
                                         }
                                     },
                                     "type": "object"
@@ -1179,7 +1646,7 @@
                         }
                     },
                     "500": {
-                        "description": "Error interno al calcular estadísticas",
+                        "description": "Error inesperado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1190,343 +1657,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Error al obtener el total de ingresos."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "string",
-                                            "example": "SQLSTATE[42S02]: Base table or view not found: ..."
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 500
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/alianzas/activityByDayOfWeek/{alliance_id}": {
-            "get": {
-                "tags": [
-                    "Alianzas"
-                ],
-                "summary": "Obtener actividad semanal de un comercio y métricas de la semana pasada",
-                "description": "Devuelve dos conjuntos de datos: (1) la actividad diaria (canjes tipo 1) de la semana actual, por día (lunes a domingo), con nombre y fecha; y (2) métricas agregadas de la semana anterior: número total de canjes (ventas) y puntos totales otorgados.",
-                "operationId": "09e03d8241ff581590d69d8acea9ab82",
-                "parameters": [
-                    {
-                        "name": "alliance_id",
-                        "in": "path",
-                        "description": "ID del comercio (alianza) para obtener su historial de actividad",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 3
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Actividad y métricas obtenidas exitosamente",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Actividad del comercio por día de la semana y métricas de la semana pasada."
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "statsToWeek": {
-                                                    "description": "Actividad diaria de la semana actual (lunes a domingo)",
-                                                    "type": "array",
-                                                    "items": {
-                                                        "properties": {
-                                                            "day": {
-                                                                "description": "Nombre del día en español",
-                                                                "type": "string",
-                                                                "example": "Lunes"
-                                                            },
-                                                            "date": {
-                                                                "description": "Fecha en formato dd/mm/yyyy",
-                                                                "type": "string",
-                                                                "format": "date",
-                                                                "example": "08/09/2025"
-                                                            },
-                                                            "total_activity": {
-                                                                "description": "Cantidad de actividades (tipo 1) registradas ese día",
-                                                                "type": "integer",
-                                                                "example": 15
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    },
-                                                    "example": [
-                                                        {
-                                                            "day": "Lunes",
-                                                            "date": "08/09/2025",
-                                                            "total_activity": 12
-                                                        },
-                                                        {
-                                                            "day": "Martes",
-                                                            "date": "09/09/2025",
-                                                            "total_activity": 18
-                                                        },
-                                                        {
-                                                            "day": "Miércoles",
-                                                            "date": "10/09/2025",
-                                                            "total_activity": 10
-                                                        },
-                                                        {
-                                                            "day": "Jueves",
-                                                            "date": "11/09/2025",
-                                                            "total_activity": 20
-                                                        },
-                                                        {
-                                                            "day": "Viernes",
-                                                            "date": "12/09/2025",
-                                                            "total_activity": 25
-                                                        },
-                                                        {
-                                                            "day": "Sábado",
-                                                            "date": "13/09/2025",
-                                                            "total_activity": 30
-                                                        },
-                                                        {
-                                                            "day": "Domingo",
-                                                            "date": "14/09/2025",
-                                                            "total_activity": 14
-                                                        }
-                                                    ]
-                                                },
-                                                "totalSales": {
-                                                    "description": "Número total de canjes (registros tipo 1) realizados durante la semana anterior",
-                                                    "type": "integer",
-                                                    "example": 45
-                                                },
-                                                "totalPoints": {
-                                                    "description": "Suma total de puntos otorgados en los canjes de la semana anterior",
-                                                    "type": "integer",
-                                                    "example": 24585
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "errors": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 200
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Comercio no encontrado",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "El comercio que intenta consultar no existe."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "string",
-                                            "example": "No query results for model [App\\Models\\Alliance] 999"
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 404
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error inesperado al obtener la actividad",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Error al obtener la actividad del comercio."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "string",
-                                            "example": "SQLSTATE[42S02]: Base table not found..."
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 500
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/alianzas/top-rewards/{alliance_id}": {
-            "get": {
-                "tags": [
-                    "Alianzas"
-                ],
-                "summary": "Obtener las 3 recompensas más canjeadas de una alianza",
-                "description": "Devuelve un listado de las 3 recompensas más canjeadas (por número de canjes) para una alianza específica. Los datos se basan en registros del historial con type_history = 1. El resultado está ordenado por cantidad descendente y luego alfabéticamente por nombre en caso de empate.",
-                "operationId": "9e8b076ea12ab89027a3247c4d71c75f",
-                "parameters": [
-                    {
-                        "name": "alliance_id",
-                        "in": "path",
-                        "description": "ID de la alianza para analizar sus recompensas más canjeadas",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 3
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Lista de recompensas más canjeadas obtenida exitosamente",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "properties": {
-                                            "reward_id": {
-                                                "type": "integer",
-                                                "example": 15
-                                            },
-                                            "reward_name": {
-                                                "type": "string",
-                                                "example": "Café cortesía"
-                                            },
-                                            "total_claimed": {
-                                                "description": "Número total de veces que se ha canjeado esta recompensa",
-                                                "type": "integer",
-                                                "example": 35
-                                            }
-                                        },
-                                        "type": "object",
-                                        "example": [
-                                            {
-                                                "reward_id": 15,
-                                                "reward_name": "Café cortesía",
-                                                "total_claimed": 35
-                                            },
-                                            {
-                                                "reward_id": 25,
-                                                "reward_name": "Descuento 10%",
-                                                "total_claimed": 10
-                                            },
-                                            {
-                                                "reward_id": 87,
-                                                "reward_name": "Entrada gratis al cine",
-                                                "total_claimed": 5
-                                            }
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Alianza no encontrada",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "La alianza especificada no existe."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 404
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error interno del servidor",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Error al obtener las recompensas más canjeadas."
+                                            "example": "Ocurrió un error inesperado al generar el QR code."
                                         },
                                         "data": {
                                             "type": "null",
@@ -2746,137 +2877,6 @@
                 }
             }
         },
-        "/api/auth/generateQR2FA": {
-            "get": {
-                "tags": [
-                    "Autenticación"
-                ],
-                "summary": "Generar QR y secreto para configurar 2FA",
-                "description": "Genera un código QR y un secreto para que el usuario configure la autenticación de dos factores en su app (Google Authenticator, Authy, etc.).",
-                "operationId": "c295dbc06a2eeeab0d76e7ce0bd11c6a",
-                "responses": {
-                    "200": {
-                        "description": "QR generado correctamente",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "QR code generado correctamente."
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "two_factor_status": {
-                                                    "type": "boolean",
-                                                    "example": false
-                                                },
-                                                "qr_code_url": {
-                                                    "type": "string",
-                                                    "example": "otpauth://totp/AppName:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=AppName"
-                                                },
-                                                "secret": {
-                                                    "type": "string",
-                                                    "example": "JBSWY3DPEHPK3PXP"
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "errors": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 200
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "409": {
-                        "description": "2FA ya está habilitada",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "La autenticación de dos factores ya está habilitada."
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "two_factor_status": {
-                                                    "type": "boolean",
-                                                    "example": true
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "errors": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 409
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error inesperado",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Ocurrió un error inesperado al generar el QR code."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "string",
-                                            "example": "Error interno del servidor."
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 500
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/api/auth/enable-2fa": {
             "post": {
                 "tags": [
@@ -3197,6 +3197,1055 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Ocurrió un error inesperado al deshabilitar la autenticación de dos factores."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/badges/getAll": {
+            "get": {
+                "tags": [
+                    "Badges"
+                ],
+                "summary": "Obtener lista paginada de badges",
+                "description": "Devuelve una lista paginada de badges con búsqueda global, filtrado por estado y ordenamiento opcional.",
+                "operationId": "a790edeb8dc66213530029f162f05199",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Número de registros por página (mín: 1, máx: 100, por defecto: 10)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    },
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "description": "Búsqueda global en: nombre, puntos requeridos o puntos otorgados",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Eco"
+                        }
+                    },
+                    {
+                        "name": "key",
+                        "in": "query",
+                        "description": "Campo por el cual ordenar. Valores permitidos: 'name', 'points_required', 'points_awared', 'updated_at'",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "name",
+                                "points_required",
+                                "points_awared",
+                                "updated_at"
+                            ],
+                            "example": "name"
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "Orden de los resultados. Valores permitidos: 'asc', 'desc'",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ],
+                            "example": "asc"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filtrar por estado. 1 = Activo, 0 = Inactivo",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ],
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Número de página para paginación",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de badges obtenida correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Badges obtenidos exitosamente."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Badge"
+                                                    }
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "first_page_url": {
+                                                    "type": "string",
+                                                    "example": "http://localhost/api/badges/getAll?page=1"
+                                                },
+                                                "from": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "last_page_url": {
+                                                    "type": "string",
+                                                    "example": "http://localhost/api/badges/getAll?page=3"
+                                                },
+                                                "next_page_url": {
+                                                    "type": "string",
+                                                    "example": "http://localhost/api/badges/getAll?page=2",
+                                                    "nullable": true
+                                                },
+                                                "path": {
+                                                    "type": "string",
+                                                    "example": "http://localhost/api/badges/getAll"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "prev_page_url": {
+                                                    "type": "string",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "to": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 25
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token de autenticación no válido o no proporcionado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de autenticación no proporcionado."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado al obtener los badges",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al obtener los comercios."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/badges/catalog": {
+            "get": {
+                "tags": [
+                    "Badges"
+                ],
+                "summary": "Obtener catálogo público de badges",
+                "description": "Devuelve la lista completa de badges activos con su información básica (id, nombre, puntos requeridos y otorgados).",
+                "operationId": "b6d3c2e0a234d276a38c857a4ba05610",
+                "responses": {
+                    "200": {
+                        "description": "Catálogo obtenido exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Badges obtenidos exitosamente."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Eco Warrior"
+                                                    },
+                                                    "points_required": {
+                                                        "type": "integer",
+                                                        "example": 100
+                                                    },
+                                                    "points_awared": {
+                                                        "type": "integer",
+                                                        "example": 50
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al obtener los badges."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/badges/create": {
+            "post": {
+                "tags": [
+                    "Badges"
+                ],
+                "summary": "Crear un nuevo badge",
+                "description": "Registra una nueva insignia en el sistema.",
+                "operationId": "3bd154e5b0a05a857921c56da0a6510d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "points_required",
+                                    "points_awared",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Planet Saver"
+                                    },
+                                    "points_required": {
+                                        "description": "Puntos mensuales mínimos requeridos",
+                                        "type": "integer",
+                                        "example": 2500
+                                    },
+                                    "points_awared": {
+                                        "description": "Puntos que se otorgan al desbloquear",
+                                        "type": "integer",
+                                        "example": 200
+                                    },
+                                    "status": {
+                                        "description": "true = activo, false = inactivo",
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Badge creado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Badge creado exitosamente."
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Badge"
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 201
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token de autenticación no válido o no proporcionado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de autenticación no proporcionado."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al crear el badge."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "name": [
+                                                    "El campo name es obligatorio."
+                                                ],
+                                                "points_required": [
+                                                    "El campo points required debe ser un entero."
+                                                ]
+                                            }
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al crear el badge."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/badges/update/{id}": {
+            "post": {
+                "tags": [
+                    "Badges"
+                ],
+                "summary": "Actualizar un badge existente",
+                "description": "Modifica los datos de una insignia por su ID.",
+                "operationId": "cc9c28372a3a777d515ee160e4ebd78c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del badge a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "points_required",
+                                    "points_awared",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Green Hero"
+                                    },
+                                    "points_required": {
+                                        "type": "integer",
+                                        "example": 1000
+                                    },
+                                    "points_awared": {
+                                        "type": "integer",
+                                        "example": 100
+                                    },
+                                    "status": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Badge actualizado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Badge actualizado exitosamente."
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Badge"
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al actualizar el badge."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al actualizar el badge."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/badges/delete/{id}": {
+            "post": {
+                "tags": [
+                    "Badges"
+                ],
+                "summary": "Eliminar un badge",
+                "description": "Elimina lógicamente un badge del sistema (soft delete si aplica, o hard delete según tu modelo).",
+                "operationId": "9fa03a81560961338ecf49bfd8973f34",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del badge a eliminar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Badge eliminado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Badge eliminado exitosamente."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al eliminar el badge."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/badges/claimBadge": {
+            "post": {
+                "tags": [
+                    "Badges"
+                ],
+                "summary": "Reclamar una insignia para un usuario",
+                "description": "Permite a un usuario reclamar una insignia si cumple con los puntos mensuales requeridos. El badge debe estar activo.",
+                "operationId": "0b0696655e5459cff369bc31179792bf",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id",
+                                    "badge"
+                                ],
+                                "properties": {
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "badge": {
+                                        "description": "ID del badge a reclamar",
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Badge reclamado o ya poseído",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "¡Felicidades! Has obtenido la insignia 'Green Hero'."
+                                        },
+                                        "data": {
+                                            "description": "Lista actual de IDs de badges del usuario",
+                                            "type": "array",
+                                            "items": {
+                                                "type": "integer",
+                                                "example": 2
+                                            }
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No cumple con los puntos requeridos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No cumples con los puntos necesarios para obtener la insignia 'Green Hero'. Necesitas al menos 1000 puntos este mes."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 403
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Datos inválidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Datos inválidos."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error al intentar actualizar la insignia del usuario."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/containers/catalog": {
+            "get": {
+                "tags": [
+                    "Contenedores"
+                ],
+                "summary": "Obtener catalogo de contenedores",
+                "description": "Obtiene un listado de contenedores activos.",
+                "operationId": "f7033ed899cfc4400d6478e50f5bf2bc",
+                "responses": {
+                    "200": {
+                        "description": "Listado de contenedores obtenido exitosamente.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Listado de contenedores obtenido exitosamente."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Contenedor Ejemplo"
+                                                    },
+                                                    "location": {
+                                                        "type": "string",
+                                                        "example": "Bogotá"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado al obtener el catalogo de contenedores",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al obtener el catalogo de contenedores."
                                         },
                                         "data": {
                                             "type": "null",
@@ -3987,103 +5036,6 @@
                 ]
             }
         },
-        "/api/containers/catalog": {
-            "get": {
-                "tags": [
-                    "Contenedores"
-                ],
-                "summary": "Obtener catalogo de contenedores",
-                "description": "Obtiene un listado de contenedores activos.",
-                "operationId": "f7033ed899cfc4400d6478e50f5bf2bc",
-                "responses": {
-                    "200": {
-                        "description": "Listado de contenedores obtenido exitosamente.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Listado de contenedores obtenido exitosamente."
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "name": {
-                                                        "type": "string",
-                                                        "example": "Contenedor Ejemplo"
-                                                    },
-                                                    "location": {
-                                                        "type": "string",
-                                                        "example": "Bogotá"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        },
-                                        "errors": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 200
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error inesperado al obtener el catalogo de contenedores",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Error al obtener el catalogo de contenedores."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "string",
-                                            "example": "Error interno del servidor."
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 500
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/api/dash/getStats": {
             "get": {
                 "tags": [
@@ -4721,203 +5673,6 @@
                 ]
             }
         },
-        "/api/users/toggle-status-pending/{userId}": {
-            "post": {
-                "tags": [
-                    "Verificación de Identidad"
-                ],
-                "summary": "Reiniciar el estado de verificación a pendiente",
-                "description": "Cambia el estado de verificación de un usuario a 'pendiente' y limpia cualquier motivo de rechazo previo. Útil para permitir que el usuario vuelva a subir sus documentos.",
-                "operationId": "8837eb8ba527d9fbd051dbb80cd85a46",
-                "parameters": [
-                    {
-                        "name": "userId",
-                        "in": "path",
-                        "description": "ID del usuario cuyo estado se reiniciará",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 5
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Estado actualizado exitosamente",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Estado actualizado exitosamente."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 200
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Token de autenticación no válido o no proporcionado",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Token de autenticación no proporcionado."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 401
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "No autorizado para modificar el estado del usuario",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "No tienes permiso para modificar este estado."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 403
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Error de validación",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Error al actualizar el estado."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "properties": {
-                                                "user_id": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "The selected user id is invalid."
-                                                    }
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 422
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error inesperado",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Error al actualizar el estado."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "string",
-                                            "example": "Error interno del servidor."
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 500
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/api/users/documents/{type}/{userId}": {
             "get": {
                 "tags": [
@@ -5317,6 +6072,203 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Error al subir los documentos."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/users/toggle-status-pending/{userId}": {
+            "post": {
+                "tags": [
+                    "Verificación de Identidad"
+                ],
+                "summary": "Reiniciar el estado de verificación a pendiente",
+                "description": "Cambia el estado de verificación de un usuario a 'pendiente' y limpia cualquier motivo de rechazo previo. Útil para permitir que el usuario vuelva a subir sus documentos.",
+                "operationId": "8837eb8ba527d9fbd051dbb80cd85a46",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID del usuario cuyo estado se reiniciará",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Estado actualizado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Estado actualizado exitosamente."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token de autenticación no válido o no proporcionado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de autenticación no proporcionado."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No autorizado para modificar el estado del usuario",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No tienes permiso para modificar este estado."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 403
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al actualizar el estado."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "user_id": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The selected user id is invalid."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al actualizar el estado."
                                         },
                                         "data": {
                                             "type": "null",
@@ -7784,6 +8736,130 @@
                 ]
             }
         },
+        "/api/scans/total-type-scans": {
+            "get": {
+                "tags": [
+                    "Escaneos"
+                ],
+                "summary": "Obtener el total de escaneos por tipo de material para el usuario autenticado",
+                "description": "Devuelve el conteo total de escaneos exitosos agrupados por tipo de material (plástico y aluminio) del usuario actual.",
+                "operationId": "c0e68c4e075a7b0c85e294fda7e483ce",
+                "responses": {
+                    "200": {
+                        "description": "Totales obtenidos correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Total de escaneos de cada tipo"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "plastic": {
+                                                    "description": "Número total de escaneos de plástico (material_type_id = 1)",
+                                                    "type": "integer",
+                                                    "example": 24
+                                                },
+                                                "aluminum": {
+                                                    "description": "Número total de escaneos de aluminio (material_type_id = 2)",
+                                                    "type": "integer",
+                                                    "example": 18
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token de autenticación no válido o no proporcionado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de autenticación no proporcionado."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado al obtener los totales",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al obtener el total de escaneos de cada tipo"
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/scans/scan": {
             "post": {
                 "tags": [
@@ -7932,130 +9008,6 @@
                         }
                     }
                 }
-            }
-        },
-        "/api/scans/total-type-scans": {
-            "get": {
-                "tags": [
-                    "Escaneos"
-                ],
-                "summary": "Obtener el total de escaneos por tipo de material para el usuario autenticado",
-                "description": "Devuelve el conteo total de escaneos exitosos agrupados por tipo de material (plástico y aluminio) del usuario actual.",
-                "operationId": "c0e68c4e075a7b0c85e294fda7e483ce",
-                "responses": {
-                    "200": {
-                        "description": "Totales obtenidos correctamente",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Total de escaneos de cada tipo"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "plastic": {
-                                                    "description": "Número total de escaneos de plástico (material_type_id = 1)",
-                                                    "type": "integer",
-                                                    "example": 24
-                                                },
-                                                "aluminum": {
-                                                    "description": "Número total de escaneos de aluminio (material_type_id = 2)",
-                                                    "type": "integer",
-                                                    "example": 18
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "errors": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 200
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Token de autenticación no válido o no proporcionado",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Token de autenticación no proporcionado."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 401
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error inesperado al obtener los totales",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Error al obtener el total de escaneos de cada tipo"
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "string",
-                                            "example": "Error interno del servidor."
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 500
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
             }
         },
         "/api/typeShop/getAll": {
@@ -8660,6 +9612,262 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Error al eliminar la categoria."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/users/getStreak": {
+            "get": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Obtener la racha actual de escaneos diarios",
+                "description": "Devuelve el número de días consecutivos en los que el usuario ha realizado al menos un escaneo válido. La racha no se reinicia si el usuario aún no ha escaneado hoy. También indica si la racha está activa (si ya escaneó hoy).",
+                "operationId": "c84f9c34d30a036fa8e340ee40347aa8",
+                "responses": {
+                    "200": {
+                        "description": "Racha calculada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Racha calculada exitosamente."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "streak": {
+                                                    "description": "Número de días consecutivos con al menos un escaneo válido",
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "is_active": {
+                                                    "description": "Indica si el usuario ya realizó al menos un escaneo hoy",
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token de autenticación no válido o no proporcionado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de autenticación no proporcionado."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado al calcular la racha",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al calcular la racha."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/users/getScansByDayOfWeek": {
+            "get": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Obtener cantidad de escaneos por día de la semana",
+                "description": "Devuelve un listado con la cantidad de escaneos válidos realizados por el usuario en cada día de la semana (lunes a domingo), basado en la semana actual (del lunes al domingo). Si un día no tiene escaneos, su conteo será 0.",
+                "operationId": "57e54d6040fe95d790a9aaab3402125e",
+                "responses": {
+                    "200": {
+                        "description": "Escaneos por día obtenidos exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Escaneos por día de la semana."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "day": {
+                                                        "description": "Nombre del día en español",
+                                                        "type": "string",
+                                                        "example": "Lunes"
+                                                    },
+                                                    "scans_count": {
+                                                        "description": "Cantidad de escaneos válidos realizados ese día",
+                                                        "type": "integer",
+                                                        "example": 3
+                                                    },
+                                                    "date": {
+                                                        "description": "Fecha del día en formato dd/mm/yyyy",
+                                                        "type": "string",
+                                                        "example": "12/02/2023"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token de autenticación no válido o no proporcionado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de autenticación no proporcionado."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado al obtener los escaneos por día",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al obtener los escaneos por día."
                                         },
                                         "data": {
                                             "type": "null",
@@ -10230,262 +11438,6 @@
                 ]
             }
         },
-        "/api/users/getStreak": {
-            "get": {
-                "tags": [
-                    "Usuarios"
-                ],
-                "summary": "Obtener la racha actual de escaneos diarios",
-                "description": "Devuelve el número de días consecutivos en los que el usuario ha realizado al menos un escaneo válido. La racha no se reinicia si el usuario aún no ha escaneado hoy. También indica si la racha está activa (si ya escaneó hoy).",
-                "operationId": "c84f9c34d30a036fa8e340ee40347aa8",
-                "responses": {
-                    "200": {
-                        "description": "Racha calculada exitosamente",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Racha calculada exitosamente."
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "streak": {
-                                                    "description": "Número de días consecutivos con al menos un escaneo válido",
-                                                    "type": "integer",
-                                                    "example": 5
-                                                },
-                                                "is_active": {
-                                                    "description": "Indica si el usuario ya realizó al menos un escaneo hoy",
-                                                    "type": "boolean",
-                                                    "example": true
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "errors": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 200
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Token de autenticación no válido o no proporcionado",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Token de autenticación no proporcionado."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 401
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error inesperado al calcular la racha",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Error al calcular la racha."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "string",
-                                            "example": "Error interno del servidor."
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 500
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/users/getScansByDayOfWeek": {
-            "get": {
-                "tags": [
-                    "Usuarios"
-                ],
-                "summary": "Obtener cantidad de escaneos por día de la semana",
-                "description": "Devuelve un listado con la cantidad de escaneos válidos realizados por el usuario en cada día de la semana (lunes a domingo), basado en la semana actual (del lunes al domingo). Si un día no tiene escaneos, su conteo será 0.",
-                "operationId": "57e54d6040fe95d790a9aaab3402125e",
-                "responses": {
-                    "200": {
-                        "description": "Escaneos por día obtenidos exitosamente",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Escaneos por día de la semana."
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "day": {
-                                                        "description": "Nombre del día en español",
-                                                        "type": "string",
-                                                        "example": "Lunes"
-                                                    },
-                                                    "scans_count": {
-                                                        "description": "Cantidad de escaneos válidos realizados ese día",
-                                                        "type": "integer",
-                                                        "example": 3
-                                                    },
-                                                    "date": {
-                                                        "description": "Fecha del día en formato dd/mm/yyyy",
-                                                        "type": "string",
-                                                        "example": "12/02/2023"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        },
-                                        "errors": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 200
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Token de autenticación no válido o no proporcionado",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Token de autenticación no proporcionado."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 401
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Error inesperado al obtener los escaneos por día",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Error al obtener los escaneos por día."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "string",
-                                            "example": "Error interno del servidor."
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 500
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/api/users/update-badge": {
             "post": {
                 "tags": [
@@ -10777,6 +11729,51 @@
                         "type": "string",
                         "format": "date-time",
                         "example": "2025-04-01T10:00:00.000000Z"
+                    }
+                },
+                "type": "object"
+            },
+            "Badge": {
+                "required": [
+                    "id",
+                    "name",
+                    "points_required",
+                    "points_awared",
+                    "status"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Eco Warrior"
+                    },
+                    "points_required": {
+                        "description": "Puntos mensuales mínimos requeridos para desbloquear",
+                        "type": "integer",
+                        "example": 100
+                    },
+                    "points_awared": {
+                        "description": "Puntos que se otorgan al desbloquear",
+                        "type": "integer",
+                        "example": 50
+                    },
+                    "status": {
+                        "description": "true = activo, false = inactivo",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-01-01T10:00:00.000000Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-04-01T15:30:00.000000Z"
                     }
                 },
                 "type": "object"
@@ -11181,6 +12178,10 @@
         {
             "name": "Autenticación",
             "description": "Endpoints para gestión de autenticación y tokens"
+        },
+        {
+            "name": "Badges",
+            "description": "Endpoints para gestión y consulta de insignias (badges)"
         },
         {
             "name": "Contenedores",

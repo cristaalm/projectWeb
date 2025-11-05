@@ -33,6 +33,131 @@ use App\Swagger\Schemas\IdentityVerificationSchema;
 #[OA\Tag(name: 'Usuarios', description: 'Endpoints para gestión de usuarios')]
 class UsersDocumentation
 {
+
+    #[OA\Get(
+        path: "/api/users/getStreak",
+        tags: ["Usuarios"],
+        summary: "Obtener la racha actual de escaneos diarios",
+        description: "Devuelve el número de días consecutivos en los que el usuario ha realizado al menos un escaneo válido. La racha no se reinicia si el usuario aún no ha escaneado hoy. También indica si la racha está activa (si ya escaneó hoy).",
+        security: [["bearerAuth" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Racha calculada exitosamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Racha calculada exitosamente."),
+                        new OA\Property(
+                            property: "data",
+                            type: "object",
+                            properties: [
+                                new OA\Property(property: "streak", type: "integer", example: 5, description: "Número de días consecutivos con al menos un escaneo válido"),
+                                new OA\Property(property: "is_active", type: "boolean", example: true, description: "Indica si el usuario ya realizó al menos un escaneo hoy")
+                            ]
+                        ),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200)
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: "Token de autenticación no válido o no proporcionado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Token de autenticación no proporcionado."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 401),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado al calcular la racha",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al calcular la racha."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function getStreak(Request $request) {}
+
+    #[OA\Get(
+        path: "/api/users/getScansByDayOfWeek",
+        tags: ["Usuarios"],
+        summary: "Obtener cantidad de escaneos por día de la semana",
+        description: "Devuelve un listado con la cantidad de escaneos válidos realizados por el usuario en cada día de la semana (lunes a domingo), basado en la semana actual (del lunes al domingo). Si un día no tiene escaneos, su conteo será 0.",
+        security: [["bearerAuth" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Escaneos por día obtenidos exitosamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Escaneos por día de la semana."),
+                        new OA\Property(
+                            property: "data",
+                            type: "array",
+                            items: new OA\Items(
+                                type: "object",
+                                properties: [
+                                    new OA\Property(property: "day", type: "string", example: "Lunes", description: "Nombre del día en español"),
+                                    new OA\Property(property: "scans_count", type: "integer", example: 3, description: "Cantidad de escaneos válidos realizados ese día"),
+                                    new OA\Property(property: "date", type: "string", example: "12/02/2023", description: "Fecha del día en formato dd/mm/yyyy")
+                                ]
+                            )
+                        ),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200)
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: "Token de autenticación no válido o no proporcionado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Token de autenticación no proporcionado."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 401),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado al obtener los escaneos por día",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al obtener los escaneos por día."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function getScansByDayOfWeek(Request $request) {}
+    
     #[OA\Get(
         path: "/api/users/getAll",
         tags: ["Usuarios"],
@@ -725,130 +850,6 @@ class UsersDocumentation
         ]
     )]
     public function tourComplete(Request $request, int $userId) {}
-
-    #[OA\Get(
-        path: "/api/users/getStreak",
-        tags: ["Usuarios"],
-        summary: "Obtener la racha actual de escaneos diarios",
-        description: "Devuelve el número de días consecutivos en los que el usuario ha realizado al menos un escaneo válido. La racha no se reinicia si el usuario aún no ha escaneado hoy. También indica si la racha está activa (si ya escaneó hoy).",
-        security: [["bearerAuth" => []]],
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: "Racha calculada exitosamente",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
-                        new OA\Property(property: "message", type: "string", example: "Racha calculada exitosamente."),
-                        new OA\Property(
-                            property: "data",
-                            type: "object",
-                            properties: [
-                                new OA\Property(property: "streak", type: "integer", example: 5, description: "Número de días consecutivos con al menos un escaneo válido"),
-                                new OA\Property(property: "is_active", type: "boolean", example: true, description: "Indica si el usuario ya realizó al menos un escaneo hoy")
-                            ]
-                        ),
-                        new OA\Property(property: "errors", type: "null", example: null),
-                        new OA\Property(property: "status", type: "integer", example: 200)
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 401,
-                description: "Token de autenticación no válido o no proporcionado",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Token de autenticación no proporcionado."),
-                        new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", type: "null", example: null),
-                        new OA\Property(property: "status", type: "integer", example: 401),
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 500,
-                description: "Error inesperado al calcular la racha",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Error al calcular la racha."),
-                        new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
-                        new OA\Property(property: "status", type: "integer", example: 500),
-                    ]
-                )
-            ),
-        ]
-    )]
-    public function getStreak(Request $request) {}
-
-    #[OA\Get(
-        path: "/api/users/getScansByDayOfWeek",
-        tags: ["Usuarios"],
-        summary: "Obtener cantidad de escaneos por día de la semana",
-        description: "Devuelve un listado con la cantidad de escaneos válidos realizados por el usuario en cada día de la semana (lunes a domingo), basado en la semana actual (del lunes al domingo). Si un día no tiene escaneos, su conteo será 0.",
-        security: [["bearerAuth" => []]],
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: "Escaneos por día obtenidos exitosamente",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
-                        new OA\Property(property: "message", type: "string", example: "Escaneos por día de la semana."),
-                        new OA\Property(
-                            property: "data",
-                            type: "array",
-                            items: new OA\Items(
-                                type: "object",
-                                properties: [
-                                    new OA\Property(property: "day", type: "string", example: "Lunes", description: "Nombre del día en español"),
-                                    new OA\Property(property: "scans_count", type: "integer", example: 3, description: "Cantidad de escaneos válidos realizados ese día"),
-                                    new OA\Property(property: "date", type: "string", example: "12/02/2023", description: "Fecha del día en formato dd/mm/yyyy")
-                                ]
-                            )
-                        ),
-                        new OA\Property(property: "errors", type: "null", example: null),
-                        new OA\Property(property: "status", type: "integer", example: 200)
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 401,
-                description: "Token de autenticación no válido o no proporcionado",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Token de autenticación no proporcionado."),
-                        new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", type: "null", example: null),
-                        new OA\Property(property: "status", type: "integer", example: 401),
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 500,
-                description: "Error inesperado al obtener los escaneos por día",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Error al obtener los escaneos por día."),
-                        new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
-                        new OA\Property(property: "status", type: "integer", example: 500),
-                    ]
-                )
-            ),
-        ]
-    )]
-    public function getScansByDayOfWeek(Request $request) {}
 
     #[OA\Post(
         path: '/api/users/update-badge',

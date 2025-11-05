@@ -118,6 +118,340 @@ class AllianceDocumentation
     )]
     public function getAll(Request $request) {}
 
+    #[OA\Get(
+        path: "/api/alianzas/cashCut/{alliance_id}",
+        tags: ["Alianzas"],
+        summary: "Hacer el corte de caja para un comercio (alianza)",
+        description: "Hacer el corte de caja para un comercio (alianza)",
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "alliance_id",
+                description: "ID del comercio (alianza)",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "integer", example: 3)
+            ),
+            new OA\Parameter(
+                name: "only_return",
+                description: "Indica si se debe retornar solo el total de puntos (true) retornarlos y hacer el corte (false)",
+                in: "query",
+                required: false,
+                schema: new OA\Schema(type: "boolean", example: false)
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Corte de caja realizado correctamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Corte de caja realizado exitosamente."),
+                        new OA\Property(property: "data", properties: [
+                            new OA\Property(property: "total_points", type: "integer", example: 8500),
+                            new OA\Property(property: "cash_out", type: "integer", example: 85),
+                        ]),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: "Token de autenticación no válido o no proporcionado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Token de autenticación no proporcionado."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 401),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado al hacer el corte de caja",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al obtener el historial."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function totalPointsByShop() {}
+
+    #[OA\Get(
+        path: "/api/alianzas/stats/{alliance_id}",
+        tags: ["Alianzas"],
+        summary: "Obtener estadísticas de rendimiento para una alianza",
+        description: "Devuelve un conjunto de métricas clave para una alianza específica, incluyendo ingresos totales, promedio de ingresos, puntos otorgados y clientes atendidos. Los ingresos se calculan a partir del historial tipo 4 (corte de caja) y los puntos otorgados del historial tipo 1.",
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "alliance_id",
+                description: "ID de la alianza (comercio) para obtener sus estadísticas",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "integer", example: 3)
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Estadísticas obtenidas exitosamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Estadisticas obtenidas exitosamente."),
+                        new OA\Property(
+                            property: "data",
+                            type: "object",
+                            properties: [
+                                new OA\Property(
+                                    property: "total_income",
+                                    type: "number",
+                                    format: "float",
+                                    example: 85.50,
+                                    description: "Ingresos totales en dólares (calculado como total de puntos tipo 4 * 0.01)"
+                                ),
+                                new OA\Property(
+                                    property: "total_points_awarded",
+                                    type: "integer",
+                                    example: 8500,
+                                    description: "Puntos totales otorgados a usuarios (tipo 1 en historial)"
+                                ),
+                                new OA\Property(
+                                    property: "average_total_income",
+                                    type: "number",
+                                    format: "float",
+                                    example: 28.50,
+                                    description: "Promedio de ingresos por corte de caja"
+                                ),
+                                new OA\Property(
+                                    property: "total_customers_served",
+                                    type: "integer",
+                                    example: 120,
+                                    description: "Cantidad total de clientes atendidos (número de registros tipo 1)"
+                                ),
+                            ]
+                        ),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: "Alianza no encontrada",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al obtener las estadisticas."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "No query results for model [App\\Models\\Alliance] 5"),
+                        new OA\Property(property: "status", type: "integer", example: 404),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error interno al calcular estadísticas",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al obtener el total de ingresos."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "SQLSTATE[42S02]: Base table or view not found: ..."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function getStatsByShop(Request $request, int $alliance_id) {}
+
+    #[OA\Get(
+        path: "/api/alianzas/activityByDayOfWeek/{alliance_id}",
+        tags: ["Alianzas"],
+        summary: "Obtener actividad semanal de un comercio y métricas de la semana pasada",
+        description: "Devuelve dos conjuntos de datos: (1) la actividad diaria (canjes tipo 1) de la semana actual, por día (lunes a domingo), con nombre y fecha; y (2) métricas agregadas de la semana anterior: número total de canjes (ventas) y puntos totales otorgados.",
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "alliance_id",
+                description: "ID del comercio (alianza) para obtener su historial de actividad",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "integer", example: 3)
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Actividad y métricas obtenidas exitosamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Actividad del comercio por día de la semana y métricas de la semana pasada."),
+                        new OA\Property(
+                            property: "data",
+                            type: "object",
+                            properties: [
+                                new OA\Property(
+                                    property: "statsToWeek",
+                                    type: "array",
+                                    description: "Actividad diaria de la semana actual (lunes a domingo)",
+                                    items: new OA\Items(
+                                        type: "object",
+                                        properties: [
+                                            new OA\Property(property: "day", type: "string", example: "Lunes", description: "Nombre del día en español"),
+                                            new OA\Property(property: "date", type: "string", format: "date", example: "08/09/2025", description: "Fecha en formato dd/mm/yyyy"),
+                                            new OA\Property(property: "total_activity", type: "integer", example: 15, description: "Cantidad de actividades (tipo 1) registradas ese día")
+                                        ]
+                                    ),
+                                    example: [
+                                        ["day" => "Lunes", "date" => "08/09/2025", "total_activity" => 12],
+                                        ["day" => "Martes", "date" => "09/09/2025", "total_activity" => 18],
+                                        ["day" => "Miércoles", "date" => "10/09/2025", "total_activity" => 10],
+                                        ["day" => "Jueves", "date" => "11/09/2025", "total_activity" => 20],
+                                        ["day" => "Viernes", "date" => "12/09/2025", "total_activity" => 25],
+                                        ["day" => "Sábado", "date" => "13/09/2025", "total_activity" => 30],
+                                        ["day" => "Domingo", "date" => "14/09/2025", "total_activity" => 14],
+                                    ]
+                                ),
+                                new OA\Property(
+                                    property: "totalSales",
+                                    type: "integer",
+                                    example: 45,
+                                    description: "Número total de canjes (registros tipo 1) realizados durante la semana anterior"
+                                ),
+                                new OA\Property(
+                                    property: "totalPoints",
+                                    type: "integer",
+                                    example: 24585,
+                                    description: "Suma total de puntos otorgados en los canjes de la semana anterior"
+                                )
+                            ]
+                        ),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: "Comercio no encontrado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "El comercio que intenta consultar no existe."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "No query results for model [App\\Models\\Alliance] 999"),
+                        new OA\Property(property: "status", type: "integer", example: 404),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado al obtener la actividad",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al obtener la actividad del comercio."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "SQLSTATE[42S02]: Base table not found..."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function getActivityByDayOfWeek(Request $request, int $alliance_id) {}
+
+    #[OA\Get(
+        path: "/api/alianzas/top-rewards/{alliance_id}",
+        tags: ["Alianzas"],
+        summary: "Obtener las 3 recompensas más canjeadas de una alianza",
+        description: "Devuelve un listado de las 3 recompensas más canjeadas (por número de canjes) para una alianza específica. Los datos se basan en registros del historial con type_history = 1. El resultado está ordenado por cantidad descendente y luego alfabéticamente por nombre en caso de empate.",
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "alliance_id",
+                description: "ID de la alianza para analizar sus recompensas más canjeadas",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "integer", example: 3)
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Lista de recompensas más canjeadas obtenida exitosamente",
+                content: new OA\JsonContent(
+                    type: "array",
+                    items: new OA\Items(
+                        type: "object",
+                        properties: [
+                            new OA\Property(property: "reward_id", type: "integer", example: 15),
+                            new OA\Property(property: "reward_name", type: "string", example: "Café cortesía"),
+                            new OA\Property(property: "total_claimed", type: "integer", example: 35, description: "Número total de veces que se ha canjeado esta recompensa")
+                        ],
+                        example: [
+                            ["reward_id" => 15, "reward_name" => "Café cortesía", "total_claimed" => 35],
+                            ["reward_id" => 25, "reward_name" => "Descuento 10%", "total_claimed" => 10],
+                            ["reward_id" => 87, "reward_name" => "Entrada gratis al cine", "total_claimed" => 5],
+                        ]
+                    )
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: "Alianza no encontrada",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "La alianza especificada no existe."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 404),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error interno del servidor",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al obtener las recompensas más canjeadas."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function getTopRewardsByAlliance(Request $request, int $alliance_id) {}
+
     #[OA\Post(
         path: "/api/alianzas/create",
         tags: ["Alianzas"],
@@ -452,338 +786,4 @@ class AllianceDocumentation
         ]
     )]
     public function updateLogo(Request $request, $id) {}
-
-    #[OA\Get(
-        path: "/api/alianzas/cashCut/{alliance_id}",
-        tags: ["Alianzas"],
-        summary: "Hacer el corte de caja para un comercio (alianza)",
-        description: "Hacer el corte de caja para un comercio (alianza)",
-        security: [["bearerAuth" => []]],
-        parameters: [
-            new OA\Parameter(
-                name: "alliance_id",
-                description: "ID del comercio (alianza)",
-                in: "path",
-                required: true,
-                schema: new OA\Schema(type: "integer", example: 3)
-            ),
-            new OA\Parameter(
-                name: "only_return",
-                description: "Indica si se debe retornar solo el total de puntos (true) retornarlos y hacer el corte (false)",
-                in: "query",
-                required: false,
-                schema: new OA\Schema(type: "boolean", example: false)
-            ),
-        ],
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: "Corte de caja realizado correctamente",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
-                        new OA\Property(property: "message", type: "string", example: "Corte de caja realizado exitosamente."),
-                        new OA\Property(property: "data", properties: [
-                            new OA\Property(property: "total_points", type: "integer", example: 8500),
-                            new OA\Property(property: "cash_out", type: "integer", example: 85),
-                        ]),
-                        new OA\Property(property: "errors", type: "null", example: null),
-                        new OA\Property(property: "status", type: "integer", example: 200),
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 401,
-                description: "Token de autenticación no válido o no proporcionado",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Token de autenticación no proporcionado."),
-                        new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", type: "null", example: null),
-                        new OA\Property(property: "status", type: "integer", example: 401),
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 500,
-                description: "Error inesperado al hacer el corte de caja",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Error al obtener el historial."),
-                        new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
-                        new OA\Property(property: "status", type: "integer", example: 500),
-                    ]
-                )
-            ),
-        ]
-    )]
-    public function totalPointsByShop() {}
-
-    #[OA\Get(
-        path: "/api/alianzas/stats/{alliance_id}",
-        tags: ["Alianzas"],
-        summary: "Obtener estadísticas de rendimiento para una alianza",
-        description: "Devuelve un conjunto de métricas clave para una alianza específica, incluyendo ingresos totales, promedio de ingresos, puntos otorgados y clientes atendidos. Los ingresos se calculan a partir del historial tipo 4 (corte de caja) y los puntos otorgados del historial tipo 1.",
-        security: [["bearerAuth" => []]],
-        parameters: [
-            new OA\Parameter(
-                name: "alliance_id",
-                description: "ID de la alianza (comercio) para obtener sus estadísticas",
-                in: "path",
-                required: true,
-                schema: new OA\Schema(type: "integer", example: 3)
-            ),
-        ],
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: "Estadísticas obtenidas exitosamente",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
-                        new OA\Property(property: "message", type: "string", example: "Estadisticas obtenidas exitosamente."),
-                        new OA\Property(
-                            property: "data",
-                            type: "object",
-                            properties: [
-                                new OA\Property(
-                                    property: "total_income",
-                                    type: "number",
-                                    format: "float",
-                                    example: 85.50,
-                                    description: "Ingresos totales en dólares (calculado como total de puntos tipo 4 * 0.01)"
-                                ),
-                                new OA\Property(
-                                    property: "total_points_awarded",
-                                    type: "integer",
-                                    example: 8500,
-                                    description: "Puntos totales otorgados a usuarios (tipo 1 en historial)"
-                                ),
-                                new OA\Property(
-                                    property: "average_total_income",
-                                    type: "number",
-                                    format: "float",
-                                    example: 28.50,
-                                    description: "Promedio de ingresos por corte de caja"
-                                ),
-                                new OA\Property(
-                                    property: "total_customers_served",
-                                    type: "integer",
-                                    example: 120,
-                                    description: "Cantidad total de clientes atendidos (número de registros tipo 1)"
-                                ),
-                            ]
-                        ),
-                        new OA\Property(property: "errors", type: "null", example: null),
-                        new OA\Property(property: "status", type: "integer", example: 200),
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 404,
-                description: "Alianza no encontrada",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Error al obtener las estadisticas."),
-                        new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", type: "string", example: "No query results for model [App\\Models\\Alliance] 5"),
-                        new OA\Property(property: "status", type: "integer", example: 404),
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 500,
-                description: "Error interno al calcular estadísticas",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Error al obtener el total de ingresos."),
-                        new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", type: "string", example: "SQLSTATE[42S02]: Base table or view not found: ..."),
-                        new OA\Property(property: "status", type: "integer", example: 500),
-                    ]
-                )
-            ),
-        ]
-    )]
-    public function getStatsByShop(Request $request, int $alliance_id) {}
-
-    #[OA\Get(
-        path: "/api/alianzas/activityByDayOfWeek/{alliance_id}",
-        tags: ["Alianzas"],
-        summary: "Obtener actividad semanal de un comercio y métricas de la semana pasada",
-        description: "Devuelve dos conjuntos de datos: (1) la actividad diaria (canjes tipo 1) de la semana actual, por día (lunes a domingo), con nombre y fecha; y (2) métricas agregadas de la semana anterior: número total de canjes (ventas) y puntos totales otorgados.",
-        security: [["bearerAuth" => []]],
-        parameters: [
-            new OA\Parameter(
-                name: "alliance_id",
-                description: "ID del comercio (alianza) para obtener su historial de actividad",
-                in: "path",
-                required: true,
-                schema: new OA\Schema(type: "integer", example: 3)
-            ),
-        ],
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: "Actividad y métricas obtenidas exitosamente",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
-                        new OA\Property(property: "message", type: "string", example: "Actividad del comercio por día de la semana y métricas de la semana pasada."),
-                        new OA\Property(
-                            property: "data",
-                            type: "object",
-                            properties: [
-                                new OA\Property(
-                                    property: "statsToWeek",
-                                    type: "array",
-                                    description: "Actividad diaria de la semana actual (lunes a domingo)",
-                                    items: new OA\Items(
-                                        type: "object",
-                                        properties: [
-                                            new OA\Property(property: "day", type: "string", example: "Lunes", description: "Nombre del día en español"),
-                                            new OA\Property(property: "date", type: "string", format: "date", example: "08/09/2025", description: "Fecha en formato dd/mm/yyyy"),
-                                            new OA\Property(property: "total_activity", type: "integer", example: 15, description: "Cantidad de actividades (tipo 1) registradas ese día")
-                                        ]
-                                    ),
-                                    example: [
-                                        ["day" => "Lunes", "date" => "08/09/2025", "total_activity" => 12],
-                                        ["day" => "Martes", "date" => "09/09/2025", "total_activity" => 18],
-                                        ["day" => "Miércoles", "date" => "10/09/2025", "total_activity" => 10],
-                                        ["day" => "Jueves", "date" => "11/09/2025", "total_activity" => 20],
-                                        ["day" => "Viernes", "date" => "12/09/2025", "total_activity" => 25],
-                                        ["day" => "Sábado", "date" => "13/09/2025", "total_activity" => 30],
-                                        ["day" => "Domingo", "date" => "14/09/2025", "total_activity" => 14],
-                                    ]
-                                ),
-                                new OA\Property(
-                                    property: "totalSales",
-                                    type: "integer",
-                                    example: 45,
-                                    description: "Número total de canjes (registros tipo 1) realizados durante la semana anterior"
-                                ),
-                                new OA\Property(
-                                    property: "totalPoints",
-                                    type: "integer",
-                                    example: 24585,
-                                    description: "Suma total de puntos otorgados en los canjes de la semana anterior"
-                                )
-                            ]
-                        ),
-                        new OA\Property(property: "errors", type: "null", example: null),
-                        new OA\Property(property: "status", type: "integer", example: 200),
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 404,
-                description: "Comercio no encontrado",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "El comercio que intenta consultar no existe."),
-                        new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", type: "string", example: "No query results for model [App\\Models\\Alliance] 999"),
-                        new OA\Property(property: "status", type: "integer", example: 404),
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 500,
-                description: "Error inesperado al obtener la actividad",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Error al obtener la actividad del comercio."),
-                        new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", type: "string", example: "SQLSTATE[42S02]: Base table not found..."),
-                        new OA\Property(property: "status", type: "integer", example: 500),
-                    ]
-                )
-            ),
-        ]
-    )]
-    public function getActivityByDayOfWeek(Request $request, int $alliance_id) {}
-
-    #[OA\Get(
-        path: "/api/alianzas/top-rewards/{alliance_id}",
-        tags: ["Alianzas"],
-        summary: "Obtener las 3 recompensas más canjeadas de una alianza",
-        description: "Devuelve un listado de las 3 recompensas más canjeadas (por número de canjes) para una alianza específica. Los datos se basan en registros del historial con type_history = 1. El resultado está ordenado por cantidad descendente y luego alfabéticamente por nombre en caso de empate.",
-        security: [["bearerAuth" => []]],
-        parameters: [
-            new OA\Parameter(
-                name: "alliance_id",
-                description: "ID de la alianza para analizar sus recompensas más canjeadas",
-                in: "path",
-                required: true,
-                schema: new OA\Schema(type: "integer", example: 3)
-            ),
-        ],
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: "Lista de recompensas más canjeadas obtenida exitosamente",
-                content: new OA\JsonContent(
-                    type: "array",
-                    items: new OA\Items(
-                        type: "object",
-                        properties: [
-                            new OA\Property(property: "reward_id", type: "integer", example: 15),
-                            new OA\Property(property: "reward_name", type: "string", example: "Café cortesía"),
-                            new OA\Property(property: "total_claimed", type: "integer", example: 35, description: "Número total de veces que se ha canjeado esta recompensa")
-                        ],
-                        example: [
-                            ["reward_id" => 15, "reward_name" => "Café cortesía", "total_claimed" => 35],
-                            ["reward_id" => 25, "reward_name" => "Descuento 10%", "total_claimed" => 10],
-                            ["reward_id" => 87, "reward_name" => "Entrada gratis al cine", "total_claimed" => 5],
-                        ]
-                    )
-                )
-            ),
-            new OA\Response(
-                response: 404,
-                description: "Alianza no encontrada",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "La alianza especificada no existe."),
-                        new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", type: "null", example: null),
-                        new OA\Property(property: "status", type: "integer", example: 404),
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 500,
-                description: "Error interno del servidor",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Error al obtener las recompensas más canjeadas."),
-                        new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
-                        new OA\Property(property: "status", type: "integer", example: 500),
-                    ]
-                )
-            ),
-        ]
-    )]
-    public function getTopRewardsByAlliance(Request $request, int $alliance_id) {}
 }

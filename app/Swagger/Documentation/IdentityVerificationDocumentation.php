@@ -7,6 +7,97 @@ use OpenApi\Attributes as OA;
 #[OA\Tag(name: 'Verificación de Identidad', description: 'Endpoints para gestión de documentos de verificación de identidad')]
 class IdentityVerificationDocumentation
 {
+    #[OA\Get(
+        path: "/api/users/documents/{type}/{userId}",
+        tags: ["Verificación de Identidad"],
+        summary: "Obtener documento de verificación",
+        description: "Devuelve un documento de verificación (frente, reverso o selfie) de un usuario. Solo accesible para administradores y moderadores.",
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(
+                name: "type",
+                description: "Tipo de documento a obtener",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "string", enum: ["front", "back", "selfie"], example: "front")
+            ),
+            new OA\Parameter(
+                name: "userId",
+                description: "ID del usuario propietario del documento",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "integer", example: 5)
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Documento obtenido correctamente",
+                content: new OA\MediaType(
+                    mediaType: "image/*",
+                    schema: new OA\Schema(type: "string", format: "binary")
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: "Token de autenticación no válido o no proporcionado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Token de autenticación no proporcionado."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 401),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 403,
+                description: "No autorizado para acceder a los documentos",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "No tienes permiso para obtener los documentos."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 403),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: "Documento no encontrado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Documento no encontrado."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 404),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al obtener los documentos."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function getDocument(Request $request, string $type, int $userId) {}
+
     #[OA\Post(
         path: "/api/users/toggle-status-pending/{userId}",
         tags: ["Verificación de Identidad"],
@@ -442,97 +533,6 @@ class IdentityVerificationDocumentation
         ]
     )]
     public function uploadSelfie(Request $request) {}
-
-    #[OA\Get(
-        path: "/api/users/documents/{type}/{userId}",
-        tags: ["Verificación de Identidad"],
-        summary: "Obtener documento de verificación",
-        description: "Devuelve un documento de verificación (frente, reverso o selfie) de un usuario. Solo accesible para administradores y moderadores.",
-        security: [["bearerAuth" => []]],
-        parameters: [
-            new OA\Parameter(
-                name: "type",
-                description: "Tipo de documento a obtener",
-                in: "path",
-                required: true,
-                schema: new OA\Schema(type: "string", enum: ["front", "back", "selfie"], example: "front")
-            ),
-            new OA\Parameter(
-                name: "userId",
-                description: "ID del usuario propietario del documento",
-                in: "path",
-                required: true,
-                schema: new OA\Schema(type: "integer", example: 5)
-            ),
-        ],
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: "Documento obtenido correctamente",
-                content: new OA\MediaType(
-                    mediaType: "image/*",
-                    schema: new OA\Schema(type: "string", format: "binary")
-                )
-            ),
-            new OA\Response(
-                response: 401,
-                description: "Token de autenticación no válido o no proporcionado",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Token de autenticación no proporcionado."),
-                        new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", type: "null", example: null),
-                        new OA\Property(property: "status", type: "integer", example: 401),
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 403,
-                description: "No autorizado para acceder a los documentos",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "No tienes permiso para obtener los documentos."),
-                        new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", type: "null", example: null),
-                        new OA\Property(property: "status", type: "integer", example: 403),
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 404,
-                description: "Documento no encontrado",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Documento no encontrado."),
-                        new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", type: "null", example: null),
-                        new OA\Property(property: "status", type: "integer", example: 404),
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 500,
-                description: "Error inesperado",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Error al obtener los documentos."),
-                        new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
-                        new OA\Property(property: "status", type: "integer", example: 500),
-                    ]
-                )
-            ),
-        ]
-    )]
-    public function getDocument(Request $request, string $type, int $userId) {}
 
     #[OA\Post(
         path: "/api/users/list-docs",

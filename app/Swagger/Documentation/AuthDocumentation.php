@@ -32,6 +32,65 @@ use App\Swagger\Schemas\UserSchema;
 #[OA\Tag(name: 'Autenticación', description: 'Endpoints para gestión de autenticación y tokens')]
 class AuthDocumentation
 {
+    #[OA\Get(
+        path: "/api/auth/generateQR2FA",
+        tags: ["Autenticación"],
+        summary: "Generar QR y secreto para configurar 2FA",
+        description: "Genera un código QR y un secreto para que el usuario configure la autenticación de dos factores en su app (Google Authenticator, Authy, etc.).",
+        security: [["bearerAuth" => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "QR generado correctamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "QR code generado correctamente."),
+                        new OA\Property(property: "data", properties: [
+                            new OA\Property(property: "two_factor_status", type: "boolean", example: false),
+                            new OA\Property(property: "qr_code_url", type: "string", example: "otpauth://totp/AppName:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=AppName"),
+                            new OA\Property(property: "secret", type: "string", example: "JBSWY3DPEHPK3PXP"),
+                        ]),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 409,
+                description: "2FA ya está habilitada",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "La autenticación de dos factores ya está habilitada."),
+                        new OA\Property(property: "data", properties: [
+                            new OA\Property(property: "two_factor_status", type: "boolean", example: true),
+                        ]),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 409),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Ocurrió un error inesperado al generar el QR code."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function generateQR2FA(Request $request) {}
+
     #[OA\Post(
         path: "/api/auth/passHash",
         tags: ["Autenticación"],
@@ -552,65 +611,6 @@ class AuthDocumentation
         ]
     )]
     public function resetPassword() {}
-
-    #[OA\Get(
-        path: "/api/auth/generateQR2FA",
-        tags: ["Autenticación"],
-        summary: "Generar QR y secreto para configurar 2FA",
-        description: "Genera un código QR y un secreto para que el usuario configure la autenticación de dos factores en su app (Google Authenticator, Authy, etc.).",
-        security: [["bearerAuth" => []]],
-        responses: [
-            new OA\Response(
-                response: 200,
-                description: "QR generado correctamente",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
-                        new OA\Property(property: "message", type: "string", example: "QR code generado correctamente."),
-                        new OA\Property(property: "data", properties: [
-                            new OA\Property(property: "two_factor_status", type: "boolean", example: false),
-                            new OA\Property(property: "qr_code_url", type: "string", example: "otpauth://totp/AppName:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=AppName"),
-                            new OA\Property(property: "secret", type: "string", example: "JBSWY3DPEHPK3PXP"),
-                        ]),
-                        new OA\Property(property: "errors", type: "null", example: null),
-                        new OA\Property(property: "status", type: "integer", example: 200),
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 409,
-                description: "2FA ya está habilitada",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: true),
-                        new OA\Property(property: "message", type: "string", example: "La autenticación de dos factores ya está habilitada."),
-                        new OA\Property(property: "data", properties: [
-                            new OA\Property(property: "two_factor_status", type: "boolean", example: true),
-                        ]),
-                        new OA\Property(property: "errors", type: "null", example: null),
-                        new OA\Property(property: "status", type: "integer", example: 409),
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 500,
-                description: "Error inesperado",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Ocurrió un error inesperado al generar el QR code."),
-                        new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
-                        new OA\Property(property: "status", type: "integer", example: 500),
-                    ]
-                )
-            ),
-        ]
-    )]
-    public function generateQR2FA(Request $request) {}
     
     #[OA\Post(
         path: "/api/auth/enable-2fa",
