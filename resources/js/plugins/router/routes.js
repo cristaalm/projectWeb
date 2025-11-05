@@ -31,6 +31,11 @@ export const routes = [
         component: () => import('@/pages/Dashboard/Rewards/'),
       },
       {
+        path: 'Badges',
+        name: 'badges',
+        component: () => import('@/pages/Dashboard/Badges/'),
+      },
+      {
         path: 'Profile',
         name: 'profile',
         component: () => import('@/pages/Dashboard/Profile/'),

@@ -17,60 +17,22 @@ const useMenuStore = defineStore('menu', {
     },
     moderatorMenu() {
       return [
-        {
-          title: 'Panel',
-          icon: 'bx-bxs-dashboard',
-          to: '/panel',
-        },
-        {
-          title: 'Usuarios',
-          icon: 'bx-user',
-          to: '/users',
-        },
-        {
-          title: 'Contenedores',
-          icon: 'bx-purchase-tag-alt',
-          to: '/containers',
-        },
-        {
-          title: 'Comercios',
-          icon: 'bx-building-house',
-          to: '/shops',
-        },
-        {
-          title: 'Recompensas',
-          icon: 'bx-bell',
-          to: '/rewards',
-        },
+        { title: 'Panel', icon: 'bx-bxs-dashboard', to: '/panel' },
+        { title: 'Usuarios', icon: 'bx-user', to: '/users' },
+        { title: 'Contenedores', icon: 'bx-purchase-tag-alt', to: '/containers' },
+        { title: 'Comercios', icon: 'bx-building-house', to: '/shops' },
+        { title: 'Recompensas', icon: 'bx-gift', to: '/rewards' },
+        { title: 'Insignias', icon: 'bx-bell', to: '/badges' },
       ]
     },
     adminMenu() {
       return [
-        {
-          title: 'Panel',
-          icon: 'bx-bxs-dashboard',
-          to: '/panel',
-        },
-        {
-          title: 'Usuarios',
-          icon: 'bx-user',
-          to: '/users',
-        },
-        {
-          title: 'Contenedores',
-          icon: 'bx-purchase-tag-alt',
-          to: '/containers',
-        },
-        {
-          title: 'Comercios',
-          icon: 'bx-building-house',
-          to: '/shops',
-        },
-        {
-          title: 'Recompensas',
-          icon: 'bx-bell',
-          to: '/rewards',
-        },
+        { title: 'Panel', icon: 'bx-bxs-dashboard', to: '/panel' },
+        { title: 'Usuarios', icon: 'bx-user', to: '/users' },
+        { title: 'Contenedores', icon: 'bx-purchase-tag-alt', to: '/containers' },
+        { title: 'Comercios', icon: 'bx-building-house', to: '/shops' },
+        { title: 'Recompensas', icon: 'bx-bell', to: '/rewards' },
+        { title: 'Insignias', icon: 'bx-bell', to: '/badges' },
       ]
     },
   },
