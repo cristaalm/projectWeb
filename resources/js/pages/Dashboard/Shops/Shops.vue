@@ -11,7 +11,12 @@ import { ModalDelete, useModalDelete } from './modules/ModalDelete'
 import { ModalLogo, useModalLogo } from './modules/ModalLogo'
 import { ModalUpdate, useModalUpdate } from './modules/ModalUpdate'
 
+import { jsPDF } from 'jspdf'
+import { autoTable } from 'jspdf-autotable'
+import { useAllianceMetrics } from '@/hooks/Shops/useAllianceMetrics'
+
 const darkModeStore = useDarkModeStore()
+const { getMetrics } = useAllianceMetrics()
 
 const {
   data: alliances,
@@ -53,7 +58,7 @@ function formatPhone(phone) {
     mask: '(000) 000-0000',
   })
 
-  if (phone.length === 0) return
+  if (!phone || phone.length === 0) return 'N/A'
   mask.resolve(phone)
 
   return mask.value
@@ -63,6 +68,273 @@ const { showCreateModal, openCreateModal } = useModalCreate()
 const { showUpdateModal, openUpdateModal, selectedShopToUpdate } = useModalUpdate()
 const { showDeleteModal, openDeleteModal, selectedShopToDelete } = useModalDelete()
 const { showLogoModal, openLogoModal, selectedShopForLogo } = useModalLogo()
+
+const exportToPDF = async item => {
+  try {
+    const metrics = await getMetrics(item.id)
+    const doc = new jsPDF()
+
+    const renovaPrimary = [5, 209, 110]   // #05d16e (Verde)
+    const renovaSecondary = [2, 70, 83]  // #024653 (Azul oscuro)
+    const renovaTertiary = [205, 255, 16] // #cdff10 (Verde limón)
+    const bodyTextColor = [50, 50, 50] // Gris oscuro para texto general
+    const lightGray = [240, 240, 240] // Gris muy claro para fondos alternos
+
+    let yPos = 0
+    const pageHeight = doc.internal.pageSize.getHeight()
+    const pageWidth = doc.internal.pageSize.getWidth()
+    const margin = 14
+    const tableWidth = pageWidth - margin * 2
+
+    const addSectionHeader = (title, y) => {
+      doc.setFontSize(14)
+      doc.setTextColor(...renovaPrimary) 
+      doc.setFont(undefined, 'bold')
+      doc.text(title, margin, y)
+      y += 2
+      doc.setDrawColor(200, 200, 200) 
+      doc.setLineWidth(0.5)
+      doc.line(margin, y, pageWidth - margin, y) 
+      doc.setFont(undefined, 'normal')
+
+      return y + 8
+    }
+
+    // --- Encabezado ---
+    const headerHeight = 35 
+
+    doc.setFillColor(...renovaPrimary) 
+    doc.rect(0, 0, pageWidth, headerHeight, 'F')
+
+    const logoWidth = 25
+    const logoHeight = 25
+    const logoMargin = 15
+    const logoX = pageWidth - logoWidth - logoMargin
+    const logoY = (headerHeight - logoHeight) / 2 
+
+    doc.addImage('/images/logoDark.png', 'PNG', logoX, logoY, logoWidth, logoHeight)
+
+    const titleMaxWidth = pageWidth - (logoWidth + logoMargin + 20) * 2 
+
+    doc.setTextColor(255, 255, 255) 
+
+    // Título Principal
+    doc.setFontSize(20) 
+    doc.setFont(undefined, 'bold')
+    doc.text('REPORTE DE COMERCIO', pageWidth / 2, 8, { 
+      align: 'center',
+      baseline: 'top', 
+      maxWidth: titleMaxWidth, 
+    })
+
+    doc.setFontSize(14)
+    doc.setFont(undefined, 'normal')
+    doc.text(item.name, pageWidth / 2, 18, { 
+      align: 'center', 
+      baseline: 'top', 
+      maxWidth: titleMaxWidth, 
+    })
+
+    doc.setFontSize(12) 
+    doc.text(item.contact_name, pageWidth / 2, 24, { 
+      align: 'center', 
+      baseline: 'top', 
+      maxWidth: titleMaxWidth, 
+    })
+
+    yPos = headerHeight + 10
+
+    // --- Información General ---
+    yPos = addSectionHeader('INFORMACIÓN GENERAL', yPos)
+    autoTable(doc, {
+      startY: yPos,
+      body: [
+        ['ID del Comercio:', item.id.toString()],
+        ['Nombre Comercial:', item.name],
+        ['Tipo de Comercio:', item.type_shop?.name || 'N/A'],
+        ['Estado Actual:', item.status ? 'Activo' : 'Inactivo'],
+      ],
+      theme: 'grid',
+      styles: { fontSize: 10, cellPadding: 3, textColor: bodyTextColor },
+      columnStyles: {
+        0: { fontStyle: 'bold', cellWidth: tableWidth * 0.35, textColor: renovaSecondary, fillColor: lightGray },
+        1: { cellWidth: tableWidth * 0.65 },
+      },
+    })
+    
+    yPos = doc.lastAutoTable.finalY + 10
+
+    // --- Información de Contacto ---
+    yPos = addSectionHeader('INFORMACIÓN DE CONTACTO', yPos)
+    autoTable(doc, {
+      startY: yPos,
+      body: [
+        ['Nombre del Contacto:', item.contact_name],
+        ['Correo Electrónico:', item.contact_email],
+        ['Teléfono:', formatPhone(item.phone)],
+        ['Dirección:', item.address],
+      ],
+      theme: 'grid',
+      styles: { fontSize: 10, cellPadding: 3, textColor: bodyTextColor },
+      columnStyles: {
+        0: { fontStyle: 'bold', cellWidth: tableWidth * 0.35, textColor: renovaSecondary, fillColor: lightGray }, // Etiquetas en color secundario
+        1: { cellWidth: tableWidth * 0.65 },
+      },
+    })
+    
+    yPos = doc.lastAutoTable.finalY + 10
+
+    // metricas del negocio 
+    yPos = addSectionHeader('MÉTRICAS DEL NEGOCIO', yPos)
+
+    const metricsBody = [
+      ['Corte (al ' + metrics.corte.fecha + '):', metrics.corte.total, 'Ingreso Histórico:', metrics.estadisticas.ingresoTotal],
+      ['Puntos (Corte):', metrics.corte.puntos.toString(), 'Puntos Canjeados (Hist.):', metrics.estadisticas.puntosCanjeados.toString()],
+      ['Clientes Atendidos (Hist.):', metrics.estadisticas.clientesAtendidos.toString(), 'Promedio Ingreso (Hist.):', metrics.estadisticas.promedioIngreso],
+      ['Transacciones (Semana):', metrics.estadisticas.transaccionesSemana.toString(), 'Ventas (Semana Ant.):', metrics.semanaAnterior.ventas.toString()],
+      ['Puntos (Semana Ant.):', metrics.semanaAnterior.puntos.toString(), '', ''],
+    ]
+
+    autoTable(doc, {
+      startY: yPos,
+      body: metricsBody,
+      theme: 'grid',
+      styles: { fontSize: 9, cellPadding: 2, textColor: bodyTextColor },
+      columnStyles: {
+        // Distribución proporcional para cuatro columnas (etiqueta/valor / etiqueta/valor)
+        0: { fontStyle: 'bold', textColor: renovaSecondary, cellWidth: tableWidth * 0.35, fillColor: lightGray },
+        1: { cellWidth: tableWidth * 0.15, halign: 'right' },
+        2: { fontStyle: 'bold', textColor: renovaSecondary, cellWidth: tableWidth * 0.35, fillColor: lightGray },
+        3: { cellWidth: tableWidth * 0.15, halign: 'right' },
+      },
+    })
+    
+    yPos = doc.lastAutoTable.finalY + 10
+
+    // --- Actividad Semanal ---
+    if (metrics.actividad.length > 0) {
+      yPos = addSectionHeader('ACTIVIDAD SEMANAL (Últ. 7 Días)', yPos)
+      
+      const actividadRows = metrics.actividad.map(dia => [
+        dia.dia,
+        dia.fecha,
+        dia.total.toString(),
+      ])
+
+      autoTable(doc, {
+        startY: yPos,
+        margin: { left: margin, right: margin },
+        tableWidth: tableWidth,
+        head: [['Día', 'Fecha', 'Transacciones']],
+        body: actividadRows,
+        theme: 'striped',
+        headStyles: { fillColor: renovaPrimary, textColor: 255, halign: 'center' },
+        styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
+        columnStyles: {
+          0: { cellWidth: tableWidth * 0.4, halign: 'center' },
+          1: { cellWidth: tableWidth * 0.4, halign: 'center' },
+          2: { cellWidth: tableWidth * 0.2, halign: 'center' },
+        },
+        didDrawPage: data => (yPos = data.cursor.y),
+      })
+
+      yPos = doc.lastAutoTable.finalY + 10
+    }
+
+    //  Top Recompensas 
+    if (metrics.recompensasTop.length > 0) {
+      if (yPos + 30 > pageHeight) {
+        doc.addPage()
+        yPos = margin
+      }
+
+      yPos = addSectionHeader('TOP RECOMPENSAS CANJEADAS', yPos)
+      
+      const recompensasRows = metrics.recompensasTop.map(reward => [
+        reward.name,
+        reward.redemptions.toString(),
+      ])
+
+      autoTable(doc, {
+        startY: yPos,
+        margin: { left: margin, right: margin },
+        tableWidth: tableWidth,
+        head: [['Recompensa', 'Canjes']],
+        body: recompensasRows,
+        theme: 'striped',
+        headStyles: { fillColor: renovaPrimary, textColor: 255, halign: 'center' }, 
+        styles: { fontSize: 9, cellPadding: 2 },
+        columnStyles: {
+          0: { cellWidth: tableWidth * 0.8, halign: 'left' },
+          1: { cellWidth: tableWidth * 0.2, halign: 'center' },
+        },
+        didParseCell: data => {
+          if (data.row.section === 'head') {
+            if (data.column.index === 0) {
+              data.cell.styles.halign = 'left'
+            } else {
+              data.cell.styles.halign = 'center'
+            }
+          }
+        },
+        didDrawPage: data => (yPos = data.cursor.y),
+      })
+
+      yPos = doc.lastAutoTable.finalY + 10
+    }
+
+    //  Información del Registro 
+    if (yPos + 40 > pageHeight) {
+      doc.addPage()
+      yPos = margin
+    }
+    
+    yPos = addSectionHeader('INFORMACIÓN DEL REGISTRO', yPos)
+    autoTable(doc, {
+      startY: yPos,
+      body: [
+        ['Fecha de Registro:', format(new Date(item.created_at), 'dd/MM/yyyy HH:mm')],
+        ['Última Actualización:', format(new Date(item.updated_at), 'dd/MM/yyyy HH:mm')],
+        ['Documento Generado:', format(new Date(), 'dd/MM/yyyy HH:mm')],
+      ],
+      theme: 'grid',
+      styles: { fontSize: 10, cellPadding: 3, textColor: bodyTextColor },
+      columnStyles: {
+        0: { fontStyle: 'bold', cellWidth: 55, textColor: renovaSecondary, fillColor: lightGray }, // Etiquetas en color secundario
+        1: { cellWidth: 125 },
+      },
+      didDrawPage: data => (yPos = data.cursor.y),
+    })
+    
+    //  Pie de página 
+    const pageCount = doc.internal.getNumberOfPages()
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i)
+      doc.setFontSize(8)
+      doc.setTextColor(150, 150, 150)
+      doc.text(
+        `Este documento es de uso interno exclusivo. © ${format(new Date(), 'yyyy')} Renova S.A. de C.V.`,
+        pageWidth / 2,
+        pageHeight - 15,
+        { align: 'center' },
+      )
+      doc.text(
+        `Página ${i} de ${pageCount} | Emitido: ${format(new Date(), 'dd/MM/yyyy HH:mm')}`,
+        pageWidth / 2,
+        pageHeight - 10,
+        { align: 'center' },
+      )
+    }
+    
+    const fileName = `Reporte_${item.name.replace(/\s+/g, '_')}_${format(new Date(), 'ddMMyyyy')}.pdf`
+
+    doc.save(fileName)
+    
+  } catch (error) {
+    console.error('Error al exportar PDF:', error)
+    alert('Error al generar el PDF. Revisa la consola para más detalles.')
+  }
+}
 </script>
 
 <template>
@@ -290,6 +562,18 @@ const { showLogoModal, openLogoModal, selectedShopForLogo } = useModalLogo()
               </template>
               <VListItemTitle class="text-blue-500">
                 Editar
+              </VListItemTitle>
+            </VListItem>
+            <VDivider />
+            <VListItem @click="exportToPDF(item)">
+              <template #prepend>
+                <VIcon
+                  icon="bx-download"
+                  class="me-2 text-blue-500"
+                />
+              </template>
+              <VListItemTitle class="text-blue-500">
+                Exportar datos
               </VListItemTitle>
             </VListItem>
             <VDivider />
