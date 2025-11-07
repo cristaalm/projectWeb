@@ -31,7 +31,7 @@ const useMenuStore = defineStore('menu', {
         { title: 'Usuarios', icon: 'bx-user', to: '/users' },
         { title: 'Contenedores', icon: 'bx-purchase-tag-alt', to: '/containers' },
         { title: 'Comercios', icon: 'bx-building-house', to: '/shops' },
-        { title: 'Recompensas', icon: 'bx-bell', to: '/rewards' },
+        { title: 'Recompensas', icon: 'bx-gift', to: '/rewards' },
         { title: 'Insignias', icon: 'bx-bell', to: '/badges' },
       ]
     },

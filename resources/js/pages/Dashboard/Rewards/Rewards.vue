@@ -73,7 +73,7 @@ const { showDeleteModal, openDeleteModal, selectedRewardToDelete } = useModalDel
       <div class="flex flex-col gap-2">
         <h2 class="text-2xl font-bold dark:!text-[#136b80] text-primary flex flex-row justify-start items-center gap-2">
           <VIcon
-            icon="bx-store"
+            icon="bx-gift"
             size="small"
           /> 
           Recompensas
