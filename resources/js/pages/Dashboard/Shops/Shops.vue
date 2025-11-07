@@ -188,7 +188,7 @@ const exportToPDF = async item => {
     yPos = addSectionHeader('MÉTRICAS DEL NEGOCIO', yPos)
 
     const metricsBody = [
-      ['Corte (al ' + metrics.corte.fecha + '):', metrics.corte.total, 'Ingreso Histórico:', metrics.estadisticas.ingresoTotal],
+      ['Corte (' + metrics.corte.fecha + '):', metrics.corte.total, 'Ingreso Histórico:', metrics.estadisticas.ingresoTotal],
       ['Puntos (Corte):', metrics.corte.puntos.toString(), 'Puntos Canjeados (Hist.):', metrics.estadisticas.puntosCanjeados.toString()],
       ['Clientes Atendidos (Hist.):', metrics.estadisticas.clientesAtendidos.toString(), 'Promedio Ingreso (Hist.):', metrics.estadisticas.promedioIngreso],
       ['Transacciones (Semana):', metrics.estadisticas.transaccionesSemana.toString(), 'Ventas (Semana Ant.):', metrics.semanaAnterior.ventas.toString()],
