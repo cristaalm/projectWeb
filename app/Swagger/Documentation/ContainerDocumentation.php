@@ -410,4 +410,107 @@ class ContainerDocumentation
         ]
     )]
     public function delete(Request $request, $id) {}
+
+    #[OA\Put(
+        path: "/api/containers/update-capacity/{id}",
+        tags: ["Contenedores"],
+        summary: "Actualizar capacidad de un contenedor",
+        security: [["bearerAuth" => []]],
+        description: "Actualiza los valores de capacidad de un contenedor por su ID. Solo se actualizan los sensores que se envían en la solicitud.",
+        parameters: [
+            new OA\Parameter(
+                name: "id",
+                description: "ID del contenedor a actualizar",
+                in: "path",
+                required: true,
+                schema: new OA\Schema(type: "integer", example: 1)
+            ),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["capacity"],
+                properties: [
+                    new OA\Property(
+                        property: "capacity",
+                        type: "object",
+                        description: "Objeto con valores de sensores. Solo se actualizan los sensores que se envían",
+                        properties: [
+                            new OA\Property(property: "sensor1", type: "integer", example: 45, description: "Valor del sensor 1"),
+                            new OA\Property(property: "sensor2", type: "integer", example: 78, description: "Valor del sensor 2"),
+                            new OA\Property(property: "sensor3", type: "integer", example: 23, description: "Valor del sensor 3"),
+                        ]
+                    ),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Capacidad del contenedor actualizada exitosamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Comercio actualizado exitosamente."),
+                        new OA\Property(property: "data", ref: "#/components/schemas/Container"),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: "Contenedor no encontrado",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Comercio seleccionado no existe."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 404),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: "Error de validación",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al actualizar el comercio."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(
+                            property: "errors",
+                            properties: [
+                                new OA\Property(
+                                    property: "capacity",
+                                    type: "array",
+                                    items: new OA\Items(type: "string", example: "The capacity field is required.")
+                                ),
+                            ]
+                        ),
+                        new OA\Property(property: "status", type: "integer", example: 422),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado al actualizar la capacidad",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Error al actualizar el comercio."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function updateCapacity(Request $request, int $id) {}
 }

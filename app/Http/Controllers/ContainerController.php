@@ -63,8 +63,6 @@ class ContainerController extends Controller
                 'name' => 'required|string|max:255',
                 'serial_number' => 'required|string|max:255',
                 'location' => 'required|string|max:255',
-                'latitude' => 'nullable|numeric',
-                'longitude' => 'nullable|numeric',
                 'status' => 'required|boolean',
             ]);
 
@@ -85,8 +83,6 @@ class ContainerController extends Controller
                 'name' => 'required|string|max:255',
                 'serial_number' => 'required|string|max:255',
                 'location' => 'required|string|max:255',
-                'latitude' => 'nullable|numeric',
-                'longitude' => 'nullable|numeric',
                 'status' => 'required|boolean',
             ]);
 
@@ -141,35 +137,40 @@ class ContainerController extends Controller
             return $this->apiResponse(false, 'Error al obtener el catalogo.', null, $e->getMessage(), 500);
         }
     }
+    
+    public function updateCapacity(Request $request, int $id)
+    {
+        try {
 
-    // public function catalog(Request $request) 
-    // {
-    //     try {
-    //         $validatedData = $request->validate([
-    //             'status' => 'nullable|string',
-    //             'limit' => 'nullable|integer',
-    //         ]);
+            // hacemos merge del id
+            $request->merge(['container_id' => $id]);
 
-    //         $status = null;
-    //         if ($validatedData['status'] != null && in_array($validatedData['status'], ['0', '1', 'true', 'false'])) {
-    //             $status = $validatedData['status'] === 'true' || $validatedData['status'] === '1';
-    //         }
+            $validatedData = $request->validate([
+                'container_id' => 'required|exists:containers,id',
+                'capacity' => 'required|array',
+            ]);
 
-    //         $alliances = Container::select('id', 'name', 'location', 'capacity');
+            $container = Container::find($validatedData['container_id']);
 
-    //         if ($status != null) {
-    //             $alliances->where('status', $status);
-    //         }
+            if (!$container) {
+                return $this->apiResponse(false, 'Comercio seleccionado no existe.', null, null, 404);
+            }
 
-    //         if ($validatedData['limit'] != null) {
-    //             $alliances->limit($validatedData['limit']);
-    //         }
+            // obtenemos la capacidad del contenedor
+            $capacityContainer = $container->capacity;
 
-    //         $alliances = $alliances->get();
+            // actualizamos solo los sensores que vienen en el request
+            if (isset($validatedData['capacity']['sensor1'])) $capacityContainer['sensor1'] = $validatedData['capacity']['sensor1'];
+            if (isset($validatedData['capacity']['sensor2'])) $capacityContainer['sensor2'] = $validatedData['capacity']['sensor2'];
+            if (isset($validatedData['capacity']['sensor3'])) $capacityContainer['sensor3'] = $validatedData['capacity']['sensor3'];
 
-    //         return $this->apiResponse(true, 'Catalogo obtenido exitosamente.', $alliances, null, 200);
-    //     } catch (\Exception $e) {
-    //         return $this->apiResponse(false, 'Error al obtener el catalogo.', null, $e->getMessage(), 500);
-    //     }
-    // }
+            $container->update(['capacity' => $capacityContainer]);
+
+            return $this->apiResponse(true, 'Comercio actualizado exitosamente.', $container, null, 200);
+        } catch (ValidationException $e) {
+            return $this->apiResponse(false, 'Error al actualizar el comercio.', null, $e->errors(), 422);
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al actualizar el comercio.', null, $e->getMessage(), 500);
+        }
+    }
 }

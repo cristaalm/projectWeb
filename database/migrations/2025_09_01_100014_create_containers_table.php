@@ -13,10 +13,8 @@ return new class extends Migration
             $table->string('name', 100);
             $table->string('serial_number', 100)->unique();
             $table->string('location', 255);
-            $table->decimal('latitude', 10, 8)->nullable();
-            $table->decimal('longitude', 11, 8)->nullable();
-            $table->integer('capacity')->default(0);
-            $table->tinyInteger('status')->default(1); // 1: activo, 0: inactivo
+            $table->json('capacity')->nullable()->default('{"sensor1":0,"sensor2":0,"sensor3":0}');
+            $table->tinyInteger('status')->default(1);
             $table->timestamps();
         });
     }

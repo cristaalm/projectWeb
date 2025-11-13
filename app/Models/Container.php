@@ -17,16 +17,12 @@ class Container extends Model
         'name',
         'serial_number',
         'location',
-        'latitude',
-        'longitude',
         'capacity',
         'status',
     ];
 
     protected $casts = [
-        'latitude' => 'decimal:8',
-        'longitude' => 'decimal:8',
-        'capacity' => 'integer',
+        'capacity' => 'array',
         'status' => ContainerStatus::class,
     ];
 

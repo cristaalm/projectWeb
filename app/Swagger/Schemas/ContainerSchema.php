@@ -19,12 +19,13 @@ class ContainerSchema
     #[OA\Property(property: "location", type: "string", example: "Bogotá")]
     public string $location;
 
-    #[OA\Property(property: "latitude", type: "string", example: "4.609711")]
-    public string $latitude;
-
-    #[OA\Property(property: "longitude", type: "string", example: "-74.085772")]
-    public string $longitude;
-
+    #[OA\Property(property: "capacity", type: "object", example: '{
+        "sensor1": 45,
+        "sensor2": 78,
+        "sensor3": 23
+    }')]
+    public object $capacity;
+    
     #[OA\Property(property: "status", type: "integer", example: 1, description: "1 = Activo, 0 = Inactivo")]
     public int $status;
 

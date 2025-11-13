@@ -5036,6 +5036,206 @@
                 ]
             }
         },
+        "/api/containers/update-capacity/{id}": {
+            "put": {
+                "tags": [
+                    "Contenedores"
+                ],
+                "summary": "Actualizar capacidad de un contenedor",
+                "description": "Actualiza los valores de capacidad de un contenedor por su ID. Solo se actualizan los sensores que se envían en la solicitud.",
+                "operationId": "0341a940a11d217791447723f5a3b0b5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del contenedor a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "capacity"
+                                ],
+                                "properties": {
+                                    "capacity": {
+                                        "description": "Objeto con valores de sensores. Solo se actualizan los sensores que se envían",
+                                        "properties": {
+                                            "sensor1": {
+                                                "description": "Valor del sensor 1",
+                                                "type": "integer",
+                                                "example": 45
+                                            },
+                                            "sensor2": {
+                                                "description": "Valor del sensor 2",
+                                                "type": "integer",
+                                                "example": 78
+                                            },
+                                            "sensor3": {
+                                                "description": "Valor del sensor 3",
+                                                "type": "integer",
+                                                "example": 23
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Capacidad del contenedor actualizada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Comercio actualizado exitosamente."
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Container"
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Contenedor no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Comercio seleccionado no existe."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al actualizar el comercio."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "capacity": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The capacity field is required."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado al actualizar la capacidad",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al actualizar el comercio."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/dash/getStats": {
             "get": {
                 "tags": [
@@ -11798,13 +11998,9 @@
                         "type": "string",
                         "example": "Bogotá"
                     },
-                    "latitude": {
-                        "type": "string",
-                        "example": "4.609711"
-                    },
-                    "longitude": {
-                        "type": "string",
-                        "example": "-74.085772"
+                    "capacity": {
+                        "type": "object",
+                        "example": "{\n        \"sensor1\": 45,\n        \"sensor2\": 78,\n        \"sensor3\": 23\n    }"
                     },
                     "status": {
                         "description": "1 = Activo, 0 = Inactivo",

@@ -28,28 +28,67 @@ const {
       <span class="text-sm text-gray-500 dark:text-gray-300">Monitoreo de contenedores</span>
     </div>
 
+    <!-- HEADERS -->
+    <div class="grid grid-cols-12 gap-2 mt-4 border-b border-gray-200 dark:border-gray-700 pb-2">
+      <div class="col-span-4 text-xs font-semibold text-gray-500 dark:text-gray-300">
+        Contenedor
+      </div>
+      <div class="col-span-2 text-xs font-semibold text-center text-gray-500 dark:text-gray-300">
+        Plastico
+      </div>
+      <div class="col-span-2 text-xs font-semibold text-center text-gray-500 dark:text-gray-300">
+        Aluminio
+      </div>
+      <div class="col-span-2 text-xs font-semibold text-center text-gray-500 dark:text-gray-300">
+        Otros
+      </div>
+      <div class="col-span-2 text-xs font-semibold text-center text-gray-500 dark:text-gray-300">
+        Estado
+      </div>
+    </div>
+
     <!-- MAIN -->
-    <div class="flex flex-col items-start gap-3 mt-4">
+    <div class="flex flex-col items-start gap-3 mt-2">
       <template v-if="!loading && containers.length > 0">
         <template
           v-for="item in containers"
           :key="item.id"
         >
-          <div class="flex flex-row items-center justify-between gap-2 w-full">
-            <div class="w-1/2 overflow-hidden truncate text-nowrap">
+          <div class="grid grid-cols-12 gap-2 w-full items-center">
+            <div class="col-span-4 overflow-hidden truncate text-nowrap">
               {{ item.name }}
             </div>
-            <div class="w-1/2 flex flex-row items-center justify-end gap-2">
+            <div class="col-span-2 flex justify-center">
               <VChip
-                :color="item.capacity > 80 ? 'error' : item.capacity > 50 ? 'warning' : 'success'"
+                :color="item.capacity.sensor1 > 80 ? 'error' : item.capacity.sensor1 > 50 ? 'warning' : 'success'"
                 variant="text"
-                size="small"
+                size="x-small"
               >
-                {{ item.capacity }}%
+                {{ item.capacity.sensor1 }}%
               </VChip>
+            </div>
+            <div class="col-span-2 flex justify-center">
+              <VChip
+                :color="item.capacity.sensor3 > 80 ? 'error' : item.capacity.sensor3 > 50 ? 'warning' : 'success'"
+                variant="text"
+                size="x-small"
+              >
+                {{ item.capacity.sensor3 }}%
+              </VChip>
+            </div>
+            <div class="col-span-2 flex justify-center">
+              <VChip
+                :color="item.capacity.sensor2 > 80 ? 'error' : item.capacity.sensor2 > 50 ? 'warning' : 'success'"
+                variant="text"
+                size="x-small"
+              >
+                {{ item.capacity.sensor2 }}%
+              </VChip>
+            </div>
+            <div class="col-span-2 flex justify-center">
               <VChip
                 :color="item.status ? 'success' : 'error'"
-                size="small"
+                size="x-small"
               >
                 {{ item.status ? 'Activo' : 'Inactivo' }}
               </VChip>
@@ -57,24 +96,42 @@ const {
           </div>
         </template>
       </template>
+      
       <template v-if="loading">
-        <div class="flex flex-row items-center justify-between gap-2 w-full">
-          <div class="w-1/2">
+        <div class="grid grid-cols-12 gap-2 w-full">
+          <div class="col-span-4">
             <VSkeletonLoader
-              type="list-item@5"
-              class="w-full"
+              type="text"
+              class="[&_div.v-skeleton-loader\_\_text]:h-4"
             />
           </div>
-          <div class="w-1/2 flex flex-col gap-2 justify-center items-end">
+          <div class="col-span-2 flex justify-center">
             <VSkeletonLoader
-              v-for="item in 5"
-              :key="item"
-              type="button"
-              class="w-[70px] [&_div.v-skeleton-loader\_\_button]:m-[0px!important]"
+              type="chip"
+              class="[&_div.v-skeleton-loader\_\_chip]:m-[0px!important]"
+            />
+          </div>
+          <div class="col-span-2 flex justify-center">
+            <VSkeletonLoader
+              type="chip"
+              class="[&_div.v-skeleton-loader\_\_chip]:m-[0px!important]"
+            />
+          </div>
+          <div class="col-span-2 flex justify-center">
+            <VSkeletonLoader
+              type="chip"
+              class="[&_div.v-skeleton-loader\_\_chip]:m-[0px!important]"
+            />
+          </div>
+          <div class="col-span-2 flex justify-center">
+            <VSkeletonLoader
+              type="chip"
+              class="[&_div.v-skeleton-loader\_\_chip]:m-[0px!important]"
             />
           </div>
         </div>
       </template>
+      
       <template v-if="!loading && containers.length === 0">
         <span class="w-full h-[100px] text-2xl text-center text-gray-500 dark:text-gray-300">
           No hay contenedores
