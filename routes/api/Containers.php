@@ -9,7 +9,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('catalog', [ContainerController::class, 'catalog']);
         
         Route::post('create', [ContainerController::class, 'create']);
-        Route::post('updateCapacity/{id}', [ContainerController::class, 'updateCapacity']);
+        Route::post('update-capacity/{id}', [ContainerController::class, 'updateCapacity']);
 
         Route::put('update/{id}', [ContainerController::class, 'update']);
         
