@@ -20,7 +20,7 @@ const avatarImg = computed(() => {
 <template>
   <div class="relative">
     <VAvatar
-      class="cursor-pointer !bg-primary/50"
+      class="cursor-pointer"
       variant="tonal"
     >
       <VImg :src="avatarImg" />
@@ -47,10 +47,7 @@ const avatarImg = computed(() => {
                   offset-y="3"
                   color="success"
                 >
-                  <VAvatar
-                    color="primary"
-                    variant="tonal"
-                  >
+                  <VAvatar variant="tonal">
                     <VImg :src="avatarImg" />
                   </VAvatar>
                 </VBadge>

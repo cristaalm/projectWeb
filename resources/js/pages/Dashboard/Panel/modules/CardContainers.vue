@@ -21,29 +21,29 @@ const {
           icon="mdi mdi-map-marker-radius-outline"
           size="32"
         />
-        <h2 class="text-lg font-bold">
+        <h2 class="text-lg font-bold truncate max-w-[200px]">
           Estado de contenedores
         </h2>
       </div>
-      <span class="text-sm text-gray-500 dark:text-gray-300">Monitoreo de contenedores</span>
+      <span class="text-sm text-gray-500 dark:text-gray-300 truncate max-w-[250px]">Monitoreo de contenedores</span>
     </div>
 
     <!-- HEADERS -->
     <div class="grid grid-cols-12 gap-2 mt-4 border-b border-gray-200 dark:border-gray-700 pb-2">
-      <div class="col-span-4 text-xs font-semibold text-gray-500 dark:text-gray-300">
-        Contenedor
+      <div class="col-span-4 text-xs font-semibold text-gray-500 dark:text-gray-300 truncate">
+        <span class="block">Contenedor</span>
       </div>
-      <div class="col-span-2 text-xs font-semibold text-center text-gray-500 dark:text-gray-300">
-        Plastico
+      <div class="col-span-2 text-xs font-semibold text-center text-gray-500 dark:text-gray-300 truncate">
+        <span class="block">Plástico</span>
       </div>
-      <div class="col-span-2 text-xs font-semibold text-center text-gray-500 dark:text-gray-300">
-        Aluminio
+      <div class="col-span-2 text-xs font-semibold text-center text-gray-500 dark:text-gray-300 truncate">
+        <span class="block">Aluminio</span>
       </div>
-      <div class="col-span-2 text-xs font-semibold text-center text-gray-500 dark:text-gray-300">
-        Otros
+      <div class="col-span-2 text-xs font-semibold text-center text-gray-500 dark:text-gray-300 truncate">
+        <span class="block">No Reciclable</span>
       </div>
-      <div class="col-span-2 text-xs font-semibold text-center text-gray-500 dark:text-gray-300">
-        Estado
+      <div class="col-span-2 text-xs font-semibold text-center text-gray-500 dark:text-gray-300 truncate">
+        <span class="block">Estado</span>
       </div>
     </div>
 

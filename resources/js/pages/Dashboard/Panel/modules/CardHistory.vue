@@ -42,8 +42,8 @@ const {
           v-for="item in history"
           :key="item.id"
         >
-          <div class="flex flex-row items-center justify-between gap-2 w-full">
-            <div class="flex flex-row items-center gap-2 w-1/2">
+          <div class="flex flex-row items-center gap-2 w-full">
+            <div class="flex flex-row items-center gap-2 flex-1 min-w-0">
               <VIcon
                 size="24"
                 color="success"
@@ -51,7 +51,7 @@ const {
                 icon="mdi mdi-gift-outline"
               />
               <div class="flex flex-col">
-                <span class="font-bold truncate max-w-[200px]">
+                <span class="font-bold truncate">
                   {{ item.reward.name }}
                 </span>
                 <span class="text-sm text-gray-500 dark:text-gray-300">
