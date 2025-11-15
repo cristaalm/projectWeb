@@ -42,6 +42,9 @@ const scrollToSection = sectionId => {
                 class="text-lg px-8 font-poppins"
                 prepend-icon="mdi mdi-cellphone"
                 append-icon="mdi mdi-arrow-right"
+                role="a"
+                href="https://bit.ly/renova-app"
+                target="_blank"
               >
                 Descargar App
               </VBtn>
@@ -96,26 +99,12 @@ const scrollToSection = sectionId => {
           cols="12"
           lg="6"
         >
-          <div class="position-relative">
-            <VSheet
-              class="position-relative aspect-square rounded-xl pa-8 backdrop-blur"
-              style="background: linear-gradient(135deg, rgba(5, 209, 110, 0.2), rgba(2, 70, 83, 0.2))"
-            >
-              <div
-                class="position-absolute inset-0 rounded-xl"
-                style="background: linear-gradient(135deg, rgba(5, 209, 110, 0.1), transparent)"
-              />
-              <VImg
-                src="/images/logo.png"
-                alt="Contenedor inteligente Renova"
-                class="position-relative z-10 w-full h-full object-contain drop-shadow-2xl"
-              />
-              <VTooltip activator="parent">
-                <span>Imagen temporal :)</span>
-              </VTooltip>
-            </VSheet>
-            <div class="position-absolute blur-circle blur-circle-1" />
-            <div class="position-absolute blur-circle blur-circle-2" />
+          <div class="relative">
+            <VImg
+              src="/images/contenedor.png"
+              alt="Contenedor inteligente Renova"
+              class="relative z-10 w-full h-full object-contain drop-shadow-2xl"
+            />
           </div>
         </VCol>
       </VRow>

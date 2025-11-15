@@ -20,6 +20,9 @@
               class="text-lg px-8 font-poppins"
               prepend-icon="mdi mdi-cellphone"
               append-icon="mdi mdi-arrow-right"
+              role="a"
+              href="https://bit.ly/renova-app"
+              target="_blank"
             >
               Descargar App Gratis
             </VBtn>

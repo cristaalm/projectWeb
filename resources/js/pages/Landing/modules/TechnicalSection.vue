@@ -124,7 +124,7 @@ const technologies = [
   {
     icon: 'mdi mdi-cellphone',
     title: 'App Móvil Nativa',
-    description: 'Desarrollada en Android Studio con Java. Interfaz intuitiva diseñada en Figma.',
+    description: 'Desarrollada en Android Studio. Interfaz intuitiva diseñada en Figma.',
   },
   {
     icon: 'mdi mdi-cloud',
@@ -139,7 +139,7 @@ const technologies = [
   {
     icon: 'mdi mdi-lightning-bolt',
     title: 'Validación Rápida',
-    description: 'Clasificación de materiales en ≤5 segundos por depósito con alta precisión.',
+    description: 'Clasificación de materiales en ≤10 segundos por depósito con alta precisión.',
   },
   {
     icon: 'mdi mdi-shield-check',
@@ -151,7 +151,7 @@ const technologies = [
 const architecture = [
   {
     title: 'Aplicación Móvil (Ciudadano y Comerciante)',
-    description: 'Desarrollada en Android Studio con Java. Permite registro mediante INE y selfie, generación de código QR único, visualización de puntos e historial, y exploración de negocios aliados. Los comerciantes pueden escanear QR para validar canjes.',
+    description: 'Desarrollada en Android Studio. Permite registro mediante INE y selfie, generación de código QR único, visualización de puntos e historial, y exploración de negocios aliados. Los comerciantes pueden escanear QR para validar canjes.',
   },
   {
     title: 'Panel Web Administrativo',
@@ -174,7 +174,7 @@ const differentiators = [
   },
   {
     label: 'Validación rápida',
-    description: '≤5 segundos por depósito',
+    description: '≤10 segundos por depósito',
   },
   {
     label: 'Ecosistema completo',

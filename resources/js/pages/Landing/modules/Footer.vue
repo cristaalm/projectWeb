@@ -34,7 +34,7 @@ const emit = defineEmits(['open-view-terms-modal'])
           <h3 class="font-weight-bold mb-4 text-white">Redes Sociales</h3>
           <ul class="footer-links">
             <li><a href="#">Facebook</a></li>
-            <li><a href="#">Instagram</a></li>
+            <li><a href="https://www.instagram.com/renova.innovation?igsh=czRkcHRpc3I1OGJs" target="_blank">Instagram</a></li>
           </ul>
         </VCol>
 

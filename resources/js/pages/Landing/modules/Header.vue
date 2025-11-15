@@ -96,6 +96,9 @@ onMounted(() => {
         class="text-primary-foreground font-poppins"
         prepend-icon="mdi-cellphone"
         @click="drawer = false"
+        role="a"
+        href="https://bit.ly/renova-app"
+        target="_blank"
       >
         Descargar App
       </VBtn>
@@ -171,6 +174,9 @@ onMounted(() => {
           class="text-primary-foreground d-none d-md-flex font-poppins"
           prepend-icon="mdi mdi-cellphone"
           @click="drawer = false"
+          role="a"
+          href="https://bit.ly/renova-app"
+          target="_blank"
         >
           Descargar App
         </VBtn>

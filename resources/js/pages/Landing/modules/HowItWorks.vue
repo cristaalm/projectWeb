@@ -9,7 +9,7 @@
           Tan fácil y rápido, en 3 pasos
         </h2>
         <p class="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty font-poppins">
-          Reciclar nunca fue tan simple. Sólo necesitas tu smartphone y ganas de hacer la diferencia.
+          Reciclar nunca fue tan simple. Sólo necesitas tu teléfono y ganas de hacer la diferencia.
         </p>
       </div>
       <VRow>
