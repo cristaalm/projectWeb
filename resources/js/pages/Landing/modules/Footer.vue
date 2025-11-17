@@ -6,59 +6,137 @@ const emit = defineEmits(['open-view-terms-modal'])
   <VFooter class="!bg-[#00464B] !text-slate-200 py-12 px-4">
     <VContainer class="max-w-7xl">
       <VRow class="mb-8">
-        <VCol cols="12" md="3">
+        <VCol
+          cols="12"
+          md="3"
+        >
           <div class="space-y-4">
             <div class="d-flex align-center gap-2">
               <div class="w-8 h-8 bg-[#00464B] rounded-lg d-flex align-center justify-center">
-                <img src="/images/logo.png" alt="Logo" />
+                <img
+                  src="/images/logo.png"
+                  alt="Logo"
+                >
               </div>
-              <span class="text-h5 font-weight-bold text-white">RENOVA</span>
+              <span class="text-h5 font-weight-bold text-white font-poppins">RENOVA</span>
             </div>
-            <p class="text-sm leading-relaxed" style="opacity: 0.8">
+            <p
+              class="text-sm leading-relaxed font-poppins"
+              style="opacity: 0.8"
+            >
               Transformando el reciclaje en México mediante tecnología inteligente y recompensas.
             </p>
           </div>
         </VCol>
 
-        <VCol cols="12" md="3">
-          <h3 class="font-weight-bold mb-4 text-white">Producto</h3>
-          <ul class="footer-links">
-            <li><a href="#como-funciona">Cómo Funciona</a></li>
-            <li><a href="#beneficios">Beneficios</a></li>
-            <li><a href="#impacto">Impacto</a></li>
-            <li><a href="#tecnico">Tecnología</a></li>
+        <VCol
+          cols="12"
+          md="3"
+        >
+          <h3 class="font-weight-bold mb-4 text-white font-poppins">
+            Producto
+          </h3>
+          <ul class="footer-links font-poppins">
+            <li>
+              <a
+                href="#como-funciona"
+                class="font-poppins"
+              >Cómo Funciona</a>
+            </li>
+            <li>
+              <a
+                href="#beneficios"
+                class="font-poppins"
+              >Beneficios</a>
+            </li>
+            <li>
+              <a
+                href="#impacto"
+                class="font-poppins"
+              >Impacto</a>
+            </li>
+            <li>
+              <a
+                href="#tecnico"
+                class="font-poppins"
+              >Tecnología</a>
+            </li>
           </ul>
         </VCol>
 
-        <VCol cols="12" md="3">
-          <h3 class="font-weight-bold mb-4 text-white">Redes Sociales</h3>
-          <ul class="footer-links">
-            <li><a href="#">Facebook</a></li>
-            <li><a href="https://www.instagram.com/renova.innovation?igsh=czRkcHRpc3I1OGJs" target="_blank">Instagram</a></li>
+        <VCol
+          cols="12"
+          md="3"
+        >
+          <h3 class="font-weight-bold mb-4 text-white font-poppins">
+            Redes Sociales
+          </h3>
+          <ul class="footer-links font-poppins">
+            <li>
+              <a
+                href="https://www.facebook.com/share/1AduhKGkXr/"
+                rel="noopener noreferrer"
+                target="_blank"
+                class=" font-poppins"
+              >Facebook</a>
+            </li>
+            <li>
+              <a
+                href="https://www.instagram.com/renova.innovation?igsh=czRkcHRpc3I1OGJs"
+                rel="noopener noreferrer"
+                target="_blank"
+                class=" font-poppins"
+              >Instagram</a>
+            </li>
           </ul>
         </VCol>
 
-        <VCol cols="12" md="3">
-          <h3 class="font-weight-bold mb-4 text-white">Contacto</h3>
-          <ul class="footer-contact">
+        <VCol
+          cols="12"
+          md="3"
+        >
+          <h3 class="font-weight-bold mb-4 text-white font-poppins">
+            Contacto
+          </h3>
+          <ul class="footer-contact font-poppins">
             <li class="d-flex align-start gap-2">
-              <VIcon size="16" class="mt-1">mdi-email</VIcon>
-              <span>soyrenovaapp@gmail.com</span>
+              <VIcon
+                size="16"
+                class="mt-1"
+                icon="mdi mdi-email"
+              />
+              <span class=" font-poppins">soyrenovaapp@gmail.com</span>
             </li>
             <li class="d-flex align-start gap-2">
-              <VIcon size="16" class="mt-1">mdi-map-marker</VIcon>
-              <span>Manzanillo, Colima, México.</span>
+              <VIcon
+                size="16"
+                class="mt-1"
+                icon="mdi mdi-map-marker"
+              />
+              <span class=" font-poppins">Manzanillo, Colima, México.</span>
             </li>
           </ul>
         </VCol>
       </VRow>
 
-      <VDivider class="mb-8" style="opacity: 0.2" />
+      <VDivider
+        class="mb-8"
+        style="opacity: 0.2"
+      />
 
-      <div class="d-flex flex-column flex-md-row justify-space-between align-center gap-4 text-sm" style="opacity: 0.8">
-        <p>&copy; {{ new Date().getFullYear() }} Renova. Todos los derechos reservados.</p>
+      <div
+        class="d-flex flex-column flex-md-row justify-space-between align-center gap-4 text-sm"
+        style="opacity: 0.8"
+      >
+        <p class=" font-poppins">
+          &copy; {{ new Date().getFullYear() }} Renova. Todos los derechos reservados.
+        </p>
         <div class="d-flex gap-6">
-          <a href="#" class="footer-link" @click="emit('open-view-terms-modal')">Condiciones y términos de uso</a>
+          <a
+            href="#"
+            class="footer-link font-poppins"
+            @click="emit('open-view-terms-modal')"
+          >Condiciones y términos de uso</a>
         </div>
       </div>
     </VContainer>

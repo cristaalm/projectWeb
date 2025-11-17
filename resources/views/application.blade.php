@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="custom_scroll">
 
 <head>
   <meta charset="UTF-8" />

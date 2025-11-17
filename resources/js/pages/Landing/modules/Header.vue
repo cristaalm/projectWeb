@@ -2,6 +2,23 @@
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/store/auth'
 import { useRouter } from 'vue-router'
+import { useDialogStore } from '@/store/useAlertDialogStorage'
+
+const handleDownloadApp = async () => {
+  const dialogStore = useDialogStore()
+
+  const result = await dialogStore.showDialog({
+    title: 'Descargar App Renova',
+    text: '¿Deseas descargar la app?, si continuas se descargara un archivo apk',
+    type: 'confirm',
+    confirmText: 'Descargar',
+    cancelText: 'Cancelar',
+  })
+
+  if (result) {
+    window.open('https://bit.ly/renova-app', '_blank')
+  }
+}
 
 const drawer = ref(false)
 const authStore = useAuthStore()
@@ -95,10 +112,7 @@ onMounted(() => {
         variant="flat"
         class="text-primary-foreground font-poppins"
         prepend-icon="mdi-cellphone"
-        @click="drawer = false"
-        role="a"
-        href="https://bit.ly/renova-app"
-        target="_blank"
+        @click="handleDownloadApp"
       >
         Descargar App
       </VBtn>
@@ -116,14 +130,16 @@ onMounted(() => {
         href="/"
         class="d-flex align-center gap-2 text-decoration-none"
       >
-        <VSheet class="w-8 h-8 bg-white rounded-lg d-flex align-center justify-center">
+        <!--
+          <VSheet class="w-8 h-8 bg-white rounded-lg d-flex align-center justify-center">
           <img
-            src="/images/logo.png"
-            alt="Logo"
-            class="w-full h-full object-contain"
+          src="/images/logo.png"
+          alt="Logo"
+          class="w-full h-full object-contain"
           >
-        </VSheet>
-        <span class="text-h5 font-weight-bold tracking-tight text-foreground font-poppins">RENOVA</span>
+          </VSheet> 
+        -->
+        <span class="text-3xl font-weight-bold tracking-tight text-[#05d16e] text-foreground font-poppins">RENOVA</span>
       </a>
 
       <!-- Menú de escritorio -->
@@ -173,10 +189,7 @@ onMounted(() => {
           variant="flat"
           class="text-primary-foreground d-none d-md-flex font-poppins"
           prepend-icon="mdi mdi-cellphone"
-          @click="drawer = false"
-          role="a"
-          href="https://bit.ly/renova-app"
-          target="_blank"
+          @click="handleDownloadApp"
         >
           Descargar App
         </VBtn>

@@ -1,3 +1,23 @@
+<script setup>
+import { useDialogStore } from '@/store/useAlertDialogStorage'
+
+const handleDownloadApp = async () => {
+  const dialogStore = useDialogStore()
+
+  const result = await dialogStore.showDialog({
+    title: 'Descargar App Renova',
+    text: '¿Deseas descargar la app?, si continuas se descargara un archivo apk',
+    type: 'confirm',
+    confirmText: 'Descargar',
+    cancelText: 'Cancelar',
+  })
+
+  if (result) {
+    window.open('https://bit.ly/renova-app', '_blank')
+  }
+}
+</script>
+
 <template>
   <section class="py-20 px-4">
     <VContainer class="max-w-5xl">
@@ -20,9 +40,7 @@
               class="text-lg px-8 font-poppins"
               prepend-icon="mdi mdi-cellphone"
               append-icon="mdi mdi-arrow-right"
-              role="a"
-              href="https://bit.ly/renova-app"
-              target="_blank"
+              @click="handleDownloadApp"
             >
               Descargar App Gratis
             </VBtn>

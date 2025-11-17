@@ -25,7 +25,7 @@ watch(isOpen, val => {
     max-width="800px"
   >
     <VCard class="overflow-hidden p-2">
-      <VCardTitle class="text-xl font-semibold !flex !flex-row !justify-between !items-center">
+      <VCardTitle class="text-xl font-semibold !flex !flex-row !justify-between !items-center !font-poppins">
         Condiciones y términos de uso
         <div class="!flex !items-center !gap-2">
           <VBtn
