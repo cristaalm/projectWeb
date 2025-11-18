@@ -26,7 +26,10 @@ const scrollToSection = sectionId => {
 </script>
 
 <template>
-  <section class="pt-8 pb-20 px-4">
+  <section
+    id="hero"
+    class="pt-8 pb-20 px-4"
+  >
     <VContainer class="max-w-7xl">
       <VRow class="align-center">
         <VCol

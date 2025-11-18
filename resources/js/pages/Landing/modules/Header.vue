@@ -25,24 +25,35 @@ const authStore = useAuthStore()
 const router = useRouter()
 
 onMounted(() => {
+  // Captura todos los enlaces de anclaje
   document.addEventListener('click', event => {
-    const target = event.target
-    if (target.tagName === 'A' && target.getAttribute('href')?.startsWith('#')) {
-      event.preventDefault()
+    let target = event.target
 
-      const id = target.getAttribute('href').slice(1)
-      const element = document.getElementById(id)
+    // Si el clic fue en un enlace de anclaje (href="#...")
+    while (target && target.tagName !== 'A') {
+      target = target.parentElement
+    }
 
-      if (element) {
-        const offsetTop = element.offsetTop - 64 // altura del header
-        
-        window.scrollTo({
-          top: offsetTop,
-          behavior: 'smooth',
-        })
-        
-        // Cierra el drawer si está abierto (en móvil)
-        drawer.value = false
+    if (target && target.tagName === 'A') {
+      const href = target.getAttribute('href')
+
+      if (href && href.startsWith('#')) {
+        event.preventDefault()
+
+        const id = href.slice(1)
+        const element = document.getElementById(id)
+
+        if (element) {
+          const offsetTop = element.offsetTop - 64 // altura del header
+
+          window.scrollTo({
+            top: offsetTop,
+            behavior: 'smooth',
+          })
+
+          // Cierra el drawer si está abierto (en móvil)
+          drawer.value = false
+        }
       }
     }
   })
@@ -58,7 +69,7 @@ onMounted(() => {
     class="bg-background border-l border-border"
   >
     <a
-      href="/"
+      href="#hero"
       class="flex items-center justify-center gap-2 w-full py-4"
     >
       <VSheet class="w-8 h-8 bg-white rounded-lg d-flex align-center justify-center">
@@ -68,7 +79,7 @@ onMounted(() => {
           class="w-full h-full object-contain"
         >
       </VSheet>
-      <span class="text-h5 font-weight-bold tracking-tight text-foreground font-poppins">RENOVA</span>
+      <span class="text-3xl font-weight-bold tracking-wider mt-1 font-stella">RENOVA</span>
     </a>
 
     <div class="pa-6 d-flex flex-column gap-6">
@@ -127,19 +138,19 @@ onMounted(() => {
     <VContainer class="d-flex align-center justify-space-between px-4">
       <!-- Logo -->
       <a
-        href="/"
+        href="#hero"
         class="d-flex align-center gap-2 text-decoration-none"
       >
-        <!--
-          <VSheet class="w-8 h-8 bg-white rounded-lg d-flex align-center justify-center">
+        
+        <VSheet class="w-8 h-8 bg-white rounded-lg d-flex align-center justify-center">
           <img
-          src="/images/logo.png"
-          alt="Logo"
-          class="w-full h-full object-contain"
+            src="/images/logo.png"
+            alt="Logo"
+            class="w-full h-full object-contain"
           >
-          </VSheet> 
-        -->
-        <span class="text-3xl font-weight-bold tracking-tight text-[#05d16e] text-foreground font-poppins">RENOVA</span>
+        </VSheet> 
+       
+        <span class="text-3xl font-bold tracking-wider mt-1 font-stella">RENOVA</span>
       </a>
 
       <!-- Menú de escritorio -->

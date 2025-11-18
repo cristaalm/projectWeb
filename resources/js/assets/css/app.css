@@ -50,6 +50,21 @@
 |--------------------------------------------------------------------------
 */
 
+@font-face {
+  font-family: 'Stella';
+
+  font-weight: 100;
+
+  font-display: swap;
+
+  src: url('/fonts/Stella.ttf') format('truetype');
+}
+
+.font-stella {
+  font-family: 'Stella';
+  letter-spacing: 1px;
+}
+
 .zoom-img-wrap {
   z-index: 2500 !important;
 }
