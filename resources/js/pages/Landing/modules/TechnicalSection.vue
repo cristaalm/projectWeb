@@ -5,7 +5,7 @@
   >
     <VContainer class="max-w-7xl">
       <div class="text-center mb-12 space-y-4">
-        <h2 class="text-4xl md:text-5xl font-weight-bold text-balance font-poppins">
+        <h2 class="text-4xl md:text-5xl font-bold text-balance font-poppins">
           Tecnología de vanguardia
         </h2>
         <p class="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty font-poppins">
@@ -13,99 +13,182 @@
         </p>
       </div>
 
-      <div class="text-center mb-8">
-        <VBtn
-          size="large"
-          variant="outlined"
-          append-icon="mdi mdi-chevron-down"
-          :class="{ 'rotate-icon': isExpanded }"
-          class="font-poppins"
-          @click="isExpanded = !isExpanded"
-        >
-          {{ isExpanded ? 'Ver menos detalles' : 'Ver detalles técnicos' }}
-        </VBtn>
+      <!-- Imágenes en columna vertical -->
+      <div class="flex flex-col md:flex-row items-center gap-8 mb-12">
+        <div class="relative">
+          <div
+            v-if="loadingScanner"
+            class="absolute inset-0 flex items-center justify-center bg-gray-200/50 rounded-lg"
+          >
+            <VProgressCircular
+              :size="40"
+              :width="3"
+              color="primary"
+              indeterminate
+            />
+          </div>
+          <img
+            :src="imageUrls.scanner"
+            alt="Escáner QR"
+            class="max-w-[350px] w-full object-contain"
+            @load="onImageLoad('scanner')"
+            @error="onImageError"
+          >
+        </div>
+        <div class="relative">
+          <div
+            v-if="loadingCamara"
+            class="absolute inset-0 flex items-center justify-center bg-gray-200/50 rounded-lg"
+          >
+            <VProgressCircular
+              :size="40"
+              :width="3"
+              color="primary"
+              indeterminate
+            />
+          </div>
+          <img
+            :src="imageUrls.camara"
+            alt="Cámara Raspberry Pi 4"
+            class="max-w-[350px] w-full object-contain"
+            @load="onImageLoad('camara')"
+            @error="onImageError"
+          >
+        </div>
+        <div class="relative">
+          <div
+            v-if="loadingRaspberry"
+            class="absolute inset-0 flex items-center justify-center bg-gray-200/50 rounded-lg"
+          >
+            <VProgressCircular
+              :size="40"
+              :width="3"
+              color="primary"
+              indeterminate
+            />
+          </div>
+          <img
+            :src="imageUrls.raspberry"
+            alt="Raspberry Pi 4"
+            class="max-w-[350px] w-full object-contain"
+            @load="onImageLoad('raspberry')"
+            @error="onImageError"
+          >
+        </div>
       </div>
 
-      <VExpandTransition>
-        <div
-          v-show="isExpanded"
-          class="space-y-8 font-poppins"
-        >
-          <VRow>
-            <VCol
-              v-for="(tech, index) in technologies"
-              :key="index"
-              cols="12"
-              md="6"
-              lg="4"
-            >
-              <VCard class="pa-6 hover-shadow">
-                <VSheet class="w-12 h-12 rounded-lg mb-4 d-flex align-center justify-center !bg-opacity-10 !bg-primary">
-                  <VIcon
-                    :icon="tech.icon"
-                    size="24"
-                    color="primary"
-                  />
-                </VSheet>
-                <h3 class="text-lg font-weight-bold mb-2">
-                  {{ tech.title }}
-                </h3>
-                <p class="text-sm text-muted-foreground leading-relaxed">
-                  {{ tech.description }}
-                </p>
-              </VCard>
-            </VCol>
-          </VRow>
-
-          <VCard class="pa-8">
-            <h3 class="text-h5 font-weight-bold mb-6">
-              Arquitectura del Sistema
-            </h3>
-            <div class="space-y-4">
-              <div
-                v-for="(arch, index) in architecture"
-                :key="index"
-              >
-                <h4 class="font-weight-semibold mb-2">
-                  {{ arch.title }}
-                </h4>
-                <p class="text-sm text-muted-foreground leading-relaxed">
-                  {{ arch.description }}
-                </p>
-              </div>
-            </div>
-          </VCard>
-
-          <VCard class="pa-8 differentiators-card">
-            <h3 class="text-h5 font-weight-bold mb-4">
-              Diferenciadores Clave
-            </h3>
-            <div class="space-y-3">
-              <div
-                v-for="(diff, index) in differentiators"
-                :key="index"
-                class="flex items-center w-full gap-1"
-              >
-                <div class="flex items-center gap-[2px]">
-                  <div class="flex items-center justify-center w-[18px] h-[18px] bg-primary rounded-full">
-                    <VIcon
-                      size="12"
-                      color="white"
-                    >
-                      mdi mdi-check
-                    </VIcon>
-                  </div>
-                  <div class="w-[12px] h-[12px] bg-primary rounded-full" />
-                  <div class="w-[8px] h-[8px] mt-[1px] bg-primary rounded-full" />
-                </div>
-                <span class="text-muted-foreground">
-                  <strong class="text-foreground">{{ diff.label }}:</strong> {{ diff.description }}
-                </span>
-              </div>
-            </div>
-          </VCard>
+      <!-- Nuevo apartado: Imagen + Tabla -->
+      <div class="flex flex-col md:flex-row gap-8 mb-12">
+        <!-- Imagen -->
+        <div class="w-full md:w-1/2 relative h-full">
+          <div
+            v-if="loadingNuevaImagen"
+            class="absolute inset-0 flex items-center justify-center bg-gray-200/50 rounded-lg z-10"
+          >
+            <VProgressCircular
+              :size="40"
+              :width="3"
+              color="primary"
+              indeterminate
+            />
+          </div>
+          <img
+            :src="imageUrls.nuevaImagen"
+            alt="Diagrama del sistema"
+            class="w-full h-full object-cover rounded-lg"
+            @load="onImageLoad('nuevaImagen')"
+            @error="onImageError"
+          >
         </div>
-      </VExpandTransition>
+
+        <!-- Tabla -->
+        <div class="w-full md:w-1/2">
+          <table class="w-full border-collapse">
+            <thead>
+              <tr>
+                <th class="border-b border-gray-300 p-3 text-start font-semibold font-poppins text-xl">
+                  Descripción del hardware
+                </th>
+                <th class="border-b border-gray-300 p-3 text-end font-semibold font-poppins text-xl">
+                  Contenedor Inteligente
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="border-b border-gray-300 p-3 text-start font-poppins">
+                  Material
+                </td>
+                <td class="border-b border-gray-300 p-3 text-end font-poppins">
+                  Melamina
+                </td>
+              </tr>
+              <tr>
+                <td class="border-b border-gray-300 p-3 text-start font-poppins">
+                  Cámara
+                </td>
+                <td class="border-b border-gray-300 p-3 text-end font-poppins">
+                  Full HD NoIR V2 
+                </td>
+              </tr>
+              <tr>
+                <td class="border-b border-gray-300 p-3 text-start font-poppins">
+                  Pantalla
+                </td>
+                <td class="border-b border-gray-300 p-3 text-end font-poppins">
+                  Display LCD 16x2
+                </td>
+              </tr>
+              <tr>
+                <td class="border-b border-gray-300 p-3 text-start font-poppins">
+                  Escáner
+                </td>
+                <td class="border-b border-gray-300 p-3 text-end font-poppins">
+                  Generico 1D y 2D/QR
+                </td>
+              </tr>
+              <tr>
+                <th class="border-b border-gray-300 p-3 text-start font-poppins font-semibold text-xl">
+                  Descripción del software
+                </th>
+                <th class="border-b border-gray-300 p-3 text-end font-poppins font-semibold text-xl" />
+              </tr>
+              <tr>
+                <td class="border-b border-gray-300 p-3 text-start font-poppins">
+                  IA
+                </td>
+                <td class="border-b border-gray-300 p-3 text-end font-poppins">
+                  GPT-4o para clasificación de materiales
+                </td>
+              </tr>
+              <tr>
+                <td class="border-b border-gray-300 p-3 text-start font-poppins">
+                  Servidor
+                </td>
+                <td class="border-b border-gray-300 p-3 text-end font-poppins">
+                  Render
+                </td>
+              </tr>
+              <tr>
+                <td class="border-b border-gray-300 p-3 text-start font-poppins">
+                  Base de datos
+                </td>
+                <td class="border-b border-gray-300 p-3 text-end font-poppins">
+                  PosgreSQL
+                </td>
+              </tr>
+              <tr>
+                <td class="border-b border-gray-300 p-3 text-start font-poppins">
+                  Lenguajes y Frameworks
+                </td>
+                <td class="border-b border-gray-300 p-3 text-end font-poppins">
+                  Laravel, Vue.js, Tailwind CSS, Kotlin, JavaScript, PHP
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </VContainer>
   </section>
 </template>
@@ -113,139 +196,32 @@
 <script setup>
 import { ref } from 'vue'
 
-const isExpanded = ref(false)
+// Estados de carga para cada imagen
+const loadingScanner = ref(true)
+const loadingCamara = ref(true)
+const loadingRaspberry = ref(true)
+const loadingNuevaImagen = ref(true)
 
-const technologies = [
-  {
-    icon: 'mdi mdi-chip',
-    title: 'IoT + Inteligencia Artificial',
-    description: 'Contenedores inteligentes con Raspberry Pi 4 y clasificación automática mediante GPT-4o.',
-  },
-  {
-    icon: 'mdi mdi-cellphone',
-    title: 'App Móvil Nativa',
-    description: 'Desarrollada en Android Studio. Interfaz intuitiva diseñada en Figma.',
-  },
-  {
-    icon: 'mdi mdi-cloud',
-    title: 'API REST Robusta',
-    description: 'Backend en Laravel con arquitectura cliente-servidor escalable y segura.',
-  },
-  {
-    icon: 'mdi mdi-database',
-    title: 'Base de Datos PostgreSQL',
-    description: 'Almacenamiento estructurado de usuarios, puntos, recompensas y métricas ambientales.',
-  },
-  {
-    icon: 'mdi mdi-lightning-bolt',
-    title: 'Validación Rápida',
-    description: 'Clasificación de materiales en ≤10 segundos por depósito con alta precisión.',
-  },
-  {
-    icon: 'mdi mdi-shield-check',
-    title: 'Seguridad y Privacidad',
-    description: 'Encriptación de datos, autenticación por tokens y eliminación automática de imágenes.',
-  },
-]
+// URLs de las imágenes
+const imageUrls = {
+  scanner: '/images/componentes/Escaner.png',
+  camara: '/images/componentes/Camara.png',
+  raspberry: '/images/componentes/Raspberry4.png',
+  nuevaImagen: '/images/contenedor/contenedor.png', // Ajusta la ruta según tu imagen
+}
 
-const architecture = [
-  {
-    title: 'Aplicación Móvil (Ciudadano y Comerciante)',
-    description: 'Desarrollada en Android Studio. Permite registro mediante INE y selfie, generación de código QR único, visualización de puntos e historial, y exploración de negocios aliados. Los comerciantes pueden escanear QR para validar canjes.',
-  },
-  {
-    title: 'Panel Web Administrativo',
-    description: 'Construido con Vue.js y Laravel. Gestión de usuarios, validación de documentos, administración de negocios aliados, categorías de comercios, y visualización de métricas ambientales. Desplegado en Render.',
-  },
-  {
-    title: 'Sistema Embebido (Contenedor Inteligente)',
-    description: 'Raspberry Pi 4 con cámara y lector QR. Identifica al usuario, captura imagen del material, envía a la API para clasificación mediante IA, y ejecuta acciones físicas según la respuesta (apertura de compuertas).',
-  },
-  {
-    title: 'Inteligencia Artificial',
-    description: 'Modelo multimodal GPT-4o con prompt estructurado para análisis de imágenes. Devuelve clasificación en JSON (plástico, aluminio, no reciclable) y puntos asignados. Optimiza tiempos de desarrollo con alta precisión.',
-  },
-]
+const onImageLoad = imageName => {
+  if (imageName === 'scanner') loadingScanner.value = false
+  if (imageName === 'camara') loadingCamara.value = false
+  if (imageName === 'raspberry') loadingRaspberry.value = false
+  if (imageName === 'nuevaImagen') loadingNuevaImagen.value = false
+}
 
-const differentiators = [
-  {
-    label: 'Multi-material',
-    description: 'Procesamiento de PET y aluminio en un solo sistema',
-  },
-  {
-    label: 'Validación rápida',
-    description: '≤10 segundos por depósito',
-  },
-  {
-    label: 'Ecosistema completo',
-    description: 'Apps móviles y web con sistema de recompensas gamificado',
-  },
-  {
-    label: 'Trazabilidad IoT',
-    description: 'Registro detallado vinculado al usuario',
-  },
-]
+const onImageError = event => {
+  event.target.src = '/images/placeholder.png'
+}
 </script>
 
 <style scoped>
-.space-y-4 > * + * {
-  margin-top: 16px;
-}
-.space-y-3 > * + * {
-  margin-top: 12px;
-}
-.space-y-8 > * + * {
-  margin-top: 32px;
-}
-.mb-12 {
-  margin-bottom: 48px;
-}
-.mb-8 {
-  margin-bottom: 32px;
-}
-.max-w-2xl {
-  max-width: 672px;
-}
-.mx-auto {
-  margin-left: auto;
-  margin-right: auto;
-}
-.text-balance {
-  text-wrap: balance;
-}
-.text-pretty {
-  text-wrap: pretty;
-}
-.leading-relaxed {
-  line-height: 1.625;
-}
-.w-12 {
-  width: 48px;
-}
-.h-12 {
-  height: 48px;
-}
-.mb-4 {
-  margin-bottom: 16px;
-}
-.gap-3 {
-  gap: 12px;
-}
-.mt-1 {
-  margin-top: 4px;
-}
-.rotate-icon :deep(.v-icon) {
-  transform: rotate(180deg);
-  transition: transform 0.3s;
-}
-.hover-shadow {
-  transition: box-shadow 0.3s;
-}
-.hover-shadow:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-.differentiators-card {
-  background: rgba(5, 209, 110, 0.05) !important;
-  border: 1px solid rgba(5, 209, 110, 0.2) !important;
-}
+/* Eliminamos todos los estilos personalizados */
 </style>

@@ -13,6 +13,54 @@
         </p>
       </div>
 
+      <!-- Video horizontal -->
+      <div class="d-flex justify-center mb-16">
+        <div class="video-horizontal-container rounded-xl overflow-hidden shadow-lg max-w-4xl w-full position-relative">
+          <!-- Spinner de carga -->
+          <div
+            v-if="loadingVideo"
+            class="loading-overlay d-flex align-center justify-center"
+          >
+            <VProgressCircular
+              :size="50"
+              :width="4"
+              color="primary"
+              indeterminate
+            />
+          </div>
+          <video
+            ref="horizontalVideo"
+            class="w-full h-auto object-cover"
+            autoplay
+            loop
+            muted
+            preload="metadata"
+            @canplaythrough="onVideoLoaded"
+          >
+            <source
+              src="/videos/V3ProyectoIntegrador03.mp4"
+              type="video/mp4"
+            >
+            Tu navegador no soporta videos.
+          </video>
+
+          <!-- Botón de sonido (solo visible después de cargar el video) -->
+          <VBtn
+            v-if="!loadingVideo"
+            fab
+            size="small"
+            color="white"
+            class="sound-button position-absolute"
+            @click="toggleSound"
+          >
+            <VIcon
+              :icon="soundIcon"
+              color="primary"
+            />
+          </VBtn>
+        </div>
+      </div>
+
       <VRow>
         <VCol
           v-for="(benefit, index) in benefits"
@@ -42,6 +90,8 @@
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
+
 const benefits = [
   {
     icon: 'mdi mdi-cash-multiple',
@@ -64,6 +114,34 @@ const benefits = [
     description: 'Nuestra IA identifica automáticamente los materiales. Sin complicaciones, sin errores.',
   },
 ]
+
+const loadingVideo = ref(true)
+const soundOn = ref(false)
+
+const onVideoLoaded = () => {
+  loadingVideo.value = false
+
+
+  // El video comienza en muted, así que soundOn debe reflejar eso
+  const video = document.querySelector('.video-horizontal-container video')
+  if (video) {
+    soundOn.value = !video.muted // Si está muted, entonces soundOn es false
+  }
+}
+
+const toggleSound = () => {
+  const video = document.querySelector('.video-horizontal-container video')
+
+  if (video) {
+    // Cambia el estado del video
+    video.muted = !video.muted
+
+    // Actualiza el estado de la UI
+    soundOn.value = !video.muted
+  }
+}
+
+const soundIcon = computed(() => soundOn.value ? 'mdi mdi-volume-high' : 'mdi mdi-volume-mute')
 </script>
 
 <style scoped>
@@ -75,6 +153,9 @@ const benefits = [
 }
 .max-w-2xl {
   max-width: 672px;
+}
+.max-w-4xl {
+  max-width: 896px;
 }
 .mx-auto {
   margin-left: auto;
@@ -104,5 +185,39 @@ const benefits = [
 .hover-card:hover {
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   transform: translateY(-4px);
+}
+.video-horizontal-container {
+  position: relative;
+  overflow: hidden;
+  /* Relación de aspecto 16:9 para video horizontal */
+  aspect-ratio: 16 / 9;
+}
+.video-horizontal-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Overlay de carga */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  transition: opacity 0.3s ease;
+}
+/* Botón de sonido */
+.sound-button {
+  bottom: 16px;
+  right: 16px;
+  z-index: 20;
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(4px);
+  transition: background-color 0.2s;
+}
+.sound-button:hover {
+  background-color: rgba(255, 255, 255, 0.9) !important;
 }
 </style>

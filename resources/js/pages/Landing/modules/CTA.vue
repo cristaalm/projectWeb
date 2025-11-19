@@ -1,12 +1,15 @@
 <script setup>
 import { useDialogStore } from '@/store/useAlertDialogStorage'
+import { ref } from 'vue'
+
+const loadingMobileApp = ref(true)
 
 const handleDownloadApp = async () => {
   const dialogStore = useDialogStore()
 
   const result = await dialogStore.showDialog({
     title: 'Descargar App Renova',
-    text: '¿Deseas descargar la app?, si continuas se descargara un archivo apk',
+    text: '¿Deseas descargar la app?, si continuas se descargará un archivo apk',
     type: 'confirm',
     confirmText: 'Descargar',
     cancelText: 'Cancelar',
@@ -21,37 +24,64 @@ const handleDownloadApp = async () => {
 <template>
   <section class="py-20 px-4">
     <VContainer class="max-w-5xl">
-      <VCard class="position-relative overflow-hidden !p-4 sm:!p-12 cta-card">
-        <div class="blur-circle blur-circle-1" />
-        <div class="blur-circle blur-circle-2" />
+      <VCard class="relative overflow-hidden p-4 sm:p-12 bg-gradient-to-br from-green-50 to-blue-50">
+        <!-- Efectos de blur -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-green-400 rounded-full filter blur-3xl opacity-20" />
+        <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-400 rounded-full filter blur-3xl opacity-20" />
 
-        <div class="position-relative z-10 text-center space-y-6">
-          <h2 class="text-4xl md:text-5xl font-weight-bold text-balance font-poppins">
-            Comienza a reciclar hoy
-          </h2>
-          <p class="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty font-poppins">
-            Únete a miles de personas que ya están ganando recompensas mientras cuidan el planeta.
-          </p>
-          <div class="d-flex flex-column flex-sm-row gap-4 justify-center pt-4">
-            <VBtn
-              size="x-large"
-              color="primary"
-              variant="flat"
-              class="text-lg px-8 font-poppins"
-              prepend-icon="mdi mdi-cellphone"
-              append-icon="mdi mdi-arrow-right"
-              @click="handleDownloadApp"
+        <!-- Contenido principal: imagen a la izquierda, texto y botones a la derecha -->
+        <div class="flex flex-col md:flex-row items-center gap-8 relative z-10">
+          <!-- Imagen del móvil (izquierda) -->
+          <div class="w-full w-1/2 lg:flex flex-row items-center justify-center relative hidden">
+            <div
+              v-if="loadingMobileApp"
+              class="absolute inset-0 flex items-center justify-center bg-gray-200/50 rounded-lg z-10"
             >
-              Descargar App Gratis
-            </VBtn>
-            <VBtn
-              size="x-large"
-              variant="outlined"
-              class="text-lg px-8 font-poppins"
-              to="login"
+              <VProgressCircular
+                :size="40"
+                :width="3"
+                color="primary"
+                indeterminate
+              />
+            </div>
+            <img
+              src="/images/phone.jpg"
+              alt="App Renova en dispositivo móvil"
+              class="w-auto max-h-[600px] object-contain rounded-xl shadow-lg font-poppins"
+              @load="loadingMobileApp = false"
+              @error="loadingMobileApp = false"
             >
-              Soy Renova
-            </VBtn>
+          </div>
+
+          <!-- Texto y botones (derecha) -->
+          <div class="w-full lg:w-1/2 text-center md:text-left space-y-6 font-poppins">
+            <h2 class="text-4xl md:text-5xl font-bold text-balance">
+              Comienza a reciclar hoy
+            </h2>
+            <p class="text-xl text-muted-foreground max-w-2xl mx-auto md:mx-0 text-pretty font-poppins">
+              Únete a miles de personas que ya están ganando recompensas mientras cuidan el planeta.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start pt-4">
+              <VBtn
+                size="x-large"
+                color="primary"
+                variant="flat"
+                class="text-lg px-8 font-poppins"
+                prepend-icon="mdi mdi-cellphone"
+                append-icon="mdi mdi-arrow-right"
+                @click="handleDownloadApp"
+              >
+                Descargar App Gratis
+              </VBtn>
+              <VBtn
+                size="x-large"
+                variant="outlined"
+                class="text-lg px-8 font-poppins"
+                to="login"
+              >
+                Soy Renova
+              </VBtn>
+            </div>
           </div>
         </div>
       </VCard>
@@ -60,52 +90,5 @@ const handleDownloadApp = async () => {
 </template>
 
 <style scoped>
-.max-w-5xl {
-  max-width: 1024px;
-}
-.space-y-6 > * + * {
-  margin-top: 24px;
-}
-.gap-4 {
-  gap: 16px;
-}
-.pt-4 {
-  padding-top: 16px;
-}
-.max-w-2xl {
-  max-width: 672px;
-}
-.mx-auto {
-  margin-left: auto;
-  margin-right: auto;
-}
-.text-balance {
-  text-wrap: balance;
-}
-.text-pretty {
-  text-wrap: pretty;
-}
-.z-10 {
-  z-index: 10;
-}
-.cta-card {
-  background: linear-gradient(135deg, rgba(5, 209, 110, 0.1), transparent, rgba(2, 70, 83, 0.1)) !important;
-}
-.blur-circle {
-  position: absolute;
-  width: 256px;
-  height: 256px;
-  border-radius: 50%;
-  filter: blur(64px);
-}
-.blur-circle-1 {
-  top: 0;
-  right: 0;
-  background: rgba(5, 209, 110, 0.2);
-}
-.blur-circle-2 {
-  bottom: 0;
-  left: 0;
-  background: rgba(2, 70, 83, 0.2);
-}
+/* Eliminamos todos los estilos personalizados */
 </style>

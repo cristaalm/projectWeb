@@ -3,7 +3,7 @@
     id="como-funciona"
     class="py-20 px-4 bg-muted/30"
   >
-    <VContainer class="max-w-7xl">
+    <VContainer class="max-w-7xl relative">
       <div class="text-center mb-16 space-y-4">
         <h2 class="text-4xl md:text-5xl font-weight-bold text-balance font-poppins">
           Tan fácil y rápido, en 3 pasos
@@ -12,7 +12,75 @@
           Reciclar nunca fue tan simple. Sólo necesitas tu teléfono y ganas de hacer la diferencia.
         </p>
       </div>
-      <VRow>
+
+      <!-- Sección de videos verticales -->
+      <div class="d-flex flex-column flex-md-row justify-center gap-6 mb-16">
+        <div class="d-flex flex-column align-center">
+          <div class="video-container rounded-xl overflow-hidden shadow-lg max-w-[300px] w-full position-relative">
+            <!-- Spinner de carga -->
+            <div
+              v-if="loading1"
+              class="loading-overlay d-flex align-center justify-center"
+            >
+              <VProgressCircular
+                :size="50"
+                :width="4"
+                color="primary"
+                indeterminate
+              />
+            </div>
+            <video
+              ref="video1"
+              class="w-full h-auto object-cover"
+              autoplay
+              loop
+              muted
+              preload="metadata"
+              @canplaythrough="onVideoLoaded(1)"
+            >
+              <source
+                src="/videos/Video1.mp4"
+                type="video/mp4"
+              >
+              Tu navegador no soporta videos.
+            </video>
+          </div>
+        </div>
+        <div class="d-flex flex-column align-center">
+          <div class="video-container rounded-xl overflow-hidden shadow-lg max-w-[300px] w-full position-relative">
+            <!-- Spinner de carga -->
+            <div
+              v-if="loading2"
+              class="loading-overlay d-flex align-center justify-center"
+            >
+              <VProgressCircular
+                :size="50"
+                :width="4"
+                color="primary"
+                indeterminate
+              />
+            </div>
+            <video
+              ref="video2"
+              class="w-full h-auto object-cover"
+              autoplay
+              loop
+              muted
+              preload="metadata"
+              @canplaythrough="onVideoLoaded(2)"
+            >
+              <source
+                src="/videos/Video2.mp4"
+                type="video/mp4"
+              >
+              Tu navegador no soporta videos.
+            </video>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pasos antiguos -->
+      <VRow class="absolute -bottom-[80px]">
         <VCol
           v-for="(step, index) in steps"
           :key="index"
@@ -48,6 +116,8 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
+
 const steps = [
   {
     icon: 'mdi mdi-qrcode',
@@ -65,6 +135,17 @@ const steps = [
     description: 'Recibe puntos al instante y canjéalos por productos, descuentos y beneficios en comercios aliados.',
   },
 ]
+
+const loading1 = ref(true)
+const loading2 = ref(true)
+
+const onVideoLoaded = videoNumber => {
+  if (videoNumber === 1) {
+    loading1.value = false
+  } else if (videoNumber === 2) {
+    loading2.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -113,5 +194,47 @@ const steps = [
 }
 .hover-shadow:hover {
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Estilos para los videos verticales */
+.video-container {
+  aspect-ratio: 9 / 16; /* Relación de aspecto vertical */
+  position: relative;
+  overflow: hidden;
+}
+
+.video-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Overlay de carga */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  transition: opacity 0.3s ease;
+}
+
+/* Responsive: en móviles los videos se apilan */
+@media (max-width: 768px) {
+  .d-flex.flex-column.flex-md-row {
+    flex-direction: column !important;
+    align-items: center;
+  }
+  .video-container {
+    max-width: 50% !important;
+  }
+}
+
+/* Ajuste de texto debajo del video */
+p {
+  margin-top: 12px;
+  font-size: 0.9rem;
 }
 </style>
