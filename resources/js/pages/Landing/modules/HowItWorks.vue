@@ -1,37 +1,32 @@
 <template>
   <section
     id="como-funciona"
-    class="py-20 px-4 bg-muted/30"
+    class="py-20 px-4 bg-gray-100/30"
   >
-    <VContainer class="max-w-7xl relative">
+    <div class="max-w-7xl mx-auto relative">
       <div class="text-center mb-16 space-y-4">
-        <h2 class="text-4xl md:text-5xl font-weight-bold text-balance font-poppins">
+        <h2 class="text-4xl md:text-5xl font-bold text-balance font-poppins">
           Tan fácil y rápido, en 3 pasos
         </h2>
-        <p class="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty font-poppins">
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto text-pretty font-poppins">
           Reciclar nunca fue tan simple. Sólo necesitas tu teléfono y ganas de hacer la diferencia.
         </p>
       </div>
 
       <!-- Sección de videos verticales -->
-      <div class="d-flex flex-column flex-md-row justify-center gap-6 mb-16">
-        <div class="d-flex flex-column align-center">
-          <div class="video-container rounded-xl overflow-hidden shadow-lg max-w-[300px] w-full position-relative">
+      <div class="flex flex-col sm:flex-row justify-center gap-6 mb-16">
+        <div class="flex flex-col items-center">
+          <div class="relative rounded-xl overflow-hidden shadow-lg max-w-[300px] w-full aspect-[9/16]">
             <!-- Spinner de carga -->
             <div
               v-if="loading1"
-              class="loading-overlay d-flex align-center justify-center"
+              class="absolute top-0 left-0 w-full h-full bg-black/30 flex items-center justify-center z-10 transition-opacity"
             >
-              <VProgressCircular
-                :size="50"
-                :width="4"
-                color="primary"
-                indeterminate
-              />
+              <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
             </div>
             <video
               ref="video1"
-              class="w-full h-auto object-cover"
+              class="w-full h-full object-cover"
               autoplay
               loop
               muted
@@ -46,23 +41,18 @@
             </video>
           </div>
         </div>
-        <div class="d-flex flex-column align-center">
-          <div class="video-container rounded-xl overflow-hidden shadow-lg max-w-[300px] w-full position-relative">
+        <div class="flex flex-col items-center">
+          <div class="relative rounded-xl overflow-hidden shadow-lg max-w-[300px] w-full aspect-[9/16]">
             <!-- Spinner de carga -->
             <div
               v-if="loading2"
-              class="loading-overlay d-flex align-center justify-center"
+              class="absolute top-0 left-0 w-full h-full bg-black/30 flex items-center justify-center z-10 transition-opacity"
             >
-              <VProgressCircular
-                :size="50"
-                :width="4"
-                color="primary"
-                indeterminate
-              />
+              <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
             </div>
             <video
               ref="video2"
-              class="w-full h-auto object-cover"
+              class="w-full h-full object-cover"
               autoplay
               loop
               muted
@@ -80,38 +70,32 @@
       </div>
 
       <!-- Pasos antiguos -->
-      <VRow class="absolute -bottom-[80px]">
-        <VCol
-          v-for="(step, index) in steps"
-          :key="index"
-          cols="12"
-          md="4"
-        >
-          <VCard class="position-relative pa-6 hover-shadow min-h-[290px] hover:scale-105 transform !transition-all !duration-300">
-            <VSheet
-              class="position-absolute step-number ml-1 mt-1"
-              color="primary"
-              rounded="circle"
-            >
-              <span class="text-white font-weight-bold text-2xl">{{ index + 1 }}</span>
-            </VSheet>
-            <VSheet class="w-16 h-16 rounded-xl mb-6 d-flex align-center justify-center !bg-opacity-10 !bg-primary">
-              <VIcon
-                :icon="step.icon"
-                size="32"
-                color="primary"
+      <div class="md:absolute -bottom-[150px] w-full px-6 md:px-0">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div
+            v-for="(step, index) in steps"
+            :key="index"
+            class="relative p-6 bg-white rounded-lg shadow-md min-h-[290px] hover:shadow-lg hover:scale-105 transform transition-all duration-300"
+          >
+            <div class="absolute top-[-16px] left-[-16px] w-12 h-12 bg-[#05D16E] rounded-full flex items-center justify-center">
+              <span class="text-white font-bold text-2xl">{{ index + 1 }}</span>
+            </div>
+            <div class="w-16 h-16 rounded-xl mb-6 flex items-center justify-center bg-[#05D16E]/10">
+              <i
+                :class="step.icon"
+                class="text-[#05D16E] text-2xl"
               />
-            </VSheet>
-            <h3 class="text-h5 font-weight-bold mb-3 font-poppins">
+            </div>
+            <h3 class="text-xl font-bold mb-3 font-poppins">
               {{ step.title }}
             </h3>
-            <p class="text-muted-foreground leading-relaxed font-poppins">
+            <p class="text-gray-600 leading-relaxed font-poppins">
               {{ step.description }}
             </p>
-          </VCard>
-        </VCol>
-      </VRow>
-    </VContainer>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -147,94 +131,3 @@ const onVideoLoaded = videoNumber => {
   }
 }
 </script>
-
-<style scoped>
-.space-y-4 > * + * {
-  margin-top: 16px;
-}
-.mb-16 {
-  margin-bottom: 64px;
-}
-.max-w-2xl {
-  max-width: 672px;
-}
-.mx-auto {
-  margin-left: auto;
-  margin-right: auto;
-}
-.text-balance {
-  text-wrap: balance;
-}
-.text-pretty {
-  text-wrap: pretty;
-}
-.leading-relaxed {
-  line-height: 1.625;
-}
-.w-16 {
-  width: 64px;
-}
-.h-16 {
-  height: 64px;
-}
-.mb-6 {
-  margin-bottom: 24px;
-}
-.step-number {
-  top: -16px;
-  left: -16px;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.hover-shadow {
-  transition: box-shadow 0.3s;
-}
-.hover-shadow:hover {
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-/* Estilos para los videos verticales */
-.video-container {
-  aspect-ratio: 9 / 16; /* Relación de aspecto vertical */
-  position: relative;
-  overflow: hidden;
-}
-
-.video-container video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Overlay de carga */
-.loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
-  z-index: 10;
-  transition: opacity 0.3s ease;
-}
-
-/* Responsive: en móviles los videos se apilan */
-@media (max-width: 768px) {
-  .d-flex.flex-column.flex-md-row {
-    flex-direction: column !important;
-    align-items: center;
-  }
-  .video-container {
-    max-width: 50% !important;
-  }
-}
-
-/* Ajuste de texto debajo del video */
-p {
-  margin-top: 12px;
-  font-size: 0.9rem;
-}
-</style>
