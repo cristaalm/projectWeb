@@ -64,7 +64,7 @@ class IdentifyVerificationController extends Controller
             ]);
             
             $validateData = $request->validate([
-                'document' => 'required|image|mimes:jpeg,png,jpg|max:5120',
+                'document' => 'required|image|mimes:jpeg,png,jpg',
                 'type' => 'required|in:ine_front,ine_back,selfie',
                 'user_id' => 'required|exists:users,id',
             ]);
@@ -100,8 +100,8 @@ class IdentifyVerificationController extends Controller
     
             $validateData = $request->validate([
                 'user_id' => 'required|exists:users,id',
-                'document_front' => 'required|image|mimes:jpeg,png,jpg|max:5120',
-                'document_back' => 'required|image|mimes:jpeg,png,jpg|max:5120',
+                'document_front' => 'required|image|mimes:jpeg,png,jpg',
+                'document_back' => 'required|image|mimes:jpeg,png,jpg',
             ]);
     
             $user = User::findOrFail($validateData['user_id']);
@@ -153,7 +153,7 @@ class IdentifyVerificationController extends Controller
 
             $validateData = $request->validate([
                 'user_id' => 'required|exists:users,id',
-                'selfie' => 'required|image|mimes:jpeg,png,jpg|max:5120',
+                'selfie' => 'required|image|mimes:jpeg,png,jpg',
             ]);
 
             $user = User::findOrFail($validateData['user_id']);

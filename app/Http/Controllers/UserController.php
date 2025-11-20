@@ -299,7 +299,7 @@ class UserController extends Controller
             ]);
 
             $validateData = $request->validate([
-                'avatar' => 'nullable|file|mimes:jpeg,png,jpg,webp|max:2048',
+                'avatar' => 'nullable|file|mimes:jpeg,png,jpg,webp',
                 'delete' => 'nullable|boolean',
             ]);
 
