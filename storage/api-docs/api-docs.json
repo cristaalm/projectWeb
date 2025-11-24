@@ -10438,7 +10438,7 @@
                     "Usuarios"
                 ],
                 "summary": "Actualizar un campo específico del perfil de usuario",
-                "description": "Permite actualizar un campo individual del perfil de un usuario (nombre, apellido, correo, teléfono o CURP).",
+                "description": "Permite actualizar un campo individual del perfil de un usuario: nombre, apellido, correo electrónico, número de teléfono o CURP. Los campos 'email', 'phone' y 'curp' deben ser únicos en el sistema (no pueden coincidir con los de otro usuario).",
                 "operationId": "2c02483c1109465365a7dd30102d4dde",
                 "parameters": [
                     {
@@ -10461,7 +10461,7 @@
                     {
                         "name": "userId",
                         "in": "path",
-                        "description": "ID del usuario a actualizar",
+                        "description": "ID del usuario cuyo campo será actualizado",
                         "required": true,
                         "schema": {
                             "type": "integer",
@@ -10553,40 +10553,8 @@
                             }
                         }
                     },
-                    "403": {
-                        "description": "No autorizado para actualizar el perfil del usuario",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "No tienes permiso para actualizar este perfil."
-                                        },
-                                        "data": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "errors": {
-                                            "type": "null",
-                                            "example": null
-                                        },
-                                        "status": {
-                                            "type": "integer",
-                                            "example": 403
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
                     "422": {
-                        "description": "Error de validación",
+                        "description": "Error de validación o valor duplicado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -10597,37 +10565,15 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Error al actualizar el campo."
+                                            "example": "El correo ya está registrado en otra cuenta."
                                         },
                                         "data": {
                                             "type": "null",
                                             "example": null
                                         },
                                         "errors": {
-                                            "properties": {
-                                                "field": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "The selected field is invalid."
-                                                    }
-                                                },
-                                                "value": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "The value field is required."
-                                                    }
-                                                },
-                                                "user_id": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "The selected user id is invalid."
-                                                    }
-                                                }
-                                            },
-                                            "type": "object"
+                                            "type": "null",
+                                            "example": null
                                         },
                                         "status": {
                                             "type": "integer",
@@ -10640,7 +10586,7 @@
                         }
                     },
                     "500": {
-                        "description": "Error inesperado",
+                        "description": "Error inesperado al actualizar el campo",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -10652,6 +10598,190 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Error al actualizar el campo."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Error interno del servidor."
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/users/resetPassword": {
+            "post": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Restablecer la contraseña del usuario autenticado",
+                "description": "Permite al usuario cambiar su contraseña actual. Se requiere la contraseña actual, una nueva contraseña (mínimo 8 caracteres) y su confirmación. La nueva contraseña no puede ser igual a la actual. Tras el cambio, se invalidan todos los tokens de acceso excepto el actual.",
+                "operationId": "32a9deb28206c57c8320df6dbd72ac45",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "current_password",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "current_password": {
+                                        "description": "Contraseña actual del usuario",
+                                        "type": "string",
+                                        "example": "oldSecurePassword123"
+                                    },
+                                    "password": {
+                                        "description": "Nueva contraseña (mínimo 8 caracteres)",
+                                        "type": "string",
+                                        "example": "newSecurePassword456"
+                                    },
+                                    "password_confirmation": {
+                                        "description": "Confirmación de la nueva contraseña (debe coincidir con 'password')",
+                                        "type": "string",
+                                        "example": "newSecurePassword456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Contraseña restablecida exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Contraseña restablecida exitosamente."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Credenciales incorrectas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Contraseña actual incorrecta."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación o datos inválidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Datos inválidos para restablecer la contraseña."
+                                        },
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "current_password": [
+                                                    "The current password field is required."
+                                                ],
+                                                "password": [
+                                                    "The password must be at least 8 characters."
+                                                ]
+                                            }
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 422
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error inesperado al restablecer la contraseña",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error inesperado al restablecer la contraseña."
                                         },
                                         "data": {
                                             "type": "null",

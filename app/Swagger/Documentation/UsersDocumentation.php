@@ -299,7 +299,7 @@ class UsersDocumentation
         path: "/api/users/updateField/{field}/{userId}",
         tags: ["Usuarios"],
         summary: "Actualizar un campo específico del perfil de usuario",
-        description: "Permite actualizar un campo individual del perfil de un usuario (nombre, apellido, correo, teléfono o CURP).",
+        description: "Permite actualizar un campo individual del perfil de un usuario: nombre, apellido, correo electrónico, número de teléfono o CURP. Los campos 'email', 'phone' y 'curp' deben ser únicos en el sistema (no pueden coincidir con los de otro usuario).",
         security: [["bearerAuth" => []]],
         parameters: [
             new OA\Parameter(
@@ -311,7 +311,7 @@ class UsersDocumentation
             ),
             new OA\Parameter(
                 name: "userId",
-                description: "ID del usuario a actualizar",
+                description: "ID del usuario cuyo campo será actualizado",
                 in: "path",
                 required: true,
                 schema: new OA\Schema(type: "integer", example: 5)
@@ -361,40 +361,26 @@ class UsersDocumentation
                 )
             ),
             new OA\Response(
-                response: 403,
-                description: "No autorizado para actualizar el perfil del usuario",
+                response: 422,
+                description: "Error de validación o valor duplicado",
                 content: new OA\JsonContent(
                     type: "object",
                     properties: [
                         new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "No tienes permiso para actualizar este perfil."),
+                        new OA\Property(
+                            property: "message",
+                            type: "string",
+                            example: "El correo ya está registrado en otra cuenta."
+                        ),
                         new OA\Property(property: "data", type: "null", example: null),
                         new OA\Property(property: "errors", type: "null", example: null),
-                        new OA\Property(property: "status", type: "integer", example: 403),
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 422,
-                description: "Error de validación",
-                content: new OA\JsonContent(
-                    type: "object",
-                    properties: [
-                        new OA\Property(property: "success", type: "boolean", example: false),
-                        new OA\Property(property: "message", type: "string", example: "Error al actualizar el campo."),
-                        new OA\Property(property: "data", type: "null", example: null),
-                        new OA\Property(property: "errors", properties: [
-                            new OA\Property(property: "field", type: "array", items: new OA\Items(type: "string", example: "The selected field is invalid.")),
-                            new OA\Property(property: "value", type: "array", items: new OA\Items(type: "string", example: "The value field is required.")),
-                            new OA\Property(property: "user_id", type: "array", items: new OA\Items(type: "string", example: "The selected user id is invalid.")),
-                        ]),
                         new OA\Property(property: "status", type: "integer", example: 422),
                     ]
                 )
             ),
             new OA\Response(
                 response: 500,
-                description: "Error inesperado",
+                description: "Error inesperado al actualizar el campo",
                 content: new OA\JsonContent(
                     type: "object",
                     properties: [
@@ -409,6 +395,106 @@ class UsersDocumentation
         ]
     )]
     public function updateField(Request $request, string $field, int $userId) {}
+
+    #[OA\Post(
+        path: "/api/users/resetPassword",
+        tags: ["Usuarios"],
+        summary: "Restablecer la contraseña del usuario autenticado",
+        description: "Permite al usuario cambiar su contraseña actual. Se requiere la contraseña actual, una nueva contraseña (mínimo 8 caracteres) y su confirmación. La nueva contraseña no puede ser igual a la actual. Tras el cambio, se invalidan todos los tokens de acceso excepto el actual.",
+        security: [["bearerAuth" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["current_password", "password", "password_confirmation"],
+                properties: [
+                    new OA\Property(
+                        property: "current_password",
+                        type: "string",
+                        example: "oldSecurePassword123",
+                        description: "Contraseña actual del usuario"
+                    ),
+                    new OA\Property(
+                        property: "password",
+                        type: "string",
+                        example: "newSecurePassword456",
+                        description: "Nueva contraseña (mínimo 8 caracteres)"
+                    ),
+                    new OA\Property(
+                        property: "password_confirmation",
+                        type: "string",
+                        example: "newSecurePassword456",
+                        description: "Confirmación de la nueva contraseña (debe coincidir con 'password')"
+                    ),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Contraseña restablecida exitosamente",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: true),
+                        new OA\Property(property: "message", type: "string", example: "Contraseña restablecida exitosamente."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 200),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 401,
+                description: "Credenciales incorrectas",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(
+                            property: "message",
+                            type: "string",
+                            example: "Contraseña actual incorrecta."
+                        ),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "null", example: null),
+                        new OA\Property(property: "status", type: "integer", example: 401),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: "Error de validación o datos inválidos",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Datos inválidos para restablecer la contraseña."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "object", example: [
+                            "current_password" => ["The current password field is required."],
+                            "password" => ["The password must be at least 8 characters."]
+                        ]),
+                        new OA\Property(property: "status", type: "integer", example: 422),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 500,
+                description: "Error inesperado al restablecer la contraseña",
+                content: new OA\JsonContent(
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "success", type: "boolean", example: false),
+                        new OA\Property(property: "message", type: "string", example: "Ocurrió un error inesperado al restablecer la contraseña."),
+                        new OA\Property(property: "data", type: "null", example: null),
+                        new OA\Property(property: "errors", type: "string", example: "Error interno del servidor."),
+                        new OA\Property(property: "status", type: "integer", example: 500),
+                    ]
+                )
+            ),
+        ]
+    )]
+    public function resetPassword(Request $request) {}
 
     #[OA\Post(
         path: "/api/users/toggleStatusAccount",

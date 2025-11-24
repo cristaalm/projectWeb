@@ -100,29 +100,49 @@ class UserController extends Controller
             ]);
 
             // Reglas base
-            $rules = [
+            $validateData = $request->validate([
                 'field' => 'required|in:name,last_name,email,phone,curp',
                 'value' => 'required',
                 'user_id' => 'required|exists:users,id',
-            ];
+            ]);
 
-            // Validación condicional de unicidad
-            if (in_array($field, ['email', 'curp'])) {
-                $rules['value'] .= "|unique:users,{$field},{$userId}";
+            $field = $validateData['field'];
+
+            // si el campo es curp, validamos que sea unica
+            if ($field === 'curp') {
+                $existingUser = User::where('curp', $request->value)->where('id', '!=', $userId)->first();
+                if ($existingUser) {
+                    return $this->apiResponse(false, 'El CURP ya está registrado en otra cuenta.', null, null, 422);
+                }
             }
 
-            $validatedData = $request->validate($rules);
+            if ($field === 'email') {
+                $existingUser = User::where('email', $request->value)->where('id', '!=', $userId)->first();
+                if ($existingUser) {
+                    return $this->apiResponse(false, 'El correo ya está registrado en otra cuenta.', null, null, 422);
+                }
+            }
+
+            if ($field === 'phone') {
+                $existingUser = User::where('phone', $request->value)->where('id', '!=', $userId)->first();
+                if ($existingUser) {
+                    return $this->apiResponse(false, 'No puede hacer uso del mismo número de teléfono en distintas cuentas.', null, null, 422);
+                }
+            }
 
             $user = User::findOrFail($userId);
 
             DB::beginTransaction();
 
-            $user->{$validatedData['field']} = $validatedData['value'];
+            $user->{$field} = $request->value;
             $user->save();
 
             DB::commit();
 
             return $this->apiResponse(true, 'Campo actualizado exitosamente.', $user, null, 200);
+        } catch (ValidationException $e) {
+            $firstError = collect($e->errors())->flatten()->first();
+            return $this->apiResponse(false, $firstError, null, $e->getMessage(), 422);
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->apiResponse(false, 'Error al actualizar el campo.', null, $e->getMessage(), 500);
