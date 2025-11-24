@@ -100,7 +100,7 @@ class AuthController extends Controller
 
             $expiresAt = 0;
             
-            if ($request->remember) {
+            if ($request->remember_me) {
                 $expiresAt = Carbon::now()->addMinutes(config('tokens.remember_expiration_minutes'));
             } else {
                 $expiresAt = Carbon::now()->addMinutes(config('tokens.default_expiration_minutes'));
@@ -185,7 +185,7 @@ class AuthController extends Controller
 
             $expiresAt = 0;
             
-            if ($request->remember) {
+            if ($request->remember_me) {
                 $expiresAt = Carbon::now()->addMinutes(config('tokens.remember_expiration_minutes'));
             } else {
                 $expiresAt = Carbon::now()->addMinutes(config('tokens.default_expiration_minutes'));
