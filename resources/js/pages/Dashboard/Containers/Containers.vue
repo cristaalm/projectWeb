@@ -38,6 +38,9 @@ const resetFilters = () => {
 const headers = [
   { title: 'Nombre', align: 'left', key: 'name' },
   { title: 'Ubicación', align: 'start', key: 'location' },
+  { title: 'Plástico', align: 'center', key: 'capacity.sensor1', sortable: false },
+  { title: 'Aluminio', align: 'center', key: 'capacity.sensor3', sortable: false },
+  { title: 'Otros', align: 'center', key: 'capacity.sensor2', sortable: false },
   { title: 'Estado', key: 'status', align: 'center', sortable: false },
   { title: 'Registro', key: 'created_at', align: 'center', sortable: true },
   { title: '', key: 'actions', sortable: false, align: 'end' },
@@ -210,6 +213,36 @@ const { showDeleteModal, openDeleteModal, selectedShopToDelete } = useModalDelet
           />
           {{ item.location }}
         </div>
+      </template>
+
+      <template #item.capacity.sensor1="{ item }">
+        <VProgressCircular
+          size="45"
+          :color="item.capacity.sensor1 > 80 ? 'error' : item.capacity.sensor1 > 50 ? 'warning' : 'success'"
+          :model-value="item.capacity.sensor1"
+        >
+          <span class="text-overline text-medium-emphasis">{{ item.capacity.sensor1 }}</span>
+        </VProgressCircular>
+      </template>
+
+      <template #item.capacity.sensor2="{ item }">
+        <VProgressCircular
+          size="45"
+          :color="item.capacity.sensor2 > 80 ? 'error' : item.capacity.sensor2 > 50 ? 'warning' : 'success'"
+          :model-value="item.capacity.sensor2"
+        >
+          <span class="text-overline text-medium-emphasis">{{ item.capacity.sensor2 }}</span>
+        </VProgressCircular>
+      </template>
+
+      <template #item.capacity.sensor3="{ item }">
+        <VProgressCircular
+          size="45"
+          :color="item.capacity.sensor3 > 80 ? 'error' : item.capacity.sensor3 > 50 ? 'warning' : 'success'"
+          :model-value="item.capacity.sensor3"
+        >
+          <span class="text-overline text-medium-emphasis">{{ item.capacity.sensor3 }}</span>
+        </VProgressCircular>
       </template>
 
       <template #item.status="{ item }">
