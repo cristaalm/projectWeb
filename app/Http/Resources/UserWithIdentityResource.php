@@ -24,6 +24,7 @@ class UserWithIdentityResource extends JsonResource
             'two_factor_status' => $this->two_factor_status,
             'code_identity' => $this->code_identity,
             'status' => $this->status,
+            'badge' => $this->badge ?? [],
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'alliance' => $this->alliance_id ? $this->whenLoaded('alliance', [
