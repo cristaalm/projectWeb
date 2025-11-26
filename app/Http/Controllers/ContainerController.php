@@ -141,8 +141,6 @@ class ContainerController extends Controller
     public function updateCapacity(Request $request, int $id)
     {
         try {
-
-            // hacemos merge del id
             $request->merge(['container_id' => $id]);
 
             $validatedData = $request->validate([
@@ -153,16 +151,33 @@ class ContainerController extends Controller
             $container = Container::find($validatedData['container_id']);
 
             if (!$container) {
-                return $this->apiResponse(false, 'Comercio seleccionado no existe.', null, null, 404);
+                return $this->apiResponse(false, 'Contenedor seleccionado no existe.', null, null, 404);
             }
 
-            // obtenemos la capacidad del contenedor
-            $capacityContainer = $container->capacity;
+            // Altura fija del sensor respecto al fondo (en cm)
+            $sensorHeight = 50;
 
-            // actualizamos solo los sensores que vienen en el request
-            if (isset($validatedData['capacity']['sensor1'])) $capacityContainer['sensor1'] = $validatedData['capacity']['sensor1'];
-            if (isset($validatedData['capacity']['sensor2'])) $capacityContainer['sensor2'] = $validatedData['capacity']['sensor2'];
-            if (isset($validatedData['capacity']['sensor3'])) $capacityContainer['sensor3'] = $validatedData['capacity']['sensor3'];
+            // Copiamos la capacidad actual para no modificarla directamente hasta calcular los porcentajes
+            $capacityContainer = $container->capacity ?? [];
+
+            // Procesamos cada sensor que venga en el request
+            foreach (['sensor1', 'sensor2', 'sensor3'] as $sensor) {
+                if (isset($validatedData['capacity'][$sensor])) {
+                    $distance = (float) $validatedData['capacity'][$sensor];
+
+                    // Calculamos la altura del contenido
+                    $contentHeight = $sensorHeight - $distance;
+
+                    // Aseguramos que esté en el rango válido [0, sensorHeight]
+                    $contentHeight = max(0, min($contentHeight, $sensorHeight));
+
+                    // Convertimos a porcentaje
+                    $fillPercentage = ($contentHeight / $sensorHeight) * 100;
+
+                    // Guardamos solo el porcentaje (entero o con decimales, según prefieras)
+                    $capacityContainer[$sensor] = round($fillPercentage, 2); // Puedes usar round($fillPercentage) si quieres enteros
+                }
+            }
 
             $container->update(['capacity' => $capacityContainer]);
 
