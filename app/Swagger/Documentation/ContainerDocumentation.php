@@ -411,11 +411,10 @@ class ContainerDocumentation
     )]
     public function delete(Request $request, $id) {}
 
-    #[OA\Put(
+    #[OA\Post(
         path: "/api/containers/update-capacity/{id}",
         tags: ["Contenedores"],
         summary: "Actualizar capacidad de un contenedor",
-        security: [["bearerAuth" => []]],
         description: "Actualiza los valores de capacidad de un contenedor por su ID. Solo se actualizan los sensores que se envían en la solicitud.",
         parameters: [
             new OA\Parameter(
