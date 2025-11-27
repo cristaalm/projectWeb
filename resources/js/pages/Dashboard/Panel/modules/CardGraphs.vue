@@ -188,7 +188,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <VCard>
+  <VCard class="col-span-12">
     <VCardItem class="d-flex align-center gap-3">
       <VCardTitle>
         <VIcon

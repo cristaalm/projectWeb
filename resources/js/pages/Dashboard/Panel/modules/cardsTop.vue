@@ -50,7 +50,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 min-h-[150px]">
+  <div class="grid col-span-12 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 min-h-[150px]">
     <template v-if="isLoading">
       <template 
         v-for="(item, index) in template" 
