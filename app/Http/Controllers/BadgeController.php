@@ -143,6 +143,8 @@ class BadgeController extends Controller
             $badges[] = $badgeId;
 
             $user->badge = $badges;
+            // sumamos los puntos de la recompenza+
+            $user->total_points = $user->total_points + $badge->points_awared;
             $user->save();
     
             return $this->apiResponse(true, "¡Felicidades! Has obtenido la insignia '$badge->name'.", $badges, null, 200);
