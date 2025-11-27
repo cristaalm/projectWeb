@@ -155,7 +155,7 @@ class ContainerController extends Controller
             }
 
             // Altura fija del sensor respecto al fondo (en cm)
-            $sensorHeight = 50;
+            $sensorHeight = 52;
 
             // Copiamos la capacidad actual para no modificarla directamente hasta calcular los porcentajes
             $capacityContainer = $container->capacity ?? [];
