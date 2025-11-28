@@ -162,7 +162,7 @@ const { showDeleteModal, openDeleteModal, selectedRewardToDelete } = useModalDel
               :disabled="status == null"
               @click="resetFilters"
             >
-              Reinciar
+              Reiniciar
             </VBtn>
           </div>
         </VCard>

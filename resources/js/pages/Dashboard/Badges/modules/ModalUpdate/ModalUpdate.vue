@@ -1,7 +1,5 @@
 <script setup>
-import { useUpdateBadge } from '@/hooks/Badges/useUpdateBadge'
-import { useValidations } from '@/hooks/Badges/useValidations'
-import { useDarkModeStore } from '@/store/dark-mode'
+import { useDeleteBadge } from '@/hooks/Badges/useDeleteBadge'
 import { ref, watch } from 'vue'
 
 const props = defineProps({
@@ -9,129 +7,45 @@ const props = defineProps({
   data: Object,
 })
 
-const emit = defineEmits(['update:modelValue', 'update'])
+const emit = defineEmits(['update:modelValue', 'delete'])
 
-const darkModeStore = useDarkModeStore()
-const { loading, updateBadge, setNewData, isUnchanged, badgeData } = useUpdateBadge()
+const { loading, deleteBadge } = useDeleteBadge()
+
 const isOpen = ref(props.modelValue)
-
-const {
-  formValidate,
-  formErrors,
-  touchField,
-  touchedFields,
-  resetValidations,
-} = useValidations({ badgeData })
 
 watch(() => props.modelValue, val => {
   isOpen.value = val
-  if (val) {
-    setNewData(props.data)
+})
+
+watch(isOpen, val => emit('update:modelValue', val))
+
+const confirmDelete = async () => {
+  if (await deleteBadge(props.data.id)) {
+    emit('delete', true)
+    isOpen.value = false
   }
-  resetValidations()
-})
-
-watch(isOpen, val => {
-  emit('update:modelValue', val)
-})
-
-const handleSaveBadge = async () => {
-  if (!formValidate.value) return
-
-  const result = await updateBadge()
-
-  if (!result) return
-
-  resetValidations()
-  emit('update')
-  isOpen.value = false
 }
 </script>
 
 <template>
   <VDialog
     v-model="isOpen"
-    max-width="800px"
+    max-width="500px"
     persistent
   >
     <VCard>
       <VCardTitle class="text-xl font-semibold">
-        📝 Editar Insignia
+        ⚠️ Confirmar eliminación
       </VCardTitle>
-
-      <VCardText class="space-y-8">
-        <div class="flex flex-col gap-4">
-          <VTextField
-            v-model="badgeData.name"
-            label="Nombre de la insignia"
-            placeholder="Nombre de la insignia"
-            outlined
-            :color="darkModeStore.darkMode ? 'white' : 'primary'" 
-            :class="formErrors.name ? '!max-h-[60px]' : '!max-h-[38px]'"
-            :disabled="loading"
-            :error="touchedFields.name && !!formErrors.name"
-            :error-messages="touchedFields.name ? formErrors.name : ''"
-            @enter="handleSaveBadge"
-            @input="touchField('name')"
-          />
-          <VTextField
-            v-model="badgeData.points_required"
-            v-number-only
-            label="Numero de puntos requeridos"
-            placeholder="Numero de puntos requeridos"
-            outlined
-            :color="darkModeStore.darkMode ? 'white' : 'primary'" 
-            :class="formErrors.points_required ? '!max-h-[60px]' : '!max-h-[38px]'"
-            :disabled="loading"
-            :error="touchedFields.points_required && !!formErrors.points_required"
-            :error-messages="touchedFields.points_required ? formErrors.points_required : ''"
-            @enter="handleSaveBadge"
-            @input="touchField('points_required')"
-          />
-          <VTextField
-            v-model="badgeData.points_awared"
-            v-number-only
-            label="Numero de puntos de recompensa"
-            placeholder="Numero de puntos de recompensa"
-            outlined
-            :color="darkModeStore.darkMode ? 'white' : 'primary'" 
-            :class="formErrors.points_awared ? '!max-h-[60px]' : '!max-h-[38px]'"
-            :disabled="loading"
-            :error="touchedFields.points_awared && !!formErrors.points_awared"
-            :error-messages="touchedFields.points_awared ? formErrors.points_awared : ''"
-            @enter="handleSaveBadge"
-            @input="touchField('points_awared')"
-          />
+      <VCardText>
+        <div class="flex flex-col items-center gap-2">
+          <div class="text-lg">
+            ¿Estás seguro de que deseas eliminar la insignia
+            <strong>{{ data?.name }}</strong>? Esta acción no se puede deshacer.
+          </div>
         </div>
-
-        <!-- Estado del plan -->
-        <VTable class="mt-4 text-no-wrap">
-          <thead>
-            <tr>
-              <th>Configuración</th>
-              <th>Valor</th>
-              <th>Descripción</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              class=" select-none cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
-              @click="() => badgeData.status = !badgeData.status"
-            >
-              <td>Estado</td>
-              <td>
-                <VCheckbox v-model="badgeData.status" />
-              </td>
-              <td class="text-sm text-gray-500 dark:text-slate-300">
-                La insignia estará habilitada o deshabilitada
-              </td>
-            </tr>
-          </tbody>
-        </VTable>
       </VCardText>
-
       <VDivider />
-
       <VCardActions class="justify-end mt-2 space-x-2">
         <VBtn
           variant="elevated"
@@ -142,13 +56,13 @@ const handleSaveBadge = async () => {
           Cancelar
         </VBtn>
         <VBtn
-          color="success"
+          color="#dc2626"
           variant="flat"
-          :disabled="loading || !formValidate || isUnchanged"
           :loading="loading"
-          @click="handleSaveBadge"
+          :disabled="loading"
+          @click="confirmDelete"
         >
-          Guardar cambios
+          Eliminar
         </VBtn>
       </VCardActions>
     </VCard>

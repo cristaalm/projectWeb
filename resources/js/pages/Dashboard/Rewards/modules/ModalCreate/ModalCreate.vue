@@ -144,8 +144,9 @@ watch(isOpen, val => {
               class="!flex-[.2]"
             />
           </div>
-          <div class="flex flex-col md:flex-row gap-2">
-            <div class="flex-[.81]">
+          <div class="flex flex-col md:flex-row gap-2 pt-4">
+            <div class="flex-[.81] flex flex-col gap-1 relative">
+              <label class="absolute -top-5 left-0">Expiración</label>
               <Litepicker 
                 v-model="rewardData.expires_at"
                 :options="{

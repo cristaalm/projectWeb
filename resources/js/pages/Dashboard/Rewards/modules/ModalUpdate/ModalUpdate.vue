@@ -146,8 +146,9 @@ const handleSaveReward = async () => {
               class="!flex-[.2]"
             />
           </div>
-          <div class="flex flex-col md:flex-row gap-2">
-            <div class="flex-[.81]">
+          <div class="flex flex-col md:flex-row gap-2 pt-4">
+            <div class="flex-[.81] flex flex-col gap-1 relative">
+              <label class="absolute -top-5 left-0">Expiración</label>
               <Litepicker 
                 v-model="rewardData.expires_at"
                 :options="{
@@ -163,6 +164,7 @@ const handleSaveReward = async () => {
                   format: 'DD/MM/YYYY'
                 }" 
                 placeholder="DD/MM/YYYY"
+                label="Expiración"
                 :class="formErrors.expires_at && touchedFields.expires_at ? '!bg-red-500/20' : '!bg-slate-200 dark:read-only:!bg-[#313245]'"
                 class="block w-full dark:!text-slate-200 px-4 py-2 dark:placeholder:!text-slate-400 text-center !cursor-pointer disabled:text-gray-300"
                 readonly

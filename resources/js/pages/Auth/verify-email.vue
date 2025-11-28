@@ -56,10 +56,10 @@ const goToHome = () => {
               class="w-full h-full"
             />
           </VAvatar>
-          <h2 class="mb-2 !text-3xl !font-bold text-h5">
+          <h2 class="mb-2 !text-3xl !font-bold text-h5 font-poppins">
             ¡Correo verificado con éxito!
           </h2>
-          <p class="mb-6 text-body-1 !text-xl">
+          <p class="mb-6 text-body-1 !text-xl font-poppins">
             Tu correo electrónico ha sido verificado correctamente.<br>
             Ya puedes cerrar esta pestaña.
           </p>
@@ -67,7 +67,7 @@ const goToHome = () => {
             block
             type="button"
             color="primary"
-            class="mt-4"
+            class="mt-4 font-poppins"
             @click="router.push({ path: '/panel' })"
           >
             Regresar al inicio

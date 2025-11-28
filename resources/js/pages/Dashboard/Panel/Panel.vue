@@ -55,26 +55,27 @@ onBeforeUnmount(() => {
 <template>
   <div class="w-full grid grid-cols-12 gap-6">
     <!-- Tarjeta de puntos -->
-    <div class="bg-white col-span-8 dark:bg-[#2A2B3E] rounded-lg p-5 shadow flex flex-row items-center justify-between">
-      <div class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex flex-row items-center gap-4">
-        Tus puntos:
-        <span class="text-2xl font-bold text-[#08B662]">
+    <div class="bg-white col-span-12 md:col-span-7 lg:col-span-8 dark:bg-[#2A2B3E] rounded-lg p-5 shadow flex flex-row items-center justify-between min-w-0">
+      <div class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex flex-row items-center gap-4 min-w-0">
+        <span class="text-nowrap">Tus puntos:</span>
+        <span class="text-2xl font-bold text-[#08B662] text-nowrap">
           {{ format(points) }} pts.
         </span>
       </div>
 
-      <!-- Reloj con ícono -->
-      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 min-w-0">
         <VIcon
           :icon="currentIcon"
           size="32"
         />
-        <span class="font-bold text-xl text-gray-800 dark:text-gray-200">{{ currentTime }}</span>
+        <span class="font-bold text-xl text-gray-800 dark:text-gray-200 text-nowrap">{{ currentTime }}</span>
       </div>
     </div>
-    <div class="bg-white col-span-4 dark:bg-[#2A2B3E] rounded-lg p-5 shadow flex flex-row items-center justify-between">
-      <div class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex flex-row items-center gap-4 text-nowrap">
-        Ambiente del Prototipo:
+
+    <!-- Tarjeta del prototipo -->
+    <div class="bg-white col-span-12 md:col-span-5 lg:col-span-4 dark:bg-[#2A2B3E] rounded-lg p-5 shadow flex flex-row items-center justify-between min-w-0">
+      <div class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex flex-row items-center gap-4 text-nowrap min-w-0">
+        <span class="truncate">Ambiente del Prototipo:</span>
       </div>
 
       <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
@@ -89,9 +90,8 @@ onBeforeUnmount(() => {
         </VBtn>
       </div>
     </div>
+
     <CardsTop />
-
-
     <div class="grid col-span-12 grid-cols-1 md:grid-cols-2 gap-4">
       <CardContainers class="col-span-1" />
       <CardHistory class="col-span-1" />

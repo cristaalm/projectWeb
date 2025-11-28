@@ -37,7 +37,7 @@ const resetFilters = () => {
 
 const headers = [
   { title: 'Nombre', align: 'left', key: 'name' },
-  { title: 'Ubicación', align: 'start', key: 'location' },
+  { title: 'Domicilio', align: 'start', key: 'location' },
   { title: 'Plástico', align: 'center', key: 'capacity.sensor1', sortable: false },
   { title: 'Aluminio', align: 'center', key: 'capacity.sensor3', sortable: false },
   { title: 'Otros', align: 'center', key: 'capacity.sensor2', sortable: false },
@@ -109,7 +109,7 @@ const { showDeleteModal, openDeleteModal, selectedShopToDelete } = useModalDelet
           prepend-icon="bx-plus"
           @click="openCreateModal"
         >
-          Agregar Contenedor
+          Agregar contenedor
         </VBtn>
       </div>
     </div>
@@ -164,7 +164,7 @@ const { showDeleteModal, openDeleteModal, selectedShopToDelete } = useModalDelet
               :color="darkModeStore.darkMode ? 'white' : 'primary'"
               class="mt-0"
               variant="outlined"
-              no-data-text="No opciones de filtrado"
+              no-data-text="No hay opciones de filtrado"
             />
             <VBtn
               variant="outlined"
@@ -174,7 +174,7 @@ const { showDeleteModal, openDeleteModal, selectedShopToDelete } = useModalDelet
               :disabled="status == null"
               @click="resetFilters"
             >
-              Reinciar
+              Reiniciar
             </VBtn>
           </div>
         </VCard>

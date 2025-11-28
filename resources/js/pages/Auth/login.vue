@@ -163,11 +163,11 @@ const goToHome = () => {
             />
           </VAvatar>
     
-          <h2 class="mb-2 !text-3xl !font-bold text-h5">
+          <h2 class="mb-2 !text-3xl !font-bold text-h5 font-poppins">
             ¡Bienvenido, {{ user?.name || "" }}!
           </h2>
     
-          <p class="mb-6 text-body-1 !text-xl">
+          <p class="mb-6 text-body-1 !text-xl font-poppins">
             Has iniciado sesión con éxito.
             <br>
             ¡Disfruta de tu día!

@@ -69,7 +69,7 @@ class ScanController extends Controller
                 $iaResult = json_decode(file_get_contents($iaApiUrl), true);
             }
     
-            if (!isset($iaResult['success']) || $iaResult['success'] !== true) {
+            if (!isset($iaResult['success']) || $iaResult['success'] != true) {
                 return $this->apiResponse(false, 'Error al escanear.', $iaResult, 'La IA no pudo procesar la imagen correctamente.', 422);
             }
             

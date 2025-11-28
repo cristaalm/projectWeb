@@ -13,84 +13,76 @@
         </p>
       </div>
 
-      <!-- Video horizontal -->
-      <div class="d-flex justify-center mb-16">
-        <div class="video-horizontal-container rounded-xl overflow-hidden shadow-lg max-w-4xl w-full position-relative">
-          <!-- Spinner de carga -->
-          <div
-            v-if="loadingVideo"
-            class="loading-overlay d-flex align-center justify-center"
-          >
-            <VProgressCircular
-              :size="50"
-              :width="4"
-              color="primary"
-              indeterminate
-            />
-          </div>
-          <video
-            ref="horizontalVideo"
-            class="w-full h-auto object-cover"
-            autoplay
-            loop
-            muted
-            preload="metadata"
-            @canplaythrough="onVideoLoaded"
-          >
-            <source
-              src="/videos/V3ProyectoIntegrador03.mp4"
-              type="video/mp4"
+      <!-- Layout asimétrico: video + beneficios -->
+      <div class="flex flex-col md:flex-row gap-12 items-center">
+        <!-- Video -->
+        <div class="md:w-1/2 w-full">
+          <div class="rounded-xl overflow-hidden shadow-lg aspect-video relative">
+            <div
+              v-if="loadingVideo"
+              class="loading-overlay flex items-center justify-center"
             >
-            Tu navegador no soporta videos.
-          </video>
+              <VProgressCircular
+                :size="50"
+                :width="4"
+                color="primary"
+                indeterminate
+              />
+            </div>
+            <video
+              ref="horizontalVideo"
+              class="w-full h-full object-cover"
+              autoplay
+              playsinline
+              controls
+              loop
+              muted
+              preload="metadata"
+              @canplaythrough="onVideoLoaded"
+            >
+              <source
+                src="/videos/V3ProyectoIntegrador03.mp4"
+                type="video/mp4"
+              >
+              Tu navegador no soporta videos.
+            </video>
+          </div>
+        </div>
 
-          <!-- Botón de sonido (solo visible después de cargar el video) -->
-          <VBtn
-            v-if="!loadingVideo"
-            fab
-            size="small"
-            color="white"
-            class="sound-button position-absolute"
-            @click="toggleSound"
+        <!-- Beneficios como lista vertical estilizada -->
+        <div class="md:w-1/2 w-full space-y-8">
+          <div
+            v-for="(benefit, index) in benefits"
+            :key="index"
+            class="benefit-item group"
           >
-            <VIcon
-              :icon="soundIcon"
-              color="primary"
-            />
-          </VBtn>
+            <div class="flex items-start gap-5">
+              <!-- Ícono con fondo sutil -->
+              <div class="min-w-12 min-h-12 rounded-xl flex items-center justify-center bg-primary bg-opacity-10 text-primary transition-colors group-hover:bg-opacity-20">
+                <VIcon
+                  :icon="benefit.icon"
+                  size="28"
+                  color="white"
+                />
+              </div>
+              <div>
+                <h3 class="text-xl font-bold mb-2 font-poppins text-gray-900">
+                  {{ benefit.title }}
+                </h3>
+                <p class="text-muted-foreground leading-relaxed text-pretty font-poppins">
+                  {{ benefit.description }}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <VRow>
-        <VCol
-          v-for="(benefit, index) in benefits"
-          :key="index"
-          cols="12"
-          md="6"
-        >
-          <VCard class="pa-8 hover-card min-h-[300px]">
-            <VSheet class="w-14 h-14 rounded-xl mb-6 d-flex align-center justify-center !bg-opacity-10 !bg-primary">
-              <VIcon
-                :icon="benefit.icon"
-                size="28"
-                color="primary"
-              />
-            </VSheet>
-            <h3 class="text-h5 font-weight-bold mb-3 font-poppins">
-              {{ benefit.title }}
-            </h3>
-            <p class="text-muted-foreground leading-relaxed text-pretty font-poppins">
-              {{ benefit.description }}
-            </p>
-          </VCard>
-        </VCol>
-      </VRow>
     </VContainer>
   </section>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 
 const benefits = [
   {
@@ -116,88 +108,13 @@ const benefits = [
 ]
 
 const loadingVideo = ref(true)
-const soundOn = ref(false)
 
 const onVideoLoaded = () => {
   loadingVideo.value = false
-
-
-  // El video comienza en muted, así que soundOn debe reflejar eso
-  const video = document.querySelector('.video-horizontal-container video')
-  if (video) {
-    soundOn.value = !video.muted // Si está muted, entonces soundOn es false
-  }
 }
-
-const toggleSound = () => {
-  const video = document.querySelector('.video-horizontal-container video')
-
-  if (video) {
-    // Cambia el estado del video
-    video.muted = !video.muted
-
-    // Actualiza el estado de la UI
-    soundOn.value = !video.muted
-  }
-}
-
-const soundIcon = computed(() => soundOn.value ? 'mdi mdi-volume-high' : 'mdi mdi-volume-mute')
 </script>
 
 <style scoped>
-.space-y-4 > * + * {
-  margin-top: 16px;
-}
-.mb-16 {
-  margin-bottom: 64px;
-}
-.max-w-2xl {
-  max-width: 672px;
-}
-.max-w-4xl {
-  max-width: 896px;
-}
-.mx-auto {
-  margin-left: auto;
-  margin-right: auto;
-}
-.text-balance {
-  text-wrap: balance;
-}
-.text-pretty {
-  text-wrap: pretty;
-}
-.leading-relaxed {
-  line-height: 1.625;
-}
-.w-14 {
-  width: 56px;
-}
-.h-14 {
-  height: 56px;
-}
-.mb-6 {
-  margin-bottom: 24px;
-}
-.hover-card {
-  transition: all 0.3s;
-}
-.hover-card:hover {
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  transform: translateY(-4px);
-}
-.video-horizontal-container {
-  position: relative;
-  overflow: hidden;
-  /* Relación de aspecto 16:9 para video horizontal */
-  aspect-ratio: 16 / 9;
-}
-.video-horizontal-container video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-/* Overlay de carga */
 .loading-overlay {
   position: absolute;
   top: 0;
@@ -206,18 +123,23 @@ const soundIcon = computed(() => soundOn.value ? 'mdi mdi-volume-high' : 'mdi md
   height: 100%;
   background-color: rgba(0, 0, 0, 0.3);
   z-index: 10;
-  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-/* Botón de sonido */
-.sound-button {
-  bottom: 16px;
-  right: 16px;
-  z-index: 20;
-  background-color: rgba(255, 255, 255, 0.8) !important;
-  backdrop-filter: blur(4px);
-  transition: background-color 0.2s;
+
+/* Beneficios como lista integrada */
+.benefit-item {
+  transition: transform 0.2s ease;
 }
-.sound-button:hover {
-  background-color: rgba(255, 255, 255, 0.9) !important;
+.benefit-item:hover {
+  transform: translateX(4px);
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+  .benefit-item h3 {
+    font-size: 1.125rem;
+  }
 }
 </style>

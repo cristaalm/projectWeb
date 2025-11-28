@@ -56,7 +56,7 @@ watch(isOpen, val => {
   >
     <VCard>
       <VCardTitle class="text-xl font-semibold">
-        📝 Agregar Contenedor
+        📝 Agregar contenedor
       </VCardTitle>
 
       <VCardText class="space-y-8">
@@ -77,8 +77,8 @@ watch(isOpen, val => {
           />
           <VTextField
             v-model="containerData.serial_number"
-            label="Numero de serie del contenedor"
-            placeholder="Numero de serie del contenedor"
+            label="Número de serie del contenedor"
+            placeholder="Número de serie del contenedor"
             outlined
             :color="darkModeStore.darkMode ? 'white' : 'primary'" 
             :class="formErrors.serial_number ? '!max-h-[60px]' : '!max-h-[38px]'"
@@ -91,8 +91,8 @@ watch(isOpen, val => {
           />
           <VTextField
             v-model="containerData.location"
-            label="Ubicacion del contenedor"
-            placeholder="Ubicacion del contenedor"
+            label="Domicilio del contenedor"
+            placeholder="Domicilio del contenedor"
             outlined
             :color="darkModeStore.darkMode ? 'white' : 'primary'" 
             :class="formErrors.location ? '!max-h-[60px]' : '!max-h-[38px]'"
@@ -105,7 +105,7 @@ watch(isOpen, val => {
           />
         </div>
 
-        <!-- Estado del plan -->
+        <!-- Estado del contenedor -->
         <VTable class="mt-4 text-no-wrap">
           <thead>
             <tr>
@@ -116,7 +116,7 @@ watch(isOpen, val => {
           </thead>
           <tbody>
             <tr
-              class=" select-none cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+              class="select-none cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
               @click="() => containerData.status = !containerData.status"
             >
               <td>Estado</td>

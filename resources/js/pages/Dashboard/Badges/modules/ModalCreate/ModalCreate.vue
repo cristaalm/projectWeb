@@ -55,7 +55,7 @@ watch(isOpen, val => {
   >
     <VCard>
       <VCardTitle class="text-xl font-semibold">
-        📝 Agregar Insignia
+        📝 Agregar insignia
       </VCardTitle>
 
       <VCardText class="space-y-8">
@@ -76,8 +76,8 @@ watch(isOpen, val => {
           <VTextField
             v-model="badgeData.points_required"
             v-number-only
-            label="Numero de puntos requeridos"
-            placeholder="Numero de puntos requeridos"
+            label="Número de puntos requeridos"
+            placeholder="Número de puntos requeridos"
             outlined
             :color="darkModeStore.darkMode ? 'white' : 'primary'" 
             :class="formErrors.points_required ? '!max-h-[60px]' : '!max-h-[38px]'"
@@ -85,25 +85,25 @@ watch(isOpen, val => {
             :error="touchedFields.points_required && !!formErrors.points_required"
             :error-messages="touchedFields.points_required ? formErrors.points_required : ''"
             @enter="handleSaveBadge"
-            @keydown="touchField('points_required')"
+            @input="touchField('points_required')"
           />
           <VTextField
-            v-model="badgeData.points_awared"
+            v-model="badgeData.points_awarded"
             v-number-only
-            label="Numero de puntos de recompensa"
-            placeholder="Numero de puntos de recompensa"
+            label="Número de puntos de recompensa"
+            placeholder="Número de puntos de recompensa"
             outlined
             :color="darkModeStore.darkMode ? 'white' : 'primary'" 
-            :class="formErrors.points_awared ? '!max-h-[60px]' : '!max-h-[38px]'"
+            :class="formErrors.points_awarded ? '!max-h-[60px]' : '!max-h-[38px]'"
             :disabled="loading"
-            :error="touchedFields.points_awared && !!formErrors.points_awared"
-            :error-messages="touchedFields.points_awared ? formErrors.points_awared : ''"
+            :error="touchedFields.points_awarded && !!formErrors.points_awarded"
+            :error-messages="touchedFields.points_awarded ? formErrors.points_awarded : ''"
             @enter="handleSaveBadge"
-            @keydown="touchField('points_awared')"
+            @input="touchField('points_awarded')"
           />
         </div>
 
-        <!-- Estado del plan -->
+        <!-- Estado de la insignia -->
         <VTable class="mt-4 text-no-wrap">
           <thead>
             <tr>
@@ -114,7 +114,7 @@ watch(isOpen, val => {
           </thead>
           <tbody>
             <tr
-              class=" select-none cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+              class="select-none cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
               @click="() => badgeData.status = !badgeData.status"
             >
               <td>Estado</td>

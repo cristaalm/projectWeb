@@ -35,7 +35,7 @@ const confirmDelete = async () => {
   >
     <VCard>
       <VCardTitle class="text-xl font-semibold">
-        ⚠️ Confirmar Eliminación
+        ⚠️ Confirmar eliminación
       </VCardTitle>
       <VCardText>
         <div class="flex flex-col items-center gap-2">

@@ -74,6 +74,7 @@ const goToHome = () => {
                   label="Correo Electrónico"
                   type="email"
                   placeholder="johndoe@email.com"
+                  class="font-poppins"
                   @keyup.enter.prevent="()=> { if (!loading && !success && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) sendEmail(form) }"
                 />
               </VCol>

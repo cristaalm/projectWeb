@@ -4,7 +4,6 @@ import { useValidations } from '@/hooks/Containers/useValidations'
 import { useDarkModeStore } from '@/store/dark-mode'
 import { ref, watch } from 'vue'
 
-
 const props = defineProps({
   modelValue: Boolean,
   data: Object,
@@ -68,7 +67,7 @@ function updatePhone(event) {
   >
     <VCard>
       <VCardTitle class="text-xl font-semibold">
-        📝 Editar Comercio
+        📝 Editar contenedor
       </VCardTitle>
 
       <VCardText class="space-y-8">
@@ -90,7 +89,7 @@ function updatePhone(event) {
           <VTextField
             v-model="containerData.serial_number"
             label="Número de serie del contenedor"
-            placeholder="Numero de serie del contenedor"
+            placeholder="Número de serie del contenedor"
             outlined
             :color="darkModeStore.darkMode ? 'white' : 'primary'" 
             :class="formErrors.serial_number ? '!max-h-[60px]' : '!max-h-[38px]'"
@@ -103,8 +102,8 @@ function updatePhone(event) {
           />
           <VTextField
             v-model="containerData.location"
-            label="Ubicación del contenedor"
-            placeholder="Ubicación del contenedor"
+            label="Domicilio del contenedor"
+            placeholder="Domicilio del contenedor"
             outlined
             :color="darkModeStore.darkMode ? 'white' : 'primary'" 
             :class="formErrors.location ? '!max-h-[60px]' : '!max-h-[38px]'"
@@ -117,7 +116,7 @@ function updatePhone(event) {
           />
         </div>
 
-        <!-- Estado del plan -->
+        <!-- Estado del contenedor -->
         <VTable class="mt-4 text-no-wrap">
           <thead>
             <tr>
@@ -128,7 +127,7 @@ function updatePhone(event) {
           </thead>
           <tbody>
             <tr
-              class=" select-none cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+              class="select-none cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
               @click="() => containerData.status = !containerData.status"
             >
               <td>Estado</td>
@@ -136,7 +135,7 @@ function updatePhone(event) {
                 <VCheckbox v-model="containerData.status" />
               </td>
               <td class="text-sm text-gray-500 dark:text-slate-300">
-                El contenedor  habilitado o deshabilitado
+                El contenedor estará habilitado o deshabilitado
               </td>
             </tr>
           </tbody>

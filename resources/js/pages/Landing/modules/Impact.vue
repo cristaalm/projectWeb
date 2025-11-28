@@ -3,59 +3,40 @@
     id="impacto"
     class="py-20 px-4 bg-[#00464B] text-slate-200"
   >
-    <VContainer class="max-w-7xl">
-      <VRow class="align-center">
-        <VCol
-          cols="12"
-          lg="6"
-        >
-          <div class="space-y-6">
-            <h2 class="text-4xl md:text-5xl font-weight-bold text-balance text-white font-poppins">
-              Tu impacto importa
-            </h2>
-            <p
-              class="text-lg leading-relaxed text-pretty font-poppins"
-              style="opacity: 0.9"
-            >
-              México recicla sólo el 9.6% de sus residuos, muy por debajo del promedio de la OCDE del 20%. Con Renova,
-              estamos cambiando esta realidad, una botella a la vez.
-            </p>
-            <p
-              class="text-lg leading-relaxed text-pretty font-poppins"
-              style="opacity: 0.9"
-            >
-              Nuestro sistema contribuye directamente a los Objetivos de Desarrollo Sostenible de la ONU,
-              específicamente al ODS 11 (Ciudades Sostenibles) y ODS 12 (Producción y Consumo Responsables).
-            </p>
-          </div>
-        </VCol>
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col lg:flex-row items-center lg:items-start gap-8">
+        <!-- Columna izquierda: texto -->
+        <div class="w-full lg:w-1/2 space-y-6">
+          <h2 class="text-4xl md:text-5xl font-bold text-balance text-white font-poppins">
+            Tu impacto importa
+          </h2>
+          <p class="text-lg leading-relaxed text-pretty font-poppins opacity-90">
+            México recicla sólo el 9.6% de sus residuos, muy por debajo del promedio de la OCDE del 20%. Con Renova,
+            estamos cambiando esta realidad, una botella a la vez.
+          </p>
+          <p class="text-lg leading-relaxed text-pretty font-poppins opacity-90">
+            Nuestro sistema contribuye directamente a los Objetivos de Desarrollo Sostenible de la ONU,
+            específicamente al ODS 11 (Ciudades Sostenibles) y ODS 12 (Producción y Consumo Responsables).
+          </p>
+        </div>
 
-        <VCol
-          cols="12"
-          lg="6"
-        >
-          <VRow>
-            <VCol
-              v-for="(stat, index) in stats"
-              :key="index"
-              cols="6"
-            >
-              <VCard class="pa-6 impact-card min-h-[200px] sm:min-h-[140px] font-poppins">
-                <div class="text-h4 font-weight-bold mb-2 text-white">
-                  {{ stat.value }}
-                </div>
-                <div
-                  class="text-sm text-white"
-                  style="opacity: 0.8"
-                >
-                  {{ stat.label }}
-                </div>
-              </VCard>
-            </VCol>
-          </VRow>
-        </VCol>
-      </VRow>
-    </VContainer>
+        <!-- Columna derecha: estadísticas -->
+        <div class="w-full lg:w-1/2 grid grid-cols-2 gap-6">
+          <div
+            v-for="(stat, index) in stats"
+            :key="index"
+            class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 impact-card  sm:min-h-[140px] font-poppins flex flex-col col-span-2 md:col-span-1 justify-center"
+          >
+            <div class="text-3xl font-bold mb-2 text-white">
+              {{ stat.value }}
+            </div>
+            <div class="text-sm text-white opacity-80">
+              {{ stat.label }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 

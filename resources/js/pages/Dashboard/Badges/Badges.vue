@@ -34,8 +34,8 @@ const resetFilters = () => {
 
 const headers = [
   { title: 'Nombre', align: 'left', key: 'name' },
-  { title: 'Puntos Requeridos', align: 'start', key: 'points_required' },
-  { title: 'Puntos de Recompenza', align: 'start', key: 'points_awared' },
+  { title: 'Puntos requeridos', align: 'start', key: 'points_required' },
+  { title: 'Puntos de recompensa', align: 'start', key: 'points_awarded' },
   { title: 'Estado', align: 'center', key: 'status', sortable: false },
   { title: '', key: 'actions', sortable: false, align: 'end' },
 ]
@@ -147,7 +147,7 @@ const { showDeleteModal, selectedBadgeToDelete, openDeleteModal } = useModalDele
               :color="darkModeStore.darkMode ? 'white' : 'primary'"
               class="mt-0"
               variant="outlined"
-              no-data-text="No opciones de filtrado"
+              no-data-text="No hay opciones de filtrado"
             />
             <VBtn
               variant="outlined"
@@ -157,7 +157,7 @@ const { showDeleteModal, selectedBadgeToDelete, openDeleteModal } = useModalDele
               :disabled="status == null"
               @click="resetFilters"
             >
-              Reinciar
+              Reiniciar
             </VBtn>
           </div>
         </VCard>
