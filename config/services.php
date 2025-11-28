@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    'firebase' => [
+        'project_id' => env('FIREBASE_PROJECT_ID'),
+        'client_email' => env('FIREBASE_CLIENT_EMAIL'),
+        // Replace \n with real newlines for private key
+        'private_key' => str_replace('\\n', "\n", env('FIREBASE_PRIVATE_KEY', '')),
+        // Optional: full JSON credentials blob
+        'credentials_json' => env('FIREBASE_CREDENTIALS_JSON'),
+    ],
+
 ];

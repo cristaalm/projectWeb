@@ -1,10 +1,32 @@
 <script setup>
-import NavItems from '@/layouts/components/NavItems.vue'
-import logo from '@images/logo.svg?raw'
-import VerticalNavLayout from '@layouts/components/VerticalNavLayout.vue'
 import Footer from '@/layouts/components/Footer.vue'
-import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
+import NavItems from '@/layouts/components/NavItems/NavItems.vue'
 import UserProfile from '@/layouts/components/UserProfile.vue'
+import { useAuthStore } from '@/store/auth'
+import VerticalNavLayout from '@layouts/components/VerticalNavLayout.vue'
+import { useRouter } from 'vue-router'
+import { useTheme } from 'vuetify'
+import { getHours } from 'date-fns'
+
+const {
+  name: themeName,
+  global: globalTheme,
+} = useTheme()
+
+const authStore = useAuthStore()
+const router = useRouter()
+
+const greeting = computed(() => {
+  const hour = getHours(new Date())
+  if (hour >= 5 && hour < 12) return 'Buenos días'
+  if (hour >= 12 && hour < 19) return 'Buenas tardes'
+  
+  return 'Buenas noches'
+})
+
+const goToHome = () => {
+  router.push({ name: 'panel' })
+}
 </script>
 
 <template>
@@ -20,58 +42,34 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
           <VIcon icon="bx-menu" />
         </IconBtn>
 
-        <!-- 👉 Search -->
-        <div
-          class="d-flex align-center cursor-pointer ms-lg-n3"
-          style="user-select: none;"
-        >
-          <!-- 👉 Search Trigger button -->
-          <IconBtn>
-            <VIcon icon="bx-search" />
-          </IconBtn>
-
-          <span class="d-none d-md-flex align-center text-disabled ms-2">
-            <span class="me-2">Search</span>
-            <span class="meta-key">&#8984;K</span>
+        <!-- texto decorativo de bienvenida junto con el nombre -->
+        <span class="text-xl font-bold">
+          {{ greeting }} {{ authStore.user?.name ?? '' }}
+          <span class="hidden md:inline">
+            {{ authStore.user?.last_name ?? '' }}
           </span>
-        </div>
+        </span>
 
         <VSpacer />
-
-        <IconBtn
-          href="https://github.com/themeselection/sneat-vuetify-vuejs-laravel-admin-template-free"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <VIcon icon="bxl-github" />
-        </IconBtn>
-
-        <IconBtn>
-          <VIcon icon="bx-bell" />
-        </IconBtn>
-
-        <NavbarThemeSwitcher class="me-1" />
 
         <UserProfile />
       </div>
     </template>
 
     <template #vertical-nav-header="{ toggleIsOverlayNavActive }">
-      <RouterLink
-        to="/"
-        class="app-logo app-title-wrapper"
+      <div
+        class="cursor-pointer app-logo app-title-wrapper"
+        @click="goToHome"
       >
         <!-- eslint-disable vue/no-v-html -->
-        <div
-          class="d-flex"
-          v-html="logo"
-        />
-        <!-- eslint-enable -->
-
-        <h1 class="app-logo-title">
-          sneat
-        </h1>
-      </RouterLink>
+        <div class="d-flex">
+          <img
+            :src="globalTheme.name.value == 'dark' ? '/images/LogoLetraDark.png' : '/images/LogoLetra.png'"
+            alt="RENOVA"
+            class="h-[45px]"
+          >
+        </div>
+      </div>
 
       <IconBtn
         class="d-block d-lg-none"

@@ -1,0 +1,191 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use App\Models\Container;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
+
+class ContainerController extends Controller
+{
+    public function getAll(Request $request)
+    {
+        try {
+            $normalize = function ($value) {
+                if (is_string($value) && strtolower($value) === 'null') {
+                    return null;
+                }
+                return $value;
+            };
+    
+            $perPage = (int) ($normalize($request->input('per_page')) ?? 10);
+            $perPage = max(1, min($perPage, 100));
+            $query = $normalize($request->input('query')) ?? '';
+            $key = $normalize($request->input('key')) ?? 'updated_at';
+            $order = strtolower($normalize($request->input('order')) ?? 'desc');
+            $status = $normalize($request->input('status'));
+
+            $containerQuery = Container::query();
+
+            if (!empty($query)) {
+                $containerQuery->where(function ($q) use ($query) {
+                    $q->where('name', 'like', '%' . $query . '%')
+                      ->orWhere('serial_number', 'like', '%' . $query . '%')
+                      ->orWhere('location', 'like', '%' . $query . '%');
+                });
+            }
+
+            if ($status != null && in_array($status, [0, 1])) {
+                $containerQuery->where('status', $status);
+            }
+
+            $allowedKeys = ['serial_number', 'location', 'status', 'updated_at'];
+
+            if ($key != null && in_array($key, $allowedKeys) && in_array($order, ['asc', 'desc'])) {
+                $containerQuery->orderBy($key, $order);
+            }
+
+            $containers = $containerQuery->paginate($perPage);
+            $data = $this->unsetDataPagination($containers);
+            return $this->apiResponse(true, 'Contenedores obtenidos exitosamente.', $data, null, 200);
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al obtener los comercios.', null, $e->getMessage(), 500);
+        }
+    }
+
+    public function create(Request $request)
+    {
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'serial_number' => 'required|string|max:255',
+                'location' => 'required|string|max:255',
+                'status' => 'required|boolean',
+            ]);
+
+            $container = Container::create($validatedData);
+
+            return $this->apiResponse(true, 'Comercio creado exitosamente.', $container, null, 201);
+        } catch (ValidationException $e) {
+            return $this->apiResponse(false, 'Error al crear el comercio.', null, $e->errors(), 422);
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al crear el comercio.', null, $e->getMessage(), 500);
+        }
+    }
+
+    public function update(Request $request, $id) 
+    {
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'serial_number' => 'required|string|max:255',
+                'location' => 'required|string|max:255',
+                'status' => 'required|boolean',
+            ]);
+
+            $container = Container::find($id);
+
+            if (!$container) {
+                return $this->apiResponse(false, 'Comercio seleccionado no existe.', null, null, 404);
+            }
+
+            $container->update($validatedData);
+
+            return $this->apiResponse(true, 'Comercio actualizado exitosamente.', $container, null, 200);
+        } catch (ValidationException $e) {
+            return $this->apiResponse(false, 'Error al actualizar el comercio.', null, $e->errors(), 422);
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al actualizar el comercio.', null, $e->getMessage(), 500);
+        }
+    }
+
+    public function delete(Request $request, $id)
+    {
+        try {
+
+            $container = Container::find($id);
+
+            if (!$container) {
+                return $this->apiResponse(false, 'Comercio seleccionado no existe.', null, null, 404);
+            }
+
+            try {
+
+                $container->delete();
+            } catch (\Illuminate\Database\QueryException $e) {
+                if ($e->getCode() === '23503') {
+                    return $this->apiResponse(false, 'No se puede eliminar el comercio, por que ya esta relacionado con otros elementos.', null, null, 422);
+                }
+                throw $e;
+            }
+
+            return $this->apiResponse(true, 'Comercio eliminado exitosamente.', null, null, 200);
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al eliminar el comercio.', null, $e->getMessage(), 500);
+        }
+    }
+
+    public function catalog(Request $request) 
+    {
+        try {
+            $alliances = Container::select('id', 'name', 'location')->where('status', 1)->get();
+            return $this->apiResponse(true, 'Catalogo obtenido exitosamente.', $alliances, null, 200);
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al obtener el catalogo.', null, $e->getMessage(), 500);
+        }
+    }
+    
+    public function updateCapacity(Request $request, int $id)
+    {
+        try {
+            $request->merge(['container_id' => $id]);
+
+            $validatedData = $request->validate([
+                'container_id' => 'required|exists:containers,id',
+                'capacity' => 'required|array',
+            ]);
+
+            $container = Container::find($validatedData['container_id']);
+
+            if (!$container) {
+                return $this->apiResponse(false, 'Contenedor seleccionado no existe.', null, null, 404);
+            }
+
+            // Altura fija del sensor respecto al fondo (en cm)
+            $sensorHeight = 52;
+
+            // Copiamos la capacidad actual para no modificarla directamente hasta calcular los porcentajes
+            $capacityContainer = $container->capacity ?? [];
+
+            // Procesamos cada sensor que venga en el request
+            foreach (['sensor1', 'sensor2', 'sensor3'] as $sensor) {
+                if (isset($validatedData['capacity'][$sensor])) {
+                    $distance = (float) $validatedData['capacity'][$sensor];
+
+                    // Calculamos la altura del contenido
+                    $contentHeight = $sensorHeight - $distance;
+
+                    // Aseguramos que esté en el rango válido [0, sensorHeight]
+                    $contentHeight = max(0, min($contentHeight, $sensorHeight));
+
+                    // Convertimos a porcentaje
+                    $fillPercentage = ($contentHeight / $sensorHeight) * 100;
+
+                    // Guardamos solo el porcentaje (entero o con decimales, según prefieras)
+                    $capacityContainer[$sensor] = round($fillPercentage, 2); // Puedes usar round($fillPercentage) si quieres enteros
+                }
+            }
+
+            $container->update(['capacity' => $capacityContainer]);
+
+            return $this->apiResponse(true, 'Comercio actualizado exitosamente.', $container, null, 200);
+        } catch (ValidationException $e) {
+            return $this->apiResponse(false, 'Error al actualizar el comercio.', null, $e->errors(), 422);
+        } catch (\Exception $e) {
+            return $this->apiResponse(false, 'Error al actualizar el comercio.', null, $e->getMessage(), 500);
+        }
+    }
+}

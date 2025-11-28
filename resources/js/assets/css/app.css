@@ -1,0 +1,117 @@
+/*
+   |--------------------------------------------------------------------------
+   | Fonts
+   |--------------------------------------------------------------------------
+   |
+   | Import all fonts used in the template, the font configuration can be
+   | seen in "tailwind.config.js".
+   |
+   | Please check this link for more details:
+   | https://tailwindcss.com/docs/theme
+   |
+   */
+@import "./fonts/_public-sans.css";
+
+/*
+   |--------------------------------------------------------------------------
+   | Components
+   |--------------------------------------------------------------------------
+   |
+   | Import CSS components.
+   |
+   */
+@import "./components/_box.css";
+@import "./components/_global.css";
+@import "./components/_image-fit.css";
+@import "./components/_scrollbar-hidden.css";
+@import "./components/_typing-dots.css";
+@import "./components/_zoom-in.css";
+
+/*
+ |--------------------------------------------------------------------------
+ | TailwindCSS Directives
+ |--------------------------------------------------------------------------
+ |
+ | Import TailwindCSS directives and swipe out at build-time with all of
+ | the styles it generates based on your configured design system.
+ |
+ | Please check this link for more details:
+ | https://tailwindcss.com/docs/installation#include-tailwind-in-your-css
+ |
+ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/*
+|--------------------------------------------------------------------------
+| Custom CSS
+|--------------------------------------------------------------------------
+*/
+
+@font-face {
+  font-family: 'Stella';
+
+  font-weight: 100;
+
+  font-display: swap;
+
+  src: url('/fonts/Stella.ttf') format('truetype');
+}
+
+.font-stella {
+  font-family: 'Stella';
+  letter-spacing: 1px;
+}
+
+.zoom-img-wrap {
+  z-index: 2500 !important;
+}
+ 
+.custom-html ul {
+  list-style-type: disc !important;
+  padding-left: 1.5rem !important;
+  margin-bottom: 1rem !important;
+}
+ 
+ .custom-html ol {
+   list-style-type: decimal !important;
+   padding-left: 1.5rem !important;
+   margin-bottom: 1rem !important;
+ }
+ 
+ .custom-html li {
+   margin-bottom: 0.5rem !important;
+ }
+
+ .custom_scroll {
+  /* Cambia el estilo de la barra de desplazamiento */
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #05d16e #e6faf0; /* Firefox: color del thumb y track */
+}
+
+ .custom_scroll.dark {
+  /* Cambia el estilo de la barra de desplazamiento */
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #026679 #2a2b3e; /* Firefox: color del thumb y track */
+}
+
+.custom_scroll::-webkit-scrollbar {
+  width: 8px; /* Ancho de la barra vertical */
+  height: 8px; /* Alto de la barra horizontal (si aplica) */
+}
+
+.custom_scroll::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Fondo del track */
+  border-radius: 10px; /* Bordes redondeados */
+}
+
+.custom_scroll::-webkit-scrollbar-thumb {
+  background: #888; /* Color del thumb */
+  border-radius: 10px; /* Bordes redondeados */
+}
+
+.custom_scroll::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Color del thumb al pasar el mouse */
+}

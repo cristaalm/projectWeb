@@ -1,10 +1,12 @@
-<script setup>
-import UpgradeToPro from '@/components/UpgradeToPro.vue'
-</script>
-
 <template>
   <VApp>
+    <ToastNotification />
+    <VDialogComponent />
     <RouterView />
-    <UpgradeToPro />
   </VApp>
 </template>
+
+<script setup>
+import ToastNotification from '@/components/Base/ToastNotification'
+import VDialogComponent from '@/components/Base/VAlertDialog/VAlertDialog.vue'
+</script>

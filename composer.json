@@ -7,11 +7,17 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "darkaonline/l5-swagger": "^9.0",
+        "jenssegers/agent": "^2.6",
+        "kreait/firebase-php": "^7.23",
         "laravel-lang/common": "^6.7",
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
-        "maennchen/zipstream-php": "^3.1"
+        "maennchen/zipstream-php": "^3.1",
+        "pragmarx/google2fa-laravel": "^2.3",
+        "sendgrid/sendgrid": "^8.1",
+        "symfony/http-client": "^7.3"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -44,6 +50,9 @@
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+        ],
+        "post-install-cmd": [
+            "@php artisan l5-swagger:generate --ansi"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""

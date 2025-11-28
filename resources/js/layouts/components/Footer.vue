@@ -1,41 +1,38 @@
+<script setup>
+import { ModalViewTerms, useModalViewTerms } from './ModalViewTerms'
+
+const { showViewTermsModal, openViewTermsModal } = useModalViewTerms()
+</script>
+
 <template>
-  <div class="h-100 d-flex align-center justify-md-space-between justify-center">
+  <div class="h-100 flex flex-col md:flex-row items-center justify-between">
     <!-- 👉 Footer: left content -->
-    <span class="d-flex align-center">
+    <span class="flex flex-row items-center">
       &copy;
       {{ new Date().getFullYear() }}
-      Made With
+      Hecho con 
       <VIcon
         icon="bx-heart"
         color="error"
         size="1.25rem"
         class="mx-1"
       />
-      By <a
-        href="https://themeselection.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="text-primary ms-1"
-      >ThemeSelection</a>
+      por <span class="text-primary dark:!text-slate-300 ms-1">RENOVA</span>
     </span>
     <!-- 👉 Footer: right content -->
-    <span class="d-md-flex gap-x-4 text-primary d-none">
+    <span class="flex-row items-center justify-end gap-x-4 text-primary hidden md:flex">
       <a
-        href="https://themeselection.com/license/"
-        target="noopener noreferrer"
-      >License</a>
+        href="/api/docs"
+        target="_blank"
+        class="dark:!text-slate-300"
+      >API Docs</a>
       <a
-        href="https://themeselection.com/"
-        target="noopener noreferrer"
-      >More Themes</a>
-      <a
-        href="https://demos.themeselection.com/sneat-vuetify-vuejs-admin-template/documentation/guide/laravel-integration/folder-structure.html"
-        target="noopener noreferrer"
-      >Documentation</a>
-      <a
-        href="https://themeselection.com/support/"
-        target="noopener noreferrer"
-      >Support</a>
+        href="#"
+        class="hover:underline  !cursor-pointer dark:!text-slate-300"
+        @click="(e) => { e.preventDefault(); openViewTermsModal() }"
+      >Condiciones y términos de uso</a>
     </span>
   </div>
+
+  <ModalViewTerms v-model="showViewTermsModal" />
 </template>

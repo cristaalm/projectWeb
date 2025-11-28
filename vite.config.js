@@ -12,10 +12,6 @@ import svgLoader from 'vite-svg-loader'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  server: {
-    host: 'localhost', // Permite acceso desde la red local
-    port: 3000,      // Puerto del frontend (ajústalo si es necesario)
-  },
   plugins: [vue({
     template: {
       transformAssetUrls: {

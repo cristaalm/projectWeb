@@ -1,23 +1,30 @@
 <script setup>
-import avatar1 from '@images/avatars/avatar-1.png'
+import avatar from '@images/placeholders/avatar.png?url'
+import { useThemeSwitcher } from '@/hooks/layout/useThemeSwitcher'
+import { storageURL } from '@/utils/constants'
+import { useAuthStore } from '@/store/auth'
+import { useRouter } from 'vue-router'
+
+const { themeName, changeTheme } = useThemeSwitcher()
+const authStore = useAuthStore()
+const user = authStore.getUser()
+const router = useRouter()
+
+const avatarImg = computed(() => {
+  if (authStore.user.avatar !== null) return storageURL + authStore.user.avatar
+  
+  return avatar
+})
 </script>
 
 <template>
-  <VBadge
-    dot
-    location="bottom right"
-    offset-x="3"
-    offset-y="3"
-    color="success"
-    bordered
-  >
+  <div class="relative">
     <VAvatar
       class="cursor-pointer"
-      color="primary"
       variant="tonal"
     >
-      <VImg :src="avatar1" />
-
+      <VImg :src="avatarImg" />
+  
       <!-- SECTION Menu -->
       <VMenu
         activator="parent"
@@ -27,7 +34,10 @@ import avatar1 from '@images/avatars/avatar-1.png'
       >
         <VList>
           <!-- 👉 User Avatar & Name -->
-          <VListItem>
+          <VListItem
+            link
+            @click="router.push({ name: 'profile' })"
+          >
             <template #prepend>
               <VListItemAction start>
                 <VBadge
@@ -37,25 +47,26 @@ import avatar1 from '@images/avatars/avatar-1.png'
                   offset-y="3"
                   color="success"
                 >
-                  <VAvatar
-                    color="primary"
-                    variant="tonal"
-                  >
-                    <VImg :src="avatar1" />
+                  <VAvatar variant="tonal">
+                    <VImg :src="avatarImg" />
                   </VAvatar>
                 </VBadge>
               </VListItemAction>
             </template>
-
+  
             <VListItemTitle class="font-weight-semibold">
-              John Doe
+              {{ user.name }} {{ user.last_name }}
             </VListItemTitle>
-            <VListItemSubtitle>Admin</VListItemSubtitle>
+            <VListItemSubtitle v-if="user.role">
+              {{ user.role.name }}
+            </VListItemSubtitle>
           </VListItem>
           <VDivider class="my-2" />
-
-          <!-- 👉 Profile -->
-          <VListItem link>
+          <!-- 👉 Modo oscuro / claro -->
+          <VListItem
+            link
+            @click="router.push({ name: 'profile' })"
+          >
             <template #prepend>
               <VIcon
                 class="me-2"
@@ -63,54 +74,28 @@ import avatar1 from '@images/avatars/avatar-1.png'
                 size="22"
               />
             </template>
-
-            <VListItemTitle>Profile</VListItemTitle>
+            <VListItemTitle>Perfil</VListItemTitle>
           </VListItem>
-
-          <!-- 👉 Settings -->
-          <VListItem link>
-            <template #prepend>
-              <VIcon
-                class="me-2"
-                icon="bx-cog"
-                size="22"
-              />
-            </template>
-
-            <VListItemTitle>Settings</VListItemTitle>
-          </VListItem>
-
-          <!-- 👉 Pricing -->
-          <VListItem link>
-            <template #prepend>
-              <VIcon
-                class="me-2"
-                icon="bx-dollar"
-                size="22"
-              />
-            </template>
-
-            <VListItemTitle>Pricing</VListItemTitle>
-          </VListItem>
-
-          <!-- 👉 FAQ -->
-          <VListItem link>
-            <template #prepend>
-              <VIcon
-                class="me-2"
-                icon="bx-help-circle"
-                size="22"
-              />
-            </template>
-
-            <VListItemTitle>FAQ</VListItemTitle>
-          </VListItem>
-
-          <!-- Divider -->
           <VDivider class="my-2" />
-
+          <!-- 👉 Modo oscuro / claro -->
+          <VListItem
+            link
+            @click="changeTheme"
+          >
+            <template #prepend>
+              <VIcon
+                class="me-2"
+                :icon="themeName === 'dark' ? 'bx-sun' : 'bx-moon'"
+                size="22"
+              />
+            </template>
+            <VListItemTitle>Modo {{ themeName === 'dark' ? 'claro' : 'oscuro' }}</VListItemTitle>
+          </VListItem>
+  
+          <VDivider class="my-2" />
+  
           <!-- 👉 Logout -->
-          <VListItem to="/login">
+          <VListItem @click.prevent="router.push({ name: 'logout' })">
             <template #prepend>
               <VIcon
                 class="me-2"
@@ -118,12 +103,13 @@ import avatar1 from '@images/avatars/avatar-1.png'
                 size="22"
               />
             </template>
-
-            <VListItemTitle>Logout</VListItemTitle>
+            <VListItemTitle>
+              Logout
+            </VListItemTitle>
           </VListItem>
         </VList>
       </VMenu>
       <!-- !SECTION -->
     </VAvatar>
-  </VBadge>
+  </div>
 </template>

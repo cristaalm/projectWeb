@@ -64,6 +64,7 @@ public/mockServiceWorker.js
 # Env files
 .env*
 !.env.example
+env.example.remoto
 
 exports
 node_modules
@@ -71,5 +72,22 @@ vendor
 
 # ============================
 # BRISA, no subas esta carpeta
-.vscode 
+.vscode
+# trataré-att.bri
 # ============================
+
+pids
+
+# Swagger docs (generated)
+# (Se versiona api-docs.json para producción; si automatizas generación, puedes volver a ignorarlos)
+# /storage/api-docs/*.json
+# /storage/api-docs/*.yaml
+
+# Private keys & service accounts
+*.pem
+*.key
+id_rsa
+id_ed25519
+*.p8
+*service-account*.json
+firebase*.json

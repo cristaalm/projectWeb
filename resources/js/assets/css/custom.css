@@ -1,0 +1,252 @@
+/* ? ########### Custom Scrollbar ########### ? */
+.scrollbar-custom::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 10px; /* Ajusta el ancho del scrollbar */
+  background-color: var(--scrollbar-bg, #c5f7de); /* Color variable */
+}
+.scrollbar-custom::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, hwb(154 19% 48%)); /* Color variable */
+  border-radius: 5px; /* Ajusta el radio de las esquinas */
+}
+
+.dark .scrollbar-custom::-webkit-scrollbar {
+  /* slate-900 */
+  background-color: rgb(40, 51, 78); /* Color variable */
+}
+
+.dark .scrollbar-custom::-webkit-scrollbar-thumb {
+  /* slate-700 */
+  background: rgb(27, 37, 59); /* Color variable */
+}
+
+/* ?  ############## NProgress ############## ? */
+
+#nprogress .bar {
+  background: var(--nprogress-bar-bg, rgb(34, 221, 59)); /* Color variable */
+  height: 8px; /* Ajusta el grosor de la barra */
+}
+
+/* Personaliza el spinner si lo usas */
+#nprogress .spinner-icon {
+  border-top-color: var(--nprogress-spinner, #29d); /* Color variable */
+  border-left-color: var(--nprogress-spinner, #29d); /* Color variable */
+}
+
+/* Cambia la posición de la barra si es necesario */
+#nprogress .bar {
+  top: 0; /* Coloca la barra en la parte superior */
+  left: 0;
+}
+
+/* Cambiar la opacidad del fondo de la barra de progreso */
+#nprogress .peg {
+  box-shadow:
+    0 0 10px var(--nprogress-shadow, #29d),
+    0 0 5px var(--nprogress-shadow, #29d); /* Efecto de sombra variable */
+}
+
+/* ? ########## CONFIG AOS ########## ?  */
+
+@media (max-width: 768px) {
+  [data-aos] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Estilos de colores según el tema */
+
+html.default {
+  --scrollbar-bg: #a3d8f7;
+  --scrollbar-thumb: #0c4a6e;
+  --nprogress-bar-bg: #0c4a6e;
+  --nprogress-spinner: #03045e;
+  --nprogress-shadow: #03045e;
+}
+
+html.theme-1 {
+  --scrollbar-bg: #a3e7b7;
+  --scrollbar-thumb: #4c855c;
+  --nprogress-bar-bg: #64b079;
+  --nprogress-spinner: #064e3b;
+  --nprogress-shadow: #064e3b;
+}
+
+html.theme-2 {
+  --scrollbar-bg: #aed9e6;
+  --scrollbar-thumb: #0077b6;
+  --nprogress-bar-bg: #03045e;
+  --nprogress-spinner: #03045e;
+  --nprogress-shadow: #03045e;
+}
+
+html.theme-3 {
+  --scrollbar-bg: #addff1;
+  --scrollbar-thumb: #00b4d8;
+  --nprogress-bar-bg: #03045e;
+  --nprogress-spinner: #03045e;
+  --nprogress-shadow: #03045e;
+}
+
+html.theme-4 {
+  --scrollbar-bg: #a8e3f4;
+  --scrollbar-thumb: #0077b6;
+  --nprogress-bar-bg: #03045e;
+  --nprogress-spinner: #03045e;
+  --nprogress-shadow: #03045e;
+}
+
+html.theme-5 {
+  --scrollbar-bg: #a1dbf2;
+  --scrollbar-thumb: #00b4d8;
+  --nprogress-bar-bg: #03045e;
+  --nprogress-spinner: #03045e;
+  --nprogress-shadow: #03045e;
+}
+
+html.theme-6 {
+  --scrollbar-bg: #83c8f0;
+  --scrollbar-thumb: #0077b6;
+  --nprogress-bar-bg: #00b4d8;
+  --nprogress-spinner: #00b4d8;
+  --nprogress-shadow: #00b4d8;
+}
+
+html.theme-7 {
+  --scrollbar-bg: #9ac4db;
+  --scrollbar-thumb: #0a2463;
+  --nprogress-bar-bg: #247ba0;
+  --nprogress-spinner: #247ba0;
+  --nprogress-shadow: #247ba0;
+}
+
+html.theme-8 {
+  --scrollbar-bg: #9cc0d7;
+  --scrollbar-thumb: #247ba0;
+  --nprogress-bar-bg: #0a2463;
+  --nprogress-spinner: #0a2463;
+  --nprogress-shadow: #0a2463;
+}
+
+html.theme-9 {
+  --scrollbar-bg: #9fd5bf;
+  --scrollbar-thumb: #0e3b43;
+  --nprogress-bar-bg: #357266;
+  --nprogress-spinner: #357266;
+  --nprogress-shadow: #357266;
+}
+
+html.theme-10 {
+  --scrollbar-bg: #b7b7a3;
+  --scrollbar-thumb: #4d4d42;
+  --nprogress-bar-bg: #6c6c60;
+  --nprogress-spinner: #6c6c60;
+  --nprogress-shadow: #6c6c60;
+}
+
+html.theme-11 {
+  --scrollbar-bg: #b0b6e6;
+  --scrollbar-thumb: #7986cb;
+  --nprogress-bar-bg: #3949ab;
+  --nprogress-spinner: #3949ab;
+  --nprogress-shadow: #3949ab;
+}
+
+html.theme-12 {
+  --scrollbar-bg: #8ca19f;
+  --scrollbar-thumb: #52796f;
+  --nprogress-bar-bg: #2f3e46;
+  --nprogress-spinner: #2f3e46;
+  --nprogress-shadow: #2f3e46;
+}
+
+html.theme-13 {
+  --scrollbar-bg: #a79582;
+  --scrollbar-thumb: #22333b;
+  --nprogress-bar-bg: #5e503f;
+  --nprogress-spinner: #5e503f;
+  --nprogress-shadow: #5e503f;
+}
+
+html.theme-14 {
+  --scrollbar-bg: #a695c4;
+  --scrollbar-thumb: #231942;
+  --nprogress-bar-bg: #5e548e;
+  --nprogress-spinner: #5e548e;
+  --nprogress-shadow: #5e548e;
+}
+
+html.theme-15 {
+  --scrollbar-bg: #517e81;
+  --scrollbar-thumb: #767522;
+  --nprogress-bar-bg: #02292f;
+  --nprogress-spinner: #02292f;
+  --nprogress-shadow: #02292f;
+}
+
+html.theme-16 {
+  --scrollbar-bg: #79c19a;
+  --scrollbar-thumb: #006466;
+  --nprogress-bar-bg: #4c956c;
+  --nprogress-spinner: #4c956c;
+  --nprogress-shadow: #4c956c;
+}
+
+html.theme-17 {
+  --scrollbar-bg: #7faee7;
+  --scrollbar-thumb: #247ba0;
+  --nprogress-bar-bg: #0a2463;
+  --nprogress-spinner: #0a2463;
+  --nprogress-shadow: #0a2463;
+}
+
+html.theme-18 {
+  --scrollbar-bg: #869f9f;
+  --scrollbar-thumb: #52796f;
+  --nprogress-bar-bg: #2f3e46;
+  --nprogress-spinner: #2f3e46;
+  --nprogress-shadow: #2f3e46;
+}
+
+html.dark {
+  --scrollbar-bg: #3e3e3e;
+  --scrollbar-thumb: #1e1e1e;
+  --nprogress-bar-bg: #3e3e3e;
+  --nprogress-spinner: #1e1e1e;
+  --nprogress-shadow: #1e1e1e;
+}
+
+html.theme-19 {
+  --scrollbar-bg: #5bcae6;
+  --scrollbar-thumb: #1e6b88;
+  --nprogress-bar-bg: #5bcae6;
+  --nprogress-spinner: #1e6b88;
+  --nprogress-shadow: #1e6b88;
+}
+
+html.theme-20 {
+  --scrollbar-bg: #67de96;
+  --scrollbar-thumb: #1aca60;
+  --nprogress-bar-bg: #67de96;
+  --nprogress-spinner: #1aca60;
+  --nprogress-shadow: #1aca60;
+}
+
+html.theme-21 {
+  --scrollbar-bg: #f0e035;
+  --scrollbar-thumb: #f88e15;
+  --nprogress-bar-bg: #f0e035;
+  --nprogress-spinner: #f88e15;
+  --nprogress-shadow: #f88e15;
+}
+
+html.theme-22 {
+  --scrollbar-bg: #ffa094;
+  --scrollbar-thumb: #db3e29;
+  --nprogress-bar-bg: #ffa094;
+  --nprogress-spinner: #db3e29;
+  --nprogress-shadow: #db3e29;
+}
+
+/* Agrega más temas según sea necesario */

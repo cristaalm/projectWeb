@@ -82,6 +82,7 @@ module.exports = {
       fontFamily: {
         'public-sans': ['Public Sans'],
         'dm-sans': ['DM Sans'],
+        'poppins': ['Poppins', 'sans-serif'],
       },
     },
   },
@@ -91,11 +92,10 @@ module.exports = {
       addBase({
         // Default colors
         ':root': {
-          '--color-theme-1': toRGB('#03045e'),
-          '--color-theme-2': toRGB('#0c4a6e'),
-          '--color-theme-3': toRGB('#0077b6'),
-          '--color-primary': toRGB('#03045e'),
-          '--color-secondary': toRGB(colors.slate['200']),
+          '--color-theme-1': toRGB('#05d16e'),
+          '--color-theme-2': toRGB('#08b662'),
+          '--color-primary': toRGB('#05d16e'),
+          '--color-secondary': toRGB('#08b662'),
           '--color-success': toRGB(colors.teal['600']),
           '--color-info': toRGB(colors.cyan['600']),
           '--color-warning': toRGB(colors.yellow['600']),
@@ -107,7 +107,7 @@ module.exports = {
 
         // Default dark-mode colors
         '.dark': {
-          '--color-primary': toRGB('#23263a'), // Fondo principal
+          '--color-primary': toRGB('#024653'), // Fondo principal
           '--color-darkmode-50': '224 230 237', // Texto principal (gris muy claro)
           '--color-darkmode-100': '180 190 210', // Texto secundario
           '--color-darkmode-200': '120 130 160', // Bordes/acento

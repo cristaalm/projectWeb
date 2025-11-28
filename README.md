@@ -34,10 +34,10 @@ Este proyecto está listo para desarrollo local y puede desplegarse fácilmente 
 
 Antes de comenzar, asegúrate de tener instalado:
 
-- PHP >= 8.1
+- PHP >= 8.2
 - Composer
 - Node.js >= 18 + pnpm
-- PostgreSQL >= 12
+- PostgreSQL >= 16
 - Git
 
 ## Instalación y Configuración

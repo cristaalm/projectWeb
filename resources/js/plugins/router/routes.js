@@ -1,50 +1,77 @@
 export const routes = [
-  { path: '/', redirect: '/dashboard' },
+  { path: '/', component: () => import('@/pages/Landing') },
   {
     path: '/',
     component: () => import('@/layouts/default.vue'),
+    meta: { requiresAuth: true, isDashboard: true },
     children: [
       {
-        path: 'dashboard',
-        component: () => import('@/pages/dashboard.vue'),
+        path: 'Panel',
+        name: 'panel',
+        component: () => import('@/pages/Dashboard/Panel/'),
       },
       {
-        path: 'account-settings',
-        component: () => import('@/pages/account-settings.vue'),
+        path: 'Users',
+        name: 'users',
+        component: () => import('@/pages/Dashboard/Users/'),
       },
       {
-        path: 'typography',
-        component: () => import('@/pages/typography.vue'),
+        path: 'Containers',
+        name: 'containers',
+        component: () => import('@/pages/Dashboard/Containers/'),
       },
       {
-        path: 'icons',
-        component: () => import('@/pages/icons.vue'),
+        path: 'Shops',
+        name: 'shops',
+        component: () => import('@/pages/Dashboard/Shops/'),
       },
       {
-        path: 'cards',
-        component: () => import('@/pages/cards.vue'),
+        path: 'Rewards',
+        name: 'rewards',
+        component: () => import('@/pages/Dashboard/Rewards/'),
       },
       {
-        path: 'tables',
-        component: () => import('@/pages/tables.vue'),
+        path: 'Badges',
+        name: 'badges',
+        component: () => import('@/pages/Dashboard/Badges/'),
       },
       {
-        path: 'form-layouts',
-        component: () => import('@/pages/form-layouts.vue'),
+        path: 'Profile',
+        name: 'profile',
+        component: () => import('@/pages/Dashboard/Profile/'),
       },
     ],
   },
   {
     path: '/',
     component: () => import('@/layouts/blank.vue'),
+    meta: { requiresAuth: true, isDashboard: false },
     children: [
       {
         path: 'login',
-        component: () => import('@/pages/login.vue'),
+        name: 'login',
+        component: () => import('@/pages/Auth/login.vue'),
       },
       {
-        path: 'register',
-        component: () => import('@/pages/register.vue'),
+        path: 'logout',
+        name: 'logout',
+        component: () => import('@/pages/Auth/logout.vue'),
+      },
+      {
+        path: 'forgot-password',
+        name: 'forgot-password',
+        component: () => import('@/pages/Auth/forgotPass.vue'),
+      },
+      {
+        path: 'reset-password',
+        name: 'reset-password',
+        component: () => import('@/pages/Auth/resetPass.vue'),
+        props: route => ({ token: route.query.token, email: route.query.email }),
+      },
+      {
+        path: 'verify-2fa',
+        name: 'verify2FA',
+        component: () => import('@/pages/Auth/verify2FA.vue'),
       },
       {
         path: '/:pathMatch(.*)*',
