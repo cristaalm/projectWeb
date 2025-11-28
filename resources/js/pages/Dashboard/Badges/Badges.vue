@@ -35,7 +35,7 @@ const resetFilters = () => {
 const headers = [
   { title: 'Nombre', align: 'left', key: 'name' },
   { title: 'Puntos requeridos', align: 'start', key: 'points_required' },
-  { title: 'Puntos de recompensa', align: 'start', key: 'points_awarded' },
+  { title: 'Puntos de recompensa', align: 'start', key: 'points_awared' },
   { title: 'Estado', align: 'center', key: 'status', sortable: false },
   { title: '', key: 'actions', sortable: false, align: 'end' },
 ]

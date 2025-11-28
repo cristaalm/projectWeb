@@ -85,21 +85,21 @@ watch(isOpen, val => {
             :error="touchedFields.points_required && !!formErrors.points_required"
             :error-messages="touchedFields.points_required ? formErrors.points_required : ''"
             @enter="handleSaveBadge"
-            @input="touchField('points_required')"
+            @keyup="touchField('points_required')"
           />
           <VTextField
-            v-model="badgeData.points_awarded"
+            v-model="badgeData.points_awared"
             v-number-only
             label="Número de puntos de recompensa"
             placeholder="Número de puntos de recompensa"
             outlined
             :color="darkModeStore.darkMode ? 'white' : 'primary'" 
-            :class="formErrors.points_awarded ? '!max-h-[60px]' : '!max-h-[38px]'"
+            :class="formErrors.points_awared ? '!max-h-[60px]' : '!max-h-[38px]'"
             :disabled="loading"
-            :error="touchedFields.points_awarded && !!formErrors.points_awarded"
-            :error-messages="touchedFields.points_awarded ? formErrors.points_awarded : ''"
+            :error="touchedFields.points_awared && !!formErrors.points_awared"
+            :error-messages="touchedFields.points_awared ? formErrors.points_awared : ''"
             @enter="handleSaveBadge"
-            @input="touchField('points_awarded')"
+            @keyup="touchField('points_awared')"
           />
         </div>
 
