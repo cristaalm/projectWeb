@@ -21,7 +21,7 @@ const {
           icon="mdi mdi-map-marker-radius-outline"
           size="32"
         />
-        <h2 class="text-lg font-bold truncate max-w-[200px]">
+        <h2 class="text-lg font-bold">
           Estado de contenedores
         </h2>
       </div>

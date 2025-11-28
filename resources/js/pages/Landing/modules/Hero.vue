@@ -80,18 +80,6 @@ const scrollToSection = sectionId => {
             <div class="d-flex align-center gap-8 pt-4 font-poppins">
               <div>
                 <div class="text-h4 font-weight-bold text-primary">
-                  63%
-                </div>
-                <div class="text-sm text-muted-foreground">
-                  Tasa de reciclaje PET
-                </div>
-              </div>
-              <VDivider
-                vertical
-                class="h-12"
-              />
-              <div>
-                <div class="text-h4 font-weight-bold text-primary">
                   +1000
                 </div>
                 <div class="text-sm text-muted-foreground">

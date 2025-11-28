@@ -29,46 +29,46 @@ export function useValidations({ shopData }) {
   
   const validators = {
     name: value => {
-      if (value === null || value === '') return 'El nombre no puede estar vacio'
+      if (value === null || value === '') return 'El nombre no puede estar vacío'
 
       if (value.length > 150) return 'El nombre debe tener menos de 150 caracteres'
 
       return ''
     },
     contact_name: value => {
-      if (value === null || value === '') return 'El nombre no puede estar vacio'
+      if (value === null || value === '') return 'El nombre de contacto no puede estar vacío'
       
-      if (value.length > 150) return 'El nombre debe tener menos de 150 caracteres'
+      if (value.length > 150) return 'El nombre de contacto debe tener menos de 150 caracteres'
 
       return ''
     },
     contact_email: value => {
-      if (value === null || value === '') return 'El correo no puede estar vacio'
+      if (value === null || value === '') return 'El correo electrónico no puede estar vacío'
       
       const regex = /^[\w.%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i
       
-      if (!regex.test(value)) return 'El correo debe ser valido.'
-      
+      if (!regex.test(value)) return 'El correo electrónico no es válido.'
+
       return ''
     },
     phone: value => {
-      if (value === null || value === '') return 'El telefono no puede estar vacio'
+      if (value === null || value === '') return 'El teléfono no puede estar vacío'
 
-      value = value.replace(/\D/g, '')
+      const digits = value.replace(/\D/g, '')
 
-      if (value.length !== 10) return 'El telefono debe tener 10 digitos.'
+      if (digits.length !== 10) return 'El número de teléfono debe tener 10 dígitos.'
 
       return ''
     },
     address: value => {
-      if (value === null || value === '') return 'La direccion no puede estar vacia'
+      if (value === null || value === '') return 'La dirección no puede estar vacía'
 
-      if (value.length > 255) return 'La direccion debe tener menos de 255 caracteres'
+      if (value.length > 255) return 'La dirección debe tener menos de 255 caracteres'
       
       return ''
     },
     type_shop_id: value => {
-      if (value === null || value === '') return 'El tipo de comercio no puede estar vacio'
+      if (value === null || value === '') return 'El tipo de comercio no puede estar vacío'
       
       return ''
     },
@@ -98,7 +98,6 @@ export function useValidations({ shopData }) {
     Object.assign(formErrors, originalForm)
     Object.keys(touchedFields).forEach(key => touchedFields[key] = false)
   }
-  
   
   return {
     formValidate,

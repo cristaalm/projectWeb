@@ -45,41 +45,39 @@ export function useValidations({ rewardData }) {
   
   const validators = {
     name: value => {
-      if (value === null || value === '') return 'El nombre no puede estar vacio'
+      if (value === null || value === '') return 'El nombre no puede estar vacío'
 
       if (value.length > 150) return 'El nombre debe tener menos de 150 caracteres'
 
       return ''
     },
     description: value => {
-      if (value === null || value === '') return 'La descripcion no puede estar vacia'
+      if (value === null || value === '') return 'La descripción no puede estar vacía'
       
-      if (value.length > 255) return 'La descripcion debe tener menos de 255 caracteres'
+      if (value.length > 255) return 'La descripción debe tener menos de 255 caracteres'
 
       return ''
     },
     points_required: value => {
-      if (!value) return 'Los puntos requeridos debe ser mayor a 0'
+      if (!value) return 'Los puntos requeridos deben ser mayores que 0'
       
       return ''
     },
     stock: value => {
       if (isUnlimitedStock.value) return ''
       
-      if (!value) return 'El stock debe ser mayor a 0'
+      if (!value) return 'El stock debe ser mayor que 0'
       
       return ''
     },
     expires_at: value => {
       if (isIndefiniteExpiration.value) return ''
       
-      if (!value) return 'La fecha de expiracion es incorrecta'
+      if (!value || value === 'DD/MM/YYYY') return 'Seleccione una fecha de expiración'
 
-      if (value == 'DD/MM/YYYY' || value == null) return 'Seleccione una fecha de expiracion'
-  
       const date = parse(value, 'dd/MM/yyyy', new Date())
   
-      if (!isValid(date)) return 'La fecha de expiracion es incorrecta'
+      if (!isValid(date)) return 'La fecha de expiración es incorrecta'
   
       return ''
     },
@@ -109,7 +107,6 @@ export function useValidations({ rewardData }) {
     Object.assign(formErrors, originalForm)
     Object.keys(touchedFields).forEach(key => touchedFields[key] = false)
   }
-  
   
   return {
     formValidate,

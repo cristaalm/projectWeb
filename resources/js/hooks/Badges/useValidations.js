@@ -21,23 +21,23 @@ export function useValidations({ badgeData }) {
   
   const validators = {
     name: value => {
-      if (value === null || value === '') return 'El nombre no puede estar vacio'
+      if (value === null || value === '') return 'El nombre no puede estar vacío'
 
       if (value.length > 150) return 'El nombre debe tener menos de 150 caracteres'
 
       return ''
     },
     points_required: value => {
-      if (isNaN(value) || value === '' || value === null || value <= 0) return 'El numero de puntos requeridos debe ser un numero positivo'
+      if (isNaN(value) || value === '' || value === null || value <= 0) return 'El número de puntos requeridos debe ser un número positivo'
 
-      if (value.length > 150) return 'El numero de puntos requeridos debe tener menos de 150 caracteres'
+      if (value.toString().length > 150) return 'El número de puntos requeridos debe tener menos de 150 caracteres'
 
       return ''
     },
     points_awared: value => {
-      if (isNaN(value) || value === '' || value === null || value <= 0) return 'El numero de puntos de recompensa debe ser un numero positivo'
+      if (isNaN(value) || value === '' || value === null || value <= 0) return 'El número de puntos de recompensa debe ser un número positivo'
 
-      if (value.length > 150) return 'El numero de puntos de recompensa debe tener menos de 150 caracteres'
+      if (value.toString().length > 150) return 'El número de puntos de recompensa debe tener menos de 150 caracteres'
       
       return ''
     },
@@ -67,7 +67,6 @@ export function useValidations({ badgeData }) {
     Object.assign(formErrors, originalForm)
     Object.keys(touchedFields).forEach(key => touchedFields[key] = false)
   }
-  
   
   return {
     formValidate,

@@ -21,23 +21,23 @@ export function useValidations({ containerData }) {
   
   const validators = {
     name: value => {
-      if (value === null || value === '') return 'El nombre no puede estar vacio'
+      if (value === null || value === '') return 'El nombre no puede estar vacío'
 
       if (value.length > 150) return 'El nombre debe tener menos de 150 caracteres'
 
       return ''
     },
     serial_number: value => {
-      if (value === null || value === '') return 'El numero de serie no puede estar vacio'
+      if (value === null || value === '') return 'El número de serie no puede estar vacío'
 
-      if (value.length > 150) return 'El numero de serie debe tener menos de 150 caracteres'
+      if (value.length > 150) return 'El número de serie debe tener menos de 150 caracteres'
 
       return ''
     },
     location: value => {
-      if (value === null || value === '') return 'La ubicacion no puede estar vacia'
+      if (value === null || value === '') return 'La ubicación no puede estar vacía'
 
-      if (value.length > 255) return 'La ubicacion debe tener menos de 255 caracteres'
+      if (value.length > 255) return 'La ubicación debe tener menos de 255 caracteres'
       
       return ''
     },
@@ -67,7 +67,6 @@ export function useValidations({ containerData }) {
     Object.assign(formErrors, originalForm)
     Object.keys(touchedFields).forEach(key => touchedFields[key] = false)
   }
-  
   
   return {
     formValidate,

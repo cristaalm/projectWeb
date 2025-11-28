@@ -21,33 +21,29 @@ export function useValidations({ passData }) {
   
   const validators = {
     password: value => {
-      if (value === null || value === '') return 'La contraseña no puede estar vacia'
+      if (value === null || value === '') return 'La contraseña no puede estar vacía'
 
       if (value.length < 8) return 'La contraseña debe tener al menos 8 caracteres'
 
-      // un numero
-      if (!/\d/.test(value)) return 'La contraseña debe contener al menos un numero'
+      if (!/\d/.test(value)) return 'La contraseña debe contener al menos un número'
 
-      // una mayuscula
-      if (!/[A-Z]/.test(value)) return 'La contraseña debe contener al menos una mayuscula'
+      if (!/[A-Z]/.test(value)) return 'La contraseña debe contener al menos una letra mayúscula'
 
-      // una minuscula
-      if (!/[a-z]/.test(value)) return 'La contraseña debe contener al menos una minuscula'
+      if (!/[a-z]/.test(value)) return 'La contraseña debe contener al menos una letra minúscula'
 
-      // un simbolo
-      if (!/[!@#$%^&*()_+\-=[\]{};':",./<>?]/.test(value)) return 'La contraseña debe contener al menos un simbolo'
+      if (!/[!@#$%^&*()_+\-=[\]{};':".,<>?]/.test(value)) return 'La contraseña debe contener al menos un símbolo'
 
       return ''
     },
     password_confirmation: value => {
-      if (value === null || value === '') return 'La confirmacion de la contraseña no puede estar vacia'
+      if (value === null || value === '') return 'La confirmación de la contraseña no puede estar vacía'
 
-      if (value !== passData.value.password) return 'Las confirmación de contraseña no coincide'
+      if (value !== passData.value.password) return 'La confirmación de la contraseña no coincide'
 
       return ''
     },
     current_password: value => {
-      if (value === null || value === '') return 'La contraseña actual no puede estar vacia'
+      if (value === null || value === '') return 'La contraseña actual no puede estar vacía'
 
       return ''
     },
@@ -77,7 +73,6 @@ export function useValidations({ passData }) {
     Object.assign(formErrors, originalForm)
     Object.keys(touchedFields).forEach(key => touchedFields[key] = false)
   }
-  
   
   return {
     formValidate,
