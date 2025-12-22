@@ -1,3 +1,9 @@
+<script setup>
+// path: App.vue
+import ToastNotification from '@/components/Base/ToastNotification'
+import VDialogComponent from '@/components/Base/VAlertDialog/VAlertDialog.vue'
+</script>
+
 <template>
   <VApp>
     <ToastNotification />
@@ -5,8 +11,3 @@
     <RouterView />
   </VApp>
 </template>
-
-<script setup>
-import ToastNotification from '@/components/Base/ToastNotification'
-import VDialogComponent from '@/components/Base/VAlertDialog/VAlertDialog.vue'
-</script>

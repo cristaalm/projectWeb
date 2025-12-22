@@ -1,19 +1,36 @@
+<script setup>
+import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t, tm, locale } = useI18n()
+
+const benefits = computed(() => tm('landing.benefits.items'))
+
+const loadingVideo = ref(true)
+
+const onVideoLoaded = () => {
+  loadingVideo.value = false
+}
+</script>
+
 <template>
   <section
     id="beneficios"
     class="py-20 px-4"
   >
     <VContainer class="max-w-7xl">
+      <!-- Título -->
       <div class="text-center mb-16 space-y-4">
         <h2 class="text-4xl md:text-5xl font-weight-bold text-balance font-poppins">
-          ¿Por qué elegir Renova?
+          {{ t('landing.benefits.title') }}
         </h2>
+
         <p class="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty font-poppins">
-          Más que una app de reciclaje, es un ecosistema completo que te recompensa por hacer lo correcto.
+          {{ t('landing.benefits.subtitle') }}
         </p>
       </div>
 
-      <!-- Layout asimétrico: video + beneficios -->
+      <!-- Layout asimétrico -->
       <div class="flex flex-col md:flex-row gap-12 items-center">
         <!-- Video -->
         <div class="md:w-1/2 w-full">
@@ -29,8 +46,8 @@
                 indeterminate
               />
             </div>
+
             <video
-              ref="horizontalVideo"
               class="w-full h-full object-cover"
               autoplay
               playsinline
@@ -44,12 +61,12 @@
                 src="/videos/V3ProyectoIntegrador03.mp4"
                 type="video/mp4"
               >
-              Tu navegador no soporta videos.
+              {{ t('landing.benefits.videoFallback') }}
             </video>
           </div>
         </div>
 
-        <!-- Beneficios como lista vertical estilizada -->
+        <!-- Beneficios -->
         <div class="md:w-1/2 w-full space-y-8">
           <div
             v-for="(benefit, index) in benefits"
@@ -57,18 +74,23 @@
             class="benefit-item group"
           >
             <div class="flex items-start gap-5">
-              <!-- Ícono con fondo sutil -->
-              <div class="min-w-12 min-h-12 rounded-xl flex items-center justify-center bg-primary bg-opacity-10 text-primary transition-colors group-hover:bg-opacity-20">
+              <div
+                class="min-w-12 min-h-12 rounded-xl flex items-center justify-center
+                       bg-primary bg-opacity-10 text-primary transition-colors
+                       group-hover:bg-opacity-20"
+              >
                 <VIcon
                   :icon="benefit.icon"
                   size="28"
                   color="white"
                 />
               </div>
+
               <div>
                 <h3 class="text-xl font-bold mb-2 font-poppins text-gray-900">
                   {{ benefit.title }}
                 </h3>
+
                 <p class="text-muted-foreground leading-relaxed text-pretty font-poppins">
                   {{ benefit.description }}
                 </p>
@@ -81,38 +103,6 @@
   </section>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-
-const benefits = [
-  {
-    icon: 'mdi mdi-cash-multiple',
-    title: 'Gana mientras cuidas el planeta',
-    description: 'Cada botella o lata que reciclas se convierte en puntos reales que puedes usar en tus tiendas favoritas.',
-  },
-  {
-    icon: 'mdi mdi-trending-up',
-    title: 'Sistema de recompensas gamificado',
-    description: 'Desbloquea logros, sube de nivel y accede a recompensas exclusivas mientras más reciclas.',
-  },
-  {
-    icon: 'mdi mdi-account-group',
-    title: 'Apoya a comercios locales',
-    description: 'Canjea tus puntos en negocios aliados de tu comunidad y fortalece la economía local.',
-  },
-  {
-    icon: 'mdi mdi-creation',
-    title: 'Tecnología inteligente',
-    description: 'Nuestra IA identifica automáticamente los materiales. Sin complicaciones, sin errores.',
-  },
-]
-
-const loadingVideo = ref(true)
-
-const onVideoLoaded = () => {
-  loadingVideo.value = false
-}
-</script>
 
 <style scoped>
 .loading-overlay {

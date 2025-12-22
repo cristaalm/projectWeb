@@ -1,3 +1,14 @@
+<script setup>
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t, tm } = useI18n()
+
+const paragraphs = computed(() => tm('landing.impact.paragraphs'))
+const stats = computed(() => tm('landing.impact.stats'))
+</script>
+
+
 <template>
   <section
     id="impacto"
@@ -5,27 +16,28 @@
   >
     <div class="max-w-7xl mx-auto">
       <div class="flex flex-col lg:flex-row items-center lg:items-start gap-8">
-        <!-- Columna izquierda: texto -->
+        <!-- Texto -->
         <div class="w-full lg:w-1/2 space-y-6">
           <h2 class="text-4xl md:text-5xl font-bold text-balance text-white font-poppins">
-            Tu impacto importa
+            {{ t('landing.impact.title') }}
           </h2>
-          <p class="text-lg leading-relaxed text-pretty font-poppins opacity-90">
-            México recicla sólo el 9.6% de sus residuos, muy por debajo del promedio de la OCDE del 20%. Con Renova,
-            estamos cambiando esta realidad, una botella a la vez.
-          </p>
-          <p class="text-lg leading-relaxed text-pretty font-poppins opacity-90">
-            Nuestro sistema contribuye directamente a los Objetivos de Desarrollo Sostenible de la ONU,
-            específicamente al ODS 11 (Ciudades Sostenibles) y ODS 12 (Producción y Consumo Responsables).
+
+          <p
+            v-for="(text, index) in paragraphs"
+            :key="index"
+            class="text-lg leading-relaxed text-pretty font-poppins opacity-90"
+          >
+            {{ text }}
           </p>
         </div>
 
-        <!-- Columna derecha: estadísticas -->
+        <!-- Estadísticas -->
         <div class="w-full lg:w-1/2 grid grid-cols-2 gap-6">
           <div
             v-for="(stat, index) in stats"
             :key="index"
-            class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 impact-card  sm:min-h-[140px] font-poppins flex flex-col col-span-2 md:col-span-1 justify-center"
+            class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 impact-card
+                   sm:min-h-[140px] font-poppins flex flex-col col-span-2 md:col-span-1 justify-center"
           >
             <div class="text-3xl font-bold mb-2 text-white">
               {{ stat.value }}
@@ -39,27 +51,6 @@
     </div>
   </section>
 </template>
-
-<script setup>
-const stats = [
-  {
-    value: '9.6%',
-    label: 'Tasa actual de reciclaje en México',
-  },
-  {
-    value: '63%',
-    label: 'Recuperación de PET en México (líder continental)',
-  },
-  {
-    value: '82.5%',
-    label: 'Mexicanos conscientes del problema',
-  },
-  {
-    value: '51.3%',
-    label: 'Separan residuos efectivamente',
-  },
-]
-</script>
 
 <style scoped>
 .space-y-6 > * + * {

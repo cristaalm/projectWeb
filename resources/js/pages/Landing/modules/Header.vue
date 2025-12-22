@@ -3,16 +3,21 @@ import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/store/auth'
 import { useRouter } from 'vue-router'
 import { useDialogStore } from '@/store/useAlertDialogStorage'
+import { useI18n } from 'vue-i18n'
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
+
+
+const { t } = useI18n()
 
 const handleDownloadApp = async () => {
   const dialogStore = useDialogStore()
 
   const result = await dialogStore.showDialog({
-    title: 'Descargar App Renova',
-    text: '¿Deseas descargar la app?, si continuas se descargara un archivo apk',
+    title: t('landing.header.dialog.downloadTitle'),
+    text: t('landing.header.dialog.downloadText'),
     type: 'confirm',
-    confirmText: 'Descargar',
-    cancelText: 'Cancelar',
+    confirmText: t('landing.header.dialog.confirm'),
+    cancelText: t('landing.header.dialog.cancel'),
   })
 
   if (result) {
@@ -25,11 +30,9 @@ const authStore = useAuthStore()
 const router = useRouter()
 
 onMounted(() => {
-  // Captura todos los enlaces de anclaje
   document.addEventListener('click', event => {
     let target = event.target
 
-    // Si el clic fue en un enlace de anclaje (href="#...")
     while (target && target.tagName !== 'A') {
       target = target.parentElement
     }
@@ -44,14 +47,13 @@ onMounted(() => {
         const element = document.getElementById(id)
 
         if (element) {
-          const offsetTop = element.offsetTop - 64 // altura del header
+          const offsetTop = element.offsetTop - 64
 
           window.scrollTo({
             top: offsetTop,
             behavior: 'smooth',
           })
 
-          // Cierra el drawer si está abierto (en móvil)
           drawer.value = false
         }
       }
@@ -61,6 +63,7 @@ onMounted(() => {
 </script>
 
 <template>
+  <!-- Drawer móvil -->
   <VNavigationDrawer
     v-model="drawer"
     temporary
@@ -79,33 +82,40 @@ onMounted(() => {
           class="w-full h-full object-contain"
         >
       </VSheet>
-      <span class="text-3xl font-weight-bold tracking-wider mt-1 font-stella">RENOVA</span>
+      <span class="text-3xl font-weight-bold tracking-wider mt-1 font-stella">
+        RENOVA
+      </span>
     </a>
 
     <div class="pa-6 d-flex flex-column gap-6">
+      <LanguageSwitcher class="justify-center mb-4" />
+
       <a
         href="#como-funciona"
         class="text-body-1 font-weight-medium text-foreground text-decoration-none d-block font-poppins"
       >
-        Cómo Funciona
+        {{ t('landing.header.menu.howItWorks') }}
       </a>
+
       <a
         href="#beneficios"
         class="text-body-1 font-weight-medium text-foreground text-decoration-none d-block font-poppins"
       >
-        Beneficios
+        {{ t('landing.header.menu.benefits') }}
       </a>
+
       <a
         href="#impacto"
         class="text-body-1 font-weight-medium text-foreground text-decoration-none d-block font-poppins"
       >
-        Impacto
+        {{ t('landing.header.menu.impact') }}
       </a>
+
       <a
         href="#tecnico"
         class="text-body-1 font-weight-medium text-foreground text-decoration-none d-block font-poppins"
       >
-        Técnico
+        {{ t('landing.header.menu.technical') }}
       </a>
 
       <VBtn
@@ -115,7 +125,7 @@ onMounted(() => {
         class="mt-4 text-primary-foreground font-poppins"
         @click="router.push({ name: 'panel' })"
       >
-        Ir al panel
+        {{ t('landing.header.actions.goToPanel') }}
       </VBtn>
 
       <VBtn
@@ -125,10 +135,12 @@ onMounted(() => {
         prepend-icon="mdi-cellphone"
         @click="handleDownloadApp"
       >
-        Descargar App
+        {{ t('landing.header.actions.downloadApp') }}
       </VBtn>
     </div>
   </VNavigationDrawer>
+
+  <!-- AppBar -->
   <VAppBar
     fixed
     elevation="0"
@@ -141,50 +153,52 @@ onMounted(() => {
         href="#hero"
         class="d-flex align-center gap-2 text-decoration-none"
       >
-        
         <VSheet class="w-8 h-8 bg-white rounded-lg d-flex align-center justify-center">
           <img
             src="/images/logo.png"
             alt="Logo"
             class="w-full h-full object-contain"
           >
-        </VSheet> 
-       
-        <span class="text-3xl font-bold tracking-wider mt-1 font-stella">RENOVA</span>
+        </VSheet>
+
+        <span class="text-3xl font-bold tracking-wider mt-1 font-stella">
+          RENOVA
+        </span>
       </a>
 
-      <!-- Menú de escritorio -->
+      <!-- Menú escritorio -->
       <VToolbarItems class="d-none d-md-flex align-center gap-8">
         <a
           href="#como-funciona"
           class="text-sm font-weight-medium text-foreground hover:text-primary transition-colors text-decoration-none font-poppins"
         >
-          Cómo Funciona
+          {{ t('landing.header.menu.howItWorks') }}
         </a>
+
         <a
           href="#beneficios"
           class="text-sm font-weight-medium text-foreground hover:text-primary transition-colors text-decoration-none font-poppins"
         >
-          Beneficios
+          {{ t('landing.header.menu.benefits') }}
         </a>
+
         <a
           href="#impacto"
           class="text-sm font-weight-medium text-foreground hover:text-primary transition-colors text-decoration-none font-poppins"
         >
-          Impacto
+          {{ t('landing.header.menu.impact') }}
         </a>
+
         <a
           href="#tecnico"
           class="text-sm font-weight-medium text-foreground hover:text-primary transition-colors text-decoration-none font-poppins"
         >
-          Técnico
+          {{ t('landing.header.menu.technical') }}
         </a>
       </VToolbarItems>
 
-      <!-- Botón de descarga (visible en todos los tamaños) -->
-      <div class="flex flex-row justify-between gap-2">
-        <!-- si tiene token, mostramos la opción de ir al dashboard -->
-
+      <!-- Acciones -->
+      <div class="flex flex-row justify-between gap-4 align-center">
         <VBtn
           v-if="authStore.accessToken"
           color="primary"
@@ -192,7 +206,7 @@ onMounted(() => {
           class="text-primary-foreground d-none d-md-flex font-poppins"
           @click="router.push({ name: 'panel' })"
         >
-          Ir al panel
+          {{ t('landing.header.actions.goToPanel') }}
         </VBtn>
 
         <VBtn
@@ -202,11 +216,14 @@ onMounted(() => {
           prepend-icon="mdi mdi-cellphone"
           @click="handleDownloadApp"
         >
-          Descargar App
+          {{ t('landing.header.actions.downloadApp') }}
         </VBtn>
+
+
+        <LanguageSwitcher />
       </div>
 
-      <!-- Menú hamburguesa para móviles -->
+      <!-- Hamburguesa -->
       <VAppBarNavIcon
         class="hidden-md-and-up"
         @click="drawer = true"

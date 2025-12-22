@@ -1,15 +1,18 @@
 <script setup>
 import { useDialogStore } from '@/store/useAlertDialogStorage'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const handleDownloadApp = async () => {
   const dialogStore = useDialogStore()
 
   const result = await dialogStore.showDialog({
-    title: 'Descargar App Renova',
-    text: '¿Deseas descargar la app?, si continuas se descargara un archivo apk',
+    title: t('landing.header.dialog.downloadTitle'),
+    text: t('landing.header.dialog.downloadText'),
     type: 'confirm',
-    confirmText: 'Descargar',
-    cancelText: 'Cancelar',
+    confirmText: t('landing.header.dialog.confirm'),
+    cancelText: t('landing.header.dialog.cancel'),
   })
 
   if (result) {
@@ -43,16 +46,18 @@ const scrollToSection = sectionId => {
               class="px-4 py-2 font-poppins"
               prepend-icon="mdi mdi-recycle"
             >
-              Gana recompensas reciclando
+              {{ t('landing.hero.chip') }}
             </VChip>
 
             <h1 class="text-5xl md:text-6xl lg:text-7xl font-weight-bold leading-tight text-balance font-poppins">
-              Recicla y gana <span class="text-primary">recompensas</span>
+              {{ t('landing.hero.title.main') }}
+              <span class="text-primary">
+                {{ t('landing.hero.title.highlight') }}
+              </span>
             </h1>
 
             <p class="text-xl text-muted-foreground leading-relaxed text-pretty font-poppins">
-              Convierte tus botellas de plástico y latas de aluminio en puntos canjeables. Renova hace que reciclar sea
-              fácil, divertido y gratificante.
+              {{ t('landing.hero.description') }}
             </p>
 
             <div class="d-flex flex-column flex-sm-row gap-4">
@@ -65,37 +70,40 @@ const scrollToSection = sectionId => {
                 append-icon="mdi mdi-arrow-right"
                 @click="handleDownloadApp"
               >
-                Descargar App
+                {{ t('landing.hero.actions.download') }}
               </VBtn>
+
               <VBtn
                 size="x-large"
                 variant="outlined"
                 class="text-lg px-8 font-poppins"
                 @click="() => scrollToSection('como-funciona')"
               >
-                Ver Cómo Funciona
+                {{ t('landing.hero.actions.howItWorks') }}
               </VBtn>
             </div>
 
             <div class="d-flex align-center gap-8 pt-4 font-poppins">
               <div>
                 <div class="text-h4 font-weight-bold text-primary">
-                  +1000
+                  {{ t('landing.hero.stats.users.value') }}
                 </div>
                 <div class="text-sm text-muted-foreground">
-                  Usuarios activos
+                  {{ t('landing.hero.stats.users.label') }}
                 </div>
               </div>
+
               <VDivider
                 vertical
                 class="h-12"
               />
+
               <div>
                 <div class="text-h4 font-weight-bold text-primary">
-                  24/7
+                  {{ t('landing.hero.stats.containers.value') }}
                 </div>
                 <div class="text-sm text-muted-foreground">
-                  Contenedores disponibles
+                  {{ t('landing.hero.stats.containers.label') }}
                 </div>
               </div>
             </div>
@@ -109,7 +117,7 @@ const scrollToSection = sectionId => {
           <div class="relative">
             <VImg
               src="/images/contenedor.png"
-              alt="Contenedor inteligente Renova"
+              :alt="t('landing.hero.imageAlt')"
               class="relative z-10 w-full h-full object-contain drop-shadow-2xl"
             />
           </div>
@@ -118,6 +126,7 @@ const scrollToSection = sectionId => {
     </VContainer>
   </section>
 </template>
+
 
 <style scoped>
 .space-y-8 > * + * {
