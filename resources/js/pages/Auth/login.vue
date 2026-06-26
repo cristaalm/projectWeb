@@ -54,23 +54,23 @@ const goToHome = () => {
       >
         <VCardItem class="justify-center">
           <span
-            class="app-logo"
+            class="app-logo d-flex align-center gap-2 cursor-pointer"
             @click="goToHome"
           >
-            <!-- eslint-disable vue/no-v-html -->
-            <div class="d-flex">
+            <VSheet class="w-12 h-12 !bg-transparent rounded-lg d-flex align-center justify-center">
               <img
-                src="/images/LogoLetra.png"
-                alt="RENOVA"
-                class="!w-[200px] mr-2"  
+                src="/images/logo.png"
+                alt="Logo"
+                class="w-full h-full object-contain bg-transparent"
               >
-            </div>
+            </VSheet>
+            <span class="text-5xl font-weight-bold tracking-wider mt-1 font-stella text-[#13b868]">EcoSort</span>
           </span>
         </VCardItem>
 
         <VCardText>
           <h4 class="font-poppins relative mb-1 text-h4">
-            ¡RENOVA le da la bienvenida! <span class="absolute md:inline-block hidden -top-2 ml-2 text-4xl transition-all duration-200 transform animate-wave">👋🏻</span>
+            ¡EcoSort le da la bienvenida! <span class="absolute md:inline-block hidden -top-2 ml-2 text-4xl transition-all duration-200 transform animate-wave">👋🏻</span>
           </h4>
           <p class="mb-0 font-poppins">
             Inicie sesión en su cuenta y comience con su día.

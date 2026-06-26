@@ -33,16 +33,17 @@ const goToHome = () => {
       >
         <VCardItem class="justify-center">
           <span
-            class="app-logo"
+            class="app-logo d-flex align-center gap-2 cursor-pointer"
             @click="goToHome"
           >
-            <div class="d-flex">
+            <VSheet class="w-12 h-12 !bg-transparent rounded-lg d-flex align-center justify-center">
               <img
-                src="/images/LogoLetra.png"
-                alt="RENOVA"
-                class="w-[200px] mr-2"  
+                src="/images/logo.png"
+                alt="Logo"
+                class="w-full h-full object-contain bg-transparent"
               >
-            </div>
+            </VSheet>
+            <span class="text-5xl font-weight-bold tracking-wider mt-1 font-stella text-[#13b868]">EcoSort</span>
           </span>
         </VCardItem>
         <div class="text-center pa-6">

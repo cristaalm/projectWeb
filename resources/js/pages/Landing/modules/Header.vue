@@ -82,7 +82,7 @@ onMounted(() => {
           class="w-full h-full object-contain"
         >
       </VSheet>
-      <span class="text-3xl font-weight-bold tracking-wider mt-1 font-stella">EcoSort</span>
+      <span class="text-4xl font-weight-bold tracking-wider mt-1 font-stella">EcoSort</span>
     </a>
 
     <div class="pa-6 d-flex flex-column gap-6">
@@ -152,7 +152,7 @@ onMounted(() => {
           >
         </VSheet>
 
-        <span class="text-3xl font-bold tracking-wider mt-1 font-stella">EcoSort</span>
+        <span class="text-4xl font-bold tracking-wider mt-1 font-stella">EcoSort</span>
       </a>
 
       <!-- Menú escritorio -->
