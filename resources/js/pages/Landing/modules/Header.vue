@@ -82,9 +82,7 @@ onMounted(() => {
           class="w-full h-full object-contain"
         >
       </VSheet>
-      <span class="text-3xl font-weight-bold tracking-wider mt-1 font-stella">
-        RENOVA
-      </span>
+      <span class="text-3xl font-weight-bold tracking-wider mt-1 font-stella">EcoSort</span>
     </a>
 
     <div class="pa-6 d-flex flex-column gap-6">
@@ -109,13 +107,6 @@ onMounted(() => {
         class="text-body-1 font-weight-medium text-foreground text-decoration-none d-block font-poppins"
       >
         {{ t('landing.header.menu.impact') }}
-      </a>
-
-      <a
-        href="#tecnico"
-        class="text-body-1 font-weight-medium text-foreground text-decoration-none d-block font-poppins"
-      >
-        {{ t('landing.header.menu.technical') }}
       </a>
 
       <VBtn
@@ -161,9 +152,7 @@ onMounted(() => {
           >
         </VSheet>
 
-        <span class="text-3xl font-bold tracking-wider mt-1 font-stella">
-          RENOVA
-        </span>
+        <span class="text-3xl font-bold tracking-wider mt-1 font-stella">EcoSort</span>
       </a>
 
       <!-- Menú escritorio -->
@@ -187,13 +176,6 @@ onMounted(() => {
           class="text-sm font-weight-medium text-foreground hover:text-primary transition-colors text-decoration-none font-poppins"
         >
           {{ t('landing.header.menu.impact') }}
-        </a>
-
-        <a
-          href="#tecnico"
-          class="text-sm font-weight-medium text-foreground hover:text-primary transition-colors text-decoration-none font-poppins"
-        >
-          {{ t('landing.header.menu.technical') }}
         </a>
       </VToolbarItems>
 
@@ -234,17 +216,21 @@ onMounted(() => {
 
 <style scoped>
 .w-8 {
-  width: 32px;
+  inline-size: 32px;
 }
+
 .h-8 {
-  height: 32px;
+  block-size: 32px;
 }
+
 .gap-2 {
   gap: 8px;
 }
+
 .gap-8 {
   gap: 32px;
 }
+
 .tracking-tight {
   letter-spacing: -0.025em;
 }

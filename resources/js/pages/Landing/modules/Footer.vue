@@ -20,10 +20,10 @@ const { t } = useI18n()
               <div class="w-8 h-8 bg-[#00464B] rounded-lg d-flex align-center justify-center">
                 <img
                   src="/images/logo.png"
-                  alt="Renova logo"
+                  alt="Logo"
                 >
               </div>
-              <span class="text-h5 font-weight-bold text-white font-poppins">RENOVA</span>
+              <span class="text-h5 font-weight-bold text-white font-poppins">EcoSort</span>
             </div>
             <p class="text-sm leading-relaxed font-poppins opacity-80">
               {{ t('landing.footer.description') }}
@@ -43,7 +43,6 @@ const { t } = useI18n()
             <li><a href="#como-funciona">{{ t('landing.footer.product.howItWorks') }}</a></li>
             <li><a href="#beneficios">{{ t('landing.footer.product.benefits') }}</a></li>
             <li><a href="#impacto">{{ t('landing.footer.product.impact') }}</a></li>
-            <li><a href="#tecnico">{{ t('landing.footer.product.technology') }}</a></li>
           </ul>
         </VCol>
 
@@ -67,7 +66,7 @@ const { t } = useI18n()
             </li>
             <li>
               <a
-                href="https://www.instagram.com/renova.innovation?igsh=czRkcHRpc3I1OGJs"
+                href="https://www.instagram.com/ecosort.innovation?igsh=czRkcHRpc3I1OGJs"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -92,7 +91,7 @@ const { t } = useI18n()
                 class="mt-1"
                 icon="mdi mdi-email"
               />
-              <span>soyrenovaapp@gmail.com</span>
+              <span>somosecosort@gmail.com</span>
             </li>
             <li class="d-flex align-start gap-2">
               <VIcon
@@ -111,7 +110,7 @@ const { t } = useI18n()
       <!-- Legal -->
       <div class="d-flex flex-column flex-md-row justify-space-between align-center gap-4 text-sm opacity-80">
         <p class="font-poppins">
-          &copy; {{ new Date().getFullYear() }} Renova. {{ t('landing.footer.legal.rights') }}
+          &copy; {{ new Date().getFullYear() }} EcoSort. {{ t('landing.footer.legal.rights') }}
         </p>
 
         <div class="d-flex align-center gap-6">
