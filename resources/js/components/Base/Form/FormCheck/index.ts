@@ -4,7 +4,7 @@ import Label from './Label.vue'
 
 const FormCheckComponent = Object.assign({}, FormCheck, {
   Input: Input,
-  Label: Label
+  Label: Label,
 })
 
 export default FormCheckComponent

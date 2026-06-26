@@ -6,7 +6,7 @@ import Panel from './Panel.vue'
 const DisclosureComponent = Object.assign({}, Disclosure, {
   Group: Group,
   Button: Button,
-  Panel: Panel
+  Panel: Panel,
 })
 
 export default DisclosureComponent

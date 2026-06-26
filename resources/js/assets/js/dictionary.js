@@ -7,18 +7,18 @@ export default {
       mission: 'Mission',
       impact: 'Impact',
       joinOurTeam: 'Join Our Team',
-      donate: 'Donate'
+      donate: 'Donate',
     },
     hero: {
       title: 'Empowering Education For All',
       description:
         'SummerLearn is an NGO committed to provide basic education to low-income schools, with the help of passionate volunteers.',
-      button: 'Get Started'
+      button: 'Get Started',
     },
     impact: {
       title: 'Our Impact',
       description:
-        'Our impact since our founding, we have worked with many schools and volunteers to provide basic education to children in need. Our programs have helped improve literacy rates, increase access to educational resources, and empower local communities to play an active role in their children’s education.'
+        'Our impact since our founding, we have worked with many schools and volunteers to provide basic education to children in need. Our programs have helped improve literacy rates, increase access to educational resources, and empower local communities to play an active role in their children’s education.',
     },
     mission: {
       title: 'Our Mission',
@@ -28,19 +28,19 @@ export default {
         1: {
           title: 'Empowering Communities',
           description:
-            'We work closely with local communities to understand their needs and provide tailored educational solutions.'
+            'We work closely with local communities to understand their needs and provide tailored educational solutions.',
         },
         2: {
           title: 'Sustainable Approach',
           description:
-            'Our programs are designed to be sustainable, with a focus on training local teachers and using locally-sourced materials.'
+            'Our programs are designed to be sustainable, with a focus on training local teachers and using locally-sourced materials.',
         },
         3: {
           title: 'Volunteer-Driven',
           description:
-            'Our work is made possible by the dedication and passion of our volunteers, who are committed to making a difference.'
-        }
-      }
+            'Our work is made possible by the dedication and passion of our volunteers, who are committed to making a difference.',
+        },
+      },
     },
     joinOurTeam: {
       title: 'Join Our Team',
@@ -48,20 +48,20 @@ export default {
         title: 'Volunteer ',
         description:
           'Be a part of our mission to provide quality education to children in need. Your time and your skills can make a significant impact.',
-        button: 'Apply to Volunteer'
+        button: 'Apply to Volunteer',
       },
       beneficiary: {
         title: 'Beneficiary ',
         description:
           'Join our summer courses where you’ll learn, grow, and gain access to new educational opportunities. Start building your future today!',
-        button: 'Apply to Beneficiary'
+        button: 'Apply to Beneficiary',
       },
       donor: {
         title: 'Donor ',
         description:
           'Your donation allows more children to join our summer courses, where they will receive quality education and tools for a better future. Together, we can make a lasting difference.',
-        button: 'Apply to Donor'
-      }
+        button: 'Apply to Donor',
+      },
     },
     footer: {
       language: 'Language',
@@ -70,14 +70,14 @@ export default {
       values: {
         activate: {
           activate: 'en',
-          lenguage: 'English'
+          lenguage: 'English',
         },
         deactivate: {
           deactivate: 'es',
-          lenguage: 'Spanish'
-        }
-      }
-    }
+          lenguage: 'Spanish',
+        },
+      },
+    },
   },
   es: {
     navbar: {
@@ -87,18 +87,18 @@ export default {
       mission: 'Misión',
       impact: 'Impacto',
       joinOurTeam: 'Únete a nosotros',
-      donate: 'Donar'
+      donate: 'Donar',
     },
     hero: {
       title: 'Potenciando la educación para todos',
       description:
         'SummerLearn es una ONG comprometida a brindar educación básica a escuelas de bajos ingresos, con la ayuda de voluntarios apasionados.',
-      button: 'Empezar'
+      button: 'Empezar',
     },
     impact: {
       title: 'Nuestro Impacto',
       description:
-        'Nuestro impacto desde nuestra fundación, hemos trabajado con muchas escuelas y voluntarios para proporcionar educación básica a niños necesitados. Nuestros programas han ayudado a mejorar las tasas de alfabetización, aumentar el acceso a recursos educativos y empoderar a las comunidades locales para desempeñar un papel activo en la educación de sus hijos.'
+        'Nuestro impacto desde nuestra fundación, hemos trabajado con muchas escuelas y voluntarios para proporcionar educación básica a niños necesitados. Nuestros programas han ayudado a mejorar las tasas de alfabetización, aumentar el acceso a recursos educativos y empoderar a las comunidades locales para desempeñar un papel activo en la educación de sus hijos.',
     },
     mission: {
       title: 'Nuestra Misión',
@@ -108,19 +108,19 @@ export default {
         1: {
           title: 'Empoderando a las comunidades',
           description:
-            'Trabajamos en estrecha colaboración con las comunidades locales para comprender sus necesidades y proporcionar soluciones educativas a medida.'
+            'Trabajamos en estrecha colaboración con las comunidades locales para comprender sus necesidades y proporcionar soluciones educativas a medida.',
         },
         2: {
           title: 'Enfoque sostenible',
           description:
-            'Nuestros programas están diseñados para ser sostenibles, con un enfoque en la capacitación de maestros locales y el uso de materiales de origen local.'
+            'Nuestros programas están diseñados para ser sostenibles, con un enfoque en la capacitación de maestros locales y el uso de materiales de origen local.',
         },
         3: {
           title: 'Impulsado por voluntarios',
           description:
-            'Nuestro trabajo es posible gracias a la dedicación y pasión de nuestros voluntarios, que están comprometidos a marcar la diferencia.'
-        }
-      }
+            'Nuestro trabajo es posible gracias a la dedicación y pasión de nuestros voluntarios, que están comprometidos a marcar la diferencia.',
+        },
+      },
     },
     joinOurTeam: {
       title: 'Únete a nuestro equipo',
@@ -128,20 +128,20 @@ export default {
         title: 'Voluntario',
         description:
           'Sé parte de nuestra misión de proporcionar educación de calidad a los niños que más lo necesitan. Tu tiempo y tus habilidades pueden generar un impacto significativo.',
-        button: 'Aplica para voluntario'
+        button: 'Aplica para voluntario',
       },
       beneficiary: {
         title: 'Beneficiario',
         description:
           'Participa en nuestros cursos de verano, donde aprenderás, crecerás y tendrás acceso a nuevas oportunidades educativas. ¡Empieza a construir tu futuro hoy!',
-        button: 'Aplica para beneficiario'
+        button: 'Aplica para beneficiario',
       },
       donor: {
         title: 'Donante',
         description:
           'Con tu donación, más niños podrán participar en nuestros cursos de verano, donde recibirán educación de calidad y herramientas para un mejor futuro.',
-        button: 'Aplica para Donante'
-      }
+        button: 'Aplica para Donante',
+      },
     },
     footer: {
       language: 'Idioma',
@@ -150,13 +150,13 @@ export default {
       values: {
         activate: {
           activate: 'es',
-          lenguage: 'Español'
+          lenguage: 'Español',
         },
         deactivate: {
           deactivate: 'en',
-          lenguage: 'Inglés'
-        }
-      }
-    }
-  }
+          lenguage: 'Inglés',
+        },
+      },
+    },
+  },
 }

@@ -4,6 +4,6 @@ import FormCheck from '../FormCheck'
 
 <template>
   <FormCheck>
-    <slot></slot>
+    <slot />
   </FormCheck>
 </template>

@@ -18,12 +18,14 @@ const fetchTopAlliances = async () => {
   selectedIndex.value = 0 
   try {
     const token = authStore.getAccessToken()
+
     console.log('CardGraphs: Obteniendo token...', token)
 
     const response = await requestGet({
       url: 'history/topAlliancesByRedemptions',
       token: token,
     })
+
     console.log('CardGraphs: Respuesta de la API:', JSON.parse(JSON.stringify(response)))
 
     if (Array.isArray(response.data) && response.data.length > 0) {
@@ -124,10 +126,11 @@ const donutChartConfig = computed(() => {
             name: {
               show: true,
               color: onSurfaceColor, 
-              formatter: (val) => {
+              formatter: val => {
                 if (val.length > 25) {
                   return val.substring(0, 17) + '...'
                 }
+                
                 return val
               },
             },
@@ -151,7 +154,7 @@ const donutChartConfig = computed(() => {
     },
     dataLabels: {
       enabled: true,
-      formatter: (val) => {
+      formatter: val => {
         return `${val.toFixed(1)}%`
       },
       style: {
@@ -160,11 +163,11 @@ const donutChartConfig = computed(() => {
         fontWeight: 600,
       },
       dropShadow: { 
-         enabled: false,
-         top: 1,
-         left: 1,
-         blur: 1,
-         opacity: 0.45,
+        enabled: false,
+        top: 1,
+        left: 1,
+        blur: 1,
+        opacity: 0.45,
       },
     },
     responsive: [{
@@ -324,7 +327,10 @@ onMounted(() => {
       </template>
 
       <template v-else>
-        <div class="text-center pa-5 d-flex flex-column align-center justify-center" style="height: 500px;">
+        <div
+          class="text-center pa-5 d-flex flex-column align-center justify-center"
+          style="height: 500px;"
+        >
           <VIcon
             icon="mdi-chart-bar-off"
             size="64"

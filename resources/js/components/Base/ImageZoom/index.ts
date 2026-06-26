@@ -1,3 +1,3 @@
-import ImageZoom from "./ImageZoom.vue";
+import ImageZoom from "./ImageZoom.vue"
 
-export default ImageZoom;
+export default ImageZoom

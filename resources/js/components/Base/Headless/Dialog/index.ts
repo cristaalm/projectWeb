@@ -8,7 +8,7 @@ const DialogComponent = Object.assign({}, Dialog, {
   Description: Description,
   Footer: Footer,
   Panel: Panel,
-  Title: Title
+  Title: Title,
 })
 
 export default DialogComponent

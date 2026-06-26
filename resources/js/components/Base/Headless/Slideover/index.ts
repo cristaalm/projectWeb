@@ -8,7 +8,7 @@ const SlideoverComponent = Object.assign({}, Slideover, {
   Description: Description,
   Footer: Footer,
   Panel: Panel,
-  Title: Title
+  Title: Title,
 })
 
 export default SlideoverComponent

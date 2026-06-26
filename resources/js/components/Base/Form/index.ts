@@ -17,5 +17,5 @@ export {
   FormLabel,
   FormSelect,
   FormSwitch,
-  InputGroup
+  InputGroup,
 }

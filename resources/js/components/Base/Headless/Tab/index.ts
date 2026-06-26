@@ -10,7 +10,7 @@ const TabComponent = Object.assign({}, Tab, {
   Group: Group,
   List: List,
   Panels: Panels,
-  Panel: Panel
+  Panel: Panel,
 })
 
 export default TabComponent

@@ -1,6 +1,6 @@
 <script lang="ts">
 export default {
-  inheritAttrs: false
+  inheritAttrs: false,
 }
 </script>
 
@@ -10,13 +10,17 @@ import { twMerge } from 'tailwind-merge'
 import { computed, useAttrs } from 'vue'
 
 const attrs = useAttrs()
+
 const computedClass = computed(() =>
-  twMerge(['flex items-center', typeof attrs.class === 'string' && attrs.class])
+  twMerge(['flex items-center', typeof attrs.class === 'string' && attrs.class]),
 )
 </script>
 
 <template>
-  <div :class="computedClass" v-bind="_.omit(attrs, 'class')">
-    <slot></slot>
+  <div
+    :class="computedClass"
+    v-bind="_.omit(attrs, 'class')"
+  >
+    <slot />
   </div>
 </template>

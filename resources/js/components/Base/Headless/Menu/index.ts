@@ -12,7 +12,7 @@ const TabComponent = Object.assign({}, Menu, {
   Item: Item,
   Divider: Divider,
   Header: Header,
-  Footer: Footer
+  Footer: Footer,
 })
 
 export default TabComponent

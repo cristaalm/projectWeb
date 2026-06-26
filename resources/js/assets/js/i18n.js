@@ -6,7 +6,7 @@ import dictionary from './dictionary'
 // Create a new instance of the i18n plugin
 const i18n = createI18n({
   locale: 'en', // Set the default locale to English
-  messages: dictionary // Set the messages for translation using the imported dictionary
+  messages: dictionary, // Set the messages for translation using the imported dictionary
 })
 
 export default i18n // Export the i18n instance for use in other parts of the application

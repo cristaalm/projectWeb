@@ -1,6 +1,6 @@
 <script lang="ts">
 export default {
-  inheritAttrs: false
+  inheritAttrs: false,
 }
 </script>
 
@@ -10,13 +10,17 @@ import { twMerge } from 'tailwind-merge'
 import { computed, useAttrs } from 'vue'
 
 const attrs = useAttrs()
+
 const computedClass = computed(() =>
-  twMerge(['cursor-pointer ml-2', typeof attrs.class === 'string' && attrs.class])
+  twMerge(['cursor-pointer ml-2', typeof attrs.class === 'string' && attrs.class]),
 )
 </script>
 
 <template>
-  <label :class="computedClass" v-bind="_.omit(attrs, 'class')">
-    <slot></slot>
+  <label
+    :class="computedClass"
+    v-bind="_.omit(attrs, 'class')"
+  >
+    <slot />
   </label>
 </template>
