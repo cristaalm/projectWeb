@@ -13,7 +13,7 @@ export default {
     },
 
     dialog: {
-      downloadTitle: 'Descargar App Renova',
+      downloadTitle: 'Descargar App EcoSort',
       downloadText: '¿Deseas descargar la app? Si continúas se descargará un archivo APK.',
       confirm: 'Descargar',
       cancel: 'Cancelar',
@@ -29,7 +29,7 @@ export default {
     },
 
     description:
-      'Convierte tus botellas de plástico y latas de aluminio en puntos canjeables. Renova hace que reciclar sea fácil, divertido y gratificante.',
+      'Convierte tus botellas de plástico y latas de aluminio en puntos canjeables. EcoSort hace que reciclar sea fácil, divertido y gratificante.',
 
     actions: {
       download: 'Descargar App',
@@ -47,7 +47,7 @@ export default {
       },
     },
 
-    imageAlt: 'Contenedor inteligente Renova',
+    imageAlt: 'Contenedor inteligente EcoSort',
   },
   
   howItWorks: {
@@ -60,7 +60,7 @@ export default {
         icon: 'mdi mdi-qrcode',
         title: 'Escanea tu código',
         description:
-          'Abre la app Renova y muestra tu código QR único en el contenedor inteligente.',
+          'Abre la app EcoSort y muestra tu código QR único en el contenedor inteligente.',
       },
       {
         icon: 'mdi mdi-camera',
@@ -80,7 +80,7 @@ export default {
   },
 
   benefits: {
-    title: '¿Por qué elegir Renova?',
+    title: '¿Por qué elegir EcoSort?',
     subtitle:
       'Más que una app de reciclaje, es un ecosistema completo que te recompensa por hacer lo correcto.',
 
@@ -118,7 +118,7 @@ export default {
     title: 'Tu impacto importa',
 
     paragraphs: [
-      'México recicla sólo el 9.6% de sus residuos, muy por debajo del promedio de la OCDE del 20%. Con Renova, estamos cambiando esta realidad, una botella a la vez.',
+      'México recicla sólo el 9.6% de sus residuos, muy por debajo del promedio de la OCDE del 20%. Con EcoSort, estamos cambiando esta realidad, una botella a la vez.',
       'Nuestro sistema contribuye directamente a los Objetivos de Desarrollo Sostenible de la ONU, específicamente al ODS 11 (Ciudades Sostenibles) y ODS 12 (Producción y Consumo Responsables).',
     ],
 
@@ -181,13 +181,13 @@ export default {
 
   cta: {
     dialog: {
-      title: 'Descargar App Renova',
+      title: 'Descargar App EcoSort',
       text: '¿Deseas descargar la app?, si continúas se descargará un archivo apk',
       confirm: 'Descargar',
       cancel: 'Cancelar',
     },
 
-    imageAlt: 'App Renova en dispositivo móvil',
+    imageAlt: 'App EcoSort en dispositivo móvil',
 
     title: 'Comienza a reciclar hoy',
     subtitle:
@@ -195,7 +195,7 @@ export default {
 
     buttons: {
       download: 'Descargar App Gratis',
-      login: 'Soy Renova',
+      login: 'Soy EcoSort',
     },
   },
 

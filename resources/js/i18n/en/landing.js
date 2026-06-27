@@ -13,7 +13,7 @@ export default {
     },
 
     dialog: {
-      downloadTitle: 'Download Renova App',
+      downloadTitle: 'Download EcoSort App',
       downloadText: 'Do you want to download the app? If you continue, an APK file will be downloaded.',
       confirm: 'Download',
       cancel: 'Cancel',
@@ -29,7 +29,7 @@ export default {
     },
 
     description:
-      'Turn your plastic bottles and aluminum cans into redeemable points. Renova makes recycling easy, fun, and rewarding.',
+      'Turn your plastic bottles and aluminum cans into redeemable points. EcoSort makes recycling easy, fun, and rewarding.',
 
     actions: {
       download: 'Download App',
@@ -47,7 +47,7 @@ export default {
       },
     },
 
-    imageAlt: 'Renova smart container',
+    imageAlt: 'EcoSort smart container',
   },
 
   howItWorks: {
@@ -60,7 +60,7 @@ export default {
         icon: 'mdi mdi-qrcode',
         title: 'Scan your code',
         description:
-          'Open the Renova app and show your unique QR code at the smart container.',
+          'Open the EcoSort app and show your unique QR code at the smart container.',
       },
       {
         icon: 'mdi mdi-camera',
@@ -80,7 +80,7 @@ export default {
   },
 
   benefits: {
-    title: 'Why choose Renova?',
+    title: 'Why choose EcoSort?',
     subtitle:
       'More than a recycling app, it is a complete ecosystem that rewards you for doing the right thing.',
 
@@ -118,7 +118,7 @@ export default {
     title: 'Your impact matters',
 
     paragraphs: [
-      'Mexico recycles only 9.6% of its waste, far below the OECD average of 20%. With Renova, we are changing this reality, one bottle at a time.',
+      'Mexico recycles only 9.6% of its waste, far below the OECD average of 20%. With EcoSort, we are changing this reality, one bottle at a time.',
       'Our system directly contributes to the United Nations Sustainable Development Goals, specifically SDG 11 (Sustainable Cities) and SDG 12 (Responsible Consumption and Production).',
     ],
 
@@ -181,13 +181,13 @@ export default {
 
   cta: {
     dialog: {
-      title: 'Download Renova App',
+      title: 'Download EcoSort App',
       text: 'Do you want to download the app? If you continue, an APK file will be downloaded.',
       confirm: 'Download',
       cancel: 'Cancel',
     },
 
-    imageAlt: 'Renova app on mobile device',
+    imageAlt: 'EcoSort app on mobile device',
 
     title: 'Start recycling today',
     subtitle:
@@ -195,7 +195,7 @@ export default {
 
     buttons: {
       download: 'Download App for Free',
-      login: 'I am Renova',
+      login: 'I am EcoSort',
     },
   },
 

@@ -65,7 +65,7 @@ const goToHome = () => {
         <div class="d-flex">
           <img
             :src="globalTheme.name.value == 'dark' ? '/images/LogoLetraDark.png' : '/images/LogoLetra.png'"
-            alt="RENOVA"
+            alt="EcoSort"
             class="h-[45px]"
           >
         </div>

@@ -74,9 +74,9 @@ const exportToPDF = async item => {
     const metrics = await getMetrics(item.id)
     const doc = new jsPDF()
 
-    const renovaPrimary = [5, 209, 110]   // #05d16e (Verde)
-    const renovaSecondary = [2, 70, 83]  // #024653 (Azul oscuro)
-    const renovaTertiary = [205, 255, 16] // #cdff10 (Verde limón)
+    const ecosortPrimary = [5, 209, 110]   // #05d16e (Verde)
+    const ecosortSecondary = [2, 70, 83]  // #024653 (Azul oscuro)
+    const ecosortTertiary = [205, 255, 16] // #cdff10 (Verde limón)
     const bodyTextColor = [50, 50, 50] // Gris oscuro para texto general
     const lightGray = [240, 240, 240] // Gris muy claro para fondos alternos
 
@@ -88,7 +88,7 @@ const exportToPDF = async item => {
 
     const addSectionHeader = (title, y) => {
       doc.setFontSize(14)
-      doc.setTextColor(...renovaPrimary) 
+      doc.setTextColor(...ecosortPrimary) 
       doc.setFont(undefined, 'bold')
       doc.text(title, margin, y)
       y += 2
@@ -103,7 +103,7 @@ const exportToPDF = async item => {
     // --- Encabezado ---
     const headerHeight = 35 
 
-    doc.setFillColor(...renovaPrimary) 
+    doc.setFillColor(...ecosortPrimary) 
     doc.rect(0, 0, pageWidth, headerHeight, 'F')
 
     const logoWidth = 25
@@ -157,7 +157,7 @@ const exportToPDF = async item => {
       theme: 'grid',
       styles: { fontSize: 10, cellPadding: 3, textColor: bodyTextColor },
       columnStyles: {
-        0: { fontStyle: 'bold', cellWidth: tableWidth * 0.35, textColor: renovaSecondary, fillColor: lightGray },
+        0: { fontStyle: 'bold', cellWidth: tableWidth * 0.35, textColor: ecosortSecondary, fillColor: lightGray },
         1: { cellWidth: tableWidth * 0.65 },
       },
     })
@@ -177,7 +177,7 @@ const exportToPDF = async item => {
       theme: 'grid',
       styles: { fontSize: 10, cellPadding: 3, textColor: bodyTextColor },
       columnStyles: {
-        0: { fontStyle: 'bold', cellWidth: tableWidth * 0.35, textColor: renovaSecondary, fillColor: lightGray }, // Etiquetas en color secundario
+        0: { fontStyle: 'bold', cellWidth: tableWidth * 0.35, textColor: ecosortSecondary, fillColor: lightGray }, // Etiquetas en color secundario
         1: { cellWidth: tableWidth * 0.65 },
       },
     })
@@ -202,9 +202,9 @@ const exportToPDF = async item => {
       styles: { fontSize: 9, cellPadding: 2, textColor: bodyTextColor },
       columnStyles: {
         // Distribución proporcional para cuatro columnas (etiqueta/valor / etiqueta/valor)
-        0: { fontStyle: 'bold', textColor: renovaSecondary, cellWidth: tableWidth * 0.35, fillColor: lightGray },
+        0: { fontStyle: 'bold', textColor: ecosortSecondary, cellWidth: tableWidth * 0.35, fillColor: lightGray },
         1: { cellWidth: tableWidth * 0.15, halign: 'right' },
-        2: { fontStyle: 'bold', textColor: renovaSecondary, cellWidth: tableWidth * 0.35, fillColor: lightGray },
+        2: { fontStyle: 'bold', textColor: ecosortSecondary, cellWidth: tableWidth * 0.35, fillColor: lightGray },
         3: { cellWidth: tableWidth * 0.15, halign: 'right' },
       },
     })
@@ -228,7 +228,7 @@ const exportToPDF = async item => {
         head: [['Día', 'Fecha', 'Transacciones']],
         body: actividadRows,
         theme: 'striped',
-        headStyles: { fillColor: renovaPrimary, textColor: 255, halign: 'center' },
+        headStyles: { fillColor: ecosortPrimary, textColor: 255, halign: 'center' },
         styles: { fontSize: 9, cellPadding: 2, halign: 'center' },
         columnStyles: {
           0: { cellWidth: tableWidth * 0.4, halign: 'center' },
@@ -262,7 +262,7 @@ const exportToPDF = async item => {
         head: [['Recompensa', 'Canjes']],
         body: recompensasRows,
         theme: 'striped',
-        headStyles: { fillColor: renovaPrimary, textColor: 255, halign: 'center' }, 
+        headStyles: { fillColor: ecosortPrimary, textColor: 255, halign: 'center' }, 
         styles: { fontSize: 9, cellPadding: 2 },
         columnStyles: {
           0: { cellWidth: tableWidth * 0.8, halign: 'left' },
@@ -300,7 +300,7 @@ const exportToPDF = async item => {
       theme: 'grid',
       styles: { fontSize: 10, cellPadding: 3, textColor: bodyTextColor },
       columnStyles: {
-        0: { fontStyle: 'bold', cellWidth: 55, textColor: renovaSecondary, fillColor: lightGray }, // Etiquetas en color secundario
+        0: { fontStyle: 'bold', cellWidth: 55, textColor: ecosortSecondary, fillColor: lightGray }, // Etiquetas en color secundario
         1: { cellWidth: 125 },
       },
       didDrawPage: data => (yPos = data.cursor.y),
@@ -313,7 +313,7 @@ const exportToPDF = async item => {
       doc.setFontSize(8)
       doc.setTextColor(150, 150, 150)
       doc.text(
-        `Este documento es de uso interno exclusivo. © ${format(new Date(), 'yyyy')} Renova S.A. de C.V.`,
+        `Este documento es de uso interno exclusivo. © ${format(new Date(), 'yyyy')} EcoSort`,
         pageWidth / 2,
         pageHeight - 15,
         { align: 'center' },

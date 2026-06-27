@@ -17,7 +17,7 @@ const { showViewTermsModal, openViewTermsModal } = useModalViewTerms()
         size="1.25rem"
         class="mx-1"
       />
-      por <span class="text-primary dark:!text-slate-300 ms-1">RENOVA</span>
+      por <span class="text-primary dark:!text-slate-300 ms-1">EcoSort</span>
     </span>
     <!-- 👉 Footer: right content -->
     <span class="flex-row items-center justify-end gap-x-4 text-primary hidden md:flex">
