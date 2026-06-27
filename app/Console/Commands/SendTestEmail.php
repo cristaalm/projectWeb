@@ -13,15 +13,11 @@ class SendTestEmail extends Command
     public function handle()
     {
         $toEmail = $this->argument('email');
-        $fromAddress = config('mail.from.address'); // Usa lo definido en config/mail.php o .env
-        $fromName = config('mail.from.name');
 
-        Mail::raw('Este es un correo de prueba enviado desde un comando de Artisan.', function ($message) use ($toEmail, $fromAddress, $fromName) {
-            $message->from($fromAddress, $fromName)
-                    ->to($toEmail)
-                    ->subject('Correo de Prueba - Laravel');
+        Mail::raw('Correo de prueba enviado desde EcoSort vía Resend.', function ($message) use ($toEmail) {
+            $message->to($toEmail)->subject('Correo de Prueba - EcoSort');
         });
 
-        $this->info("Correo de prueba enviado a: {$toEmail} desde {$fromAddress}");
+        $this->info("Correo enviado correctamente a: {$toEmail}");
     }
 }

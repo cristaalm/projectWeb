@@ -16,6 +16,7 @@
         "laravel/tinker": "^2.9",
         "maennchen/zipstream-php": "^3.1",
         "pragmarx/google2fa-laravel": "^2.3",
+        "resend/resend-php": "^1.4",
         "sendgrid/sendgrid": "^8.1",
         "symfony/http-client": "^7.3"
     },

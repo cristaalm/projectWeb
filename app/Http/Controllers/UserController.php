@@ -20,12 +20,12 @@ use App\Enums\VerificationStatus;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\PointsModifiedMail;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\TransientToken;
 
 // notifications
 use App\Notifications\UserStatusAccountNotification;
-use App\Mail\PointsModifiedMail;
 use App\Notifications\UserCredentialsNotification;
 
 class UserController extends Controller
