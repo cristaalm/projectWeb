@@ -4,9 +4,9 @@ import NavItems from '@/layouts/components/NavItems/NavItems.vue'
 import UserProfile from '@/layouts/components/UserProfile.vue'
 import { useAuthStore } from '@/store/auth'
 import VerticalNavLayout from '@layouts/components/VerticalNavLayout.vue'
+import { getHours } from 'date-fns'
 import { useRouter } from 'vue-router'
 import { useTheme } from 'vuetify'
-import { getHours } from 'date-fns'
 
 const {
   name: themeName,
@@ -61,14 +61,17 @@ const goToHome = () => {
         class="cursor-pointer app-logo app-title-wrapper"
         @click="goToHome"
       >
-        <!-- eslint-disable vue/no-v-html -->
-        <div class="d-flex">
+        <VSheet class="w-12 h-12 !bg-transparent rounded-lg d-flex align-center justify-center">
           <img
-            :src="globalTheme.name.value == 'dark' ? '/images/LogoLetraDark.png' : '/images/LogoLetra.png'"
-            alt="EcoSort"
-            class="h-[45px]"
+            :src="globalTheme.name.value == 'dark' ? '/images/logoDark.png' : '/images/logo.png'"
+            alt="Logo"
+            class="w-full h-full object-contain"
           >
-        </div>
+        </VSheet>
+        <span
+          class="text-5xl font-weight-bold tracking-wider font-stella"
+          :style="{ color: globalTheme.name.value == 'dark' ? '#0b6374' : '#13b868' }"
+        >EcoSort</span>
       </div>
 
       <IconBtn
