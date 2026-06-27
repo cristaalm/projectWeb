@@ -38,7 +38,7 @@ class UserSeeder extends Seeder
         $users[] = User::factory()->create([
             'name' => 'Renova',
             'last_name' => 'app',
-            'email' => 'soyrenovaapp@gmail.com',
+            'email' => 'somosecosort@gmail.com',
             'password' => Hash::make('admin123'),
             'role_id' => $adminRole->id,
             'email_verified_at' => now(),

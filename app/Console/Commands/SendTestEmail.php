@@ -14,7 +14,7 @@ class SendTestEmail extends Command
     {
         $toEmail = $this->argument('email');
 
-        Mail::raw('Correo de prueba enviado desde EcoSort vía Resend.', function ($message) use ($toEmail) {
+        Mail::raw('Correo de prueba enviado desde EcoSort vía Brevo.', function ($message) use ($toEmail) {
             $message->to($toEmail)->subject('Correo de Prueba - EcoSort');
         });
 

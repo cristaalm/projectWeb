@@ -1,6 +1,6 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
+import { useI18n } from 'vue-i18n'
 
 const emit = defineEmits(['open-view-terms-modal'])
 const { t } = useI18n()
@@ -91,7 +91,7 @@ const { t } = useI18n()
                 class="mt-1"
                 icon="mdi mdi-email"
               />
-              <span>somosecosort@gmail.com</span>
+              <span class=" font-poppins">somosecosort@gmail.com</span>
             </li>
             <li class="d-flex align-start gap-2">
               <VIcon
@@ -128,3 +128,74 @@ const { t } = useI18n()
     </VContainer>
   </VFooter>
 </template>
+
+<style scoped>
+.max-w-7xl {
+  max-inline-size: 1280px;
+}
+
+.space-y-4 > * + * {
+  margin-block-start: 16px;
+}
+
+.gap-2 {
+  gap: 8px;
+}
+
+.gap-4 {
+  gap: 16px;
+}
+
+.gap-6 {
+  gap: 24px;
+}
+
+.w-8 {
+  inline-size: 32px;
+}
+
+.h-8 {
+  block-size: 32px;
+}
+
+.mb-8 {
+  margin-block-end: 32px;
+}
+
+.mb-4 {
+  margin-block-end: 16px;
+}
+
+.mt-1 {
+  margin-block-start: 4px;
+}
+
+.leading-relaxed {
+  line-height: 1.625;
+}
+
+.footer-links,
+.footer-contact {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.footer-links li,
+.footer-contact li {
+  font-size: 14px;
+  margin-block-end: 8px;
+}
+
+.footer-links a,
+.footer-link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer-links a:hover,
+.footer-link:hover {
+  color: rgb(5, 209, 110);
+}
+</style>
