@@ -5,7 +5,7 @@ return [
     'documentations' => [
         'default' => [
             'api' => [
-                'title' => 'Renova API Docs',
+                'title' => 'ECOSORT API Docs',
             ],
 
             'routes' => [

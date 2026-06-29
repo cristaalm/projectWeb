@@ -36,7 +36,7 @@
               <td style="background-color: #fee2e2; padding: 24px 0; text-align: center">
                 <img
                   src="https://renova-3q4h.onrender.com/images/LogoLetra.png"
-                  alt="RENOVA Logo"
+                  alt="ECOSORT Logo"
                   style="max-width: 180px; height: auto"
                 />
               </td>
@@ -82,7 +82,7 @@
                   border-top: 1px solid #e5e7eb;
                 "
               >
-                © {{ date('Y') }} RENOVA. Todos los derechos reservados.<br />
+                © {{ date('Y') }} ECOSORT. Todos los derechos reservados.<br />
                 <span style="color: #9ca3af">Estamos aquí para ayudarte a reciclar mejor.</span>
               </td>
             </tr>

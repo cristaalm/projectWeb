@@ -6,7 +6,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Info(
     version: "1.0.0",
-    title: "API RENOVA",
+    title: "API ECOSORT",
     description: "Documentación de la API de Laravel con Swagger"
 )]
 #[OA\SecurityScheme(

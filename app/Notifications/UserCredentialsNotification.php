@@ -23,7 +23,7 @@ class UserCredentialsNotification extends Notification implements ShouldQueue
     public function toMail($notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Tus credenciales de acceso a RENOVA')
+            ->subject('Tus credenciales de acceso a EcoSort')
             ->view('emails.user-credentials', [
                 'user' => $notifiable,
                 'password' => $this->password,

@@ -36,7 +36,7 @@
               <td style="background-color: #c3e3d8; padding: 24px 0; text-align: center">
                 <img
                   src="https://renova-3q4h.onrender.com/images/LogoLetra.png"
-                  alt="RENOVA Logo"
+                  alt="ECOSORT Logo"
                   style="max-width: 180px; height: auto"
                 />
               </td>
@@ -54,7 +54,7 @@
                 </p>
 
                 <p style="font-size: 16px; margin-bottom: 20px;">
-                  Tu contraseña en <strong>RENOVA</strong> se ha restablecido correctamente.
+                  Tu contraseña en <strong>ECOSORT</strong> se ha restablecido correctamente.
                   Ya puedes iniciar sesión con tu nueva contraseña.
                 </p>
 
@@ -82,7 +82,7 @@
                 </div>
 
                 <p style="font-size: 16px; margin-bottom: 0;">
-                  Gracias por confiar en RENOVA. Estamos aquí para cuidar de ti.
+                  Gracias por confiar en ECOSORT. Estamos aquí para cuidar de ti.
                 </p>
               </td>
             </tr>
@@ -99,7 +99,7 @@
                   border-top: 1px solid #e5e7eb;
                 "
               >
-                © {{ date('Y') }} RENOVA. Todos los derechos reservados.<br />
+                © {{ date('Y') }} ECOSORT. Todos los derechos reservados.<br />
                 <span style="color: #9ca3af">Tu seguridad es nuestra prioridad.</span>
               </td>
             </tr>

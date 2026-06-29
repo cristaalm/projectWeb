@@ -36,7 +36,7 @@ class UserSeeder extends Seeder
 
         // Admin
         $users[] = User::factory()->create([
-            'name' => 'Renova',
+            'name' => 'ECOSORT',
             'last_name' => 'app',
             'email' => 'somosecosort@gmail.com',
             'password' => Hash::make('admin123'),

@@ -1,7 +1,7 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "API RENOVA",
+        "title": "API ECOSORT",
         "description": "Documentación de la API de Laravel con Swagger",
         "version": "1.0.0"
     },
