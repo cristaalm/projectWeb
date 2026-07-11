@@ -6,25 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('device_tokens', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->string('token')->index();
-            $table->string('platform', 50)->index();
+            $table->unsignedBigInteger('user_id');
+            $table->text('token')->unique();
+            $table->string('platform', 50);
             $table->timestamps();
 
-            $table->unique(['user_id', 'platform']);
+            $table->foreign('user_id', 'fk_device_tokens_user')
+                  ->references('id')->on('users')->onDelete('cascade');
+
+            $table->index('user_id', 'idx_device_tokens_user');
+            $table->index('platform', 'idx_device_tokens_platform');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('device_tokens');

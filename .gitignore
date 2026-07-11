@@ -91,3 +91,6 @@ id_ed25519
 *.p8
 *service-account*.json
 firebase*.json
+
+# Documentación interna de referencia (no versionada)
+/docs

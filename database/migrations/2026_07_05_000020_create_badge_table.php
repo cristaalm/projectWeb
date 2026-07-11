@@ -6,24 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('badge', function (Blueprint $table) {
             $table->id();
             $table->string('name', 100);
-            $table->integer('points_required');
-            $table->integer('points_awared');
+            $table->integer('recycles_required');
+            $table->integer('points_awarded');
             $table->boolean('status')->default(true);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('badge');
