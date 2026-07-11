@@ -191,8 +191,8 @@ class AuthController extends Controller
                 $expiresAt = Carbon::now()->addMinutes(config('tokens.default_expiration_minutes'));
             }
 
-            $webAccept = ['admin', 'moderator'];
-            $mobileAccept = ['user','comerciante', 'admin', 'moderator'];
+            $webAccept = ['superadmin', 'moderador', 'admin_merchant'];
+            $mobileAccept = ['member','merchant', 'superadmin', 'moderador', 'admin_merchant'];
 
             // vereificamos si $user->role->name esta dentro de webAccept
             if ($isDesktop && !in_array($user->role->name, $webAccept)) {
