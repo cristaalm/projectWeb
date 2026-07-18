@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BadgeController;
 
 Route::prefix('badges')->group(function () {
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'ensureUserIsActive'])->group(function () {
 
         Route::get('getAll', [BadgeController::class, 'getAll']);
         Route::get('catalog', [BadgeController::class, 'catalogBadges']);

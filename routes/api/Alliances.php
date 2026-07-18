@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AllianceController;
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'ensureUserIsActive'])->group(function () {
     Route::prefix('alianzas')->group(function () {
         //GET
         Route::get('getAll', [AllianceController::class, 'getAll']);

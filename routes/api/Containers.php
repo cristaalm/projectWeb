@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ContainerController;
 
 Route::prefix('containers')->group(function () {
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'ensureUserIsActive'])->group(function () {
         Route::get('getAll', [ContainerController::class, 'getAll']);
         Route::get('catalog', [ContainerController::class, 'catalog']);
         

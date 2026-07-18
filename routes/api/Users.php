@@ -5,7 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\IdentifyVerificationController;
 
 Route::prefix('users')->group(function () {
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'ensureUserIsActive'])->group(function () {
 
         // Controller user
         Route::get('getAll', [UserController::class, 'getAll']);
@@ -38,6 +38,5 @@ Route::prefix('users')->group(function () {
     // Controller user
     Route::post('identityUserCode', [UserController::class, 'identityUserCode']);
     Route::post('identityUser', [UserController::class, 'identityUser']);
-    Route::post('register', [UserController::class, 'registerUser']);
 });
 

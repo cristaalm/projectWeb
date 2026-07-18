@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TypeShopController;
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'ensureUserIsActive'])->group(function () {
     Route::prefix('typeShop')->group(function () {
         Route::get('getAll', [TypeShopController::class, 'getAll']);
         Route::get('catalog', [TypeShopController::class, 'catalog']);

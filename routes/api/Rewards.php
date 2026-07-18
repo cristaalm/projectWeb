@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RewardController;
 use App\Http\Controllers\RewardUserController;
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'ensureUserIsActive'])->group(function () {
     Route::prefix('reward')->group(function () {
         Route::get('getAll', [RewardController::class, 'getAll']); // path: /api/reward/getAll
         Route::post('create', [RewardController::class, 'create']); // path: /api/reward/create
