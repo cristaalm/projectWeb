@@ -12,6 +12,12 @@ import svgLoader from 'vite-svg-loader'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  server: {
+    host: 'localhost', // Permite acceso desde la red local
+    port: 5173, // Puerto del frontend
+    origin: 'http://localhost:5173', // URL pública de los assets (evita que Docker exponga 0.0.0.0 al navegador)
+    cors: { origin: true }, // Refleja el Origin real de cada request (la app se sirve en :80, distinto puerto que Vite)
+  },
   plugins: [vue({
     template: {
       transformAssetUrls: {
