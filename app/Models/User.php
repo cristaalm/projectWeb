@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Str;
 
@@ -15,7 +16,6 @@ use App\Notifications\CustomResetPassword;
 
 // ENUMS
 use App\Enums\UserStatus;
-use App\Enums\VerificationStatus;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -26,20 +26,15 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_name',
         'email',
         'phone',
-        'curp',
         'password',
         'email_verified_at',
+        'phone_verified_at',
         'tour',
-        'total_points',
-        'verification_status',
         'avatar',
-        'badge', // campo para guardar el estado de las insignias
-        'points_month', // puntos obtenidos en el mes
         'two_factor_status',
         'code_identity',
         'status',
         'google2fa_secret',
-        'alliance_id',
         'role_id',
     ];
 
@@ -51,15 +46,12 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'phone_verified_at' => 'datetime',
         'password' => 'hashed',
-        'verification_status' => VerificationStatus::class,
         'two_factor_status' => 'boolean',
         'status' => UserStatus::class,
-        'total_points' => 'integer',
         'tour' => 'boolean',
         'avatar' => 'string',
-        'badge' => 'array',
-        'points_month' => 'integer',
         'google2fa_secret' => 'string',
     ];
 
@@ -68,14 +60,27 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Role::class);
     }
 
-    public function alliance(): BelongsTo
+    public function merchant(): HasOne
     {
-        return $this->belongsTo(Alliance::class);
+        return $this->hasOne(Merchant::class);
     }
 
-    public function identityVerification(): HasMany
+    public function organizationMember(): HasOne
     {
-        return $this->hasMany(IdentityVerification::class);
+        return $this->hasOne(OrganizationMember::class);
+    }
+
+    /**
+     * A user is linked to an alliance through exactly one of merchant/organizationMember,
+     * never both — if both are populated it's a data-integrity bug, not a case to silently pick from.
+     */
+    public function currentAlliance(): ?Alliance
+    {
+        if ($this->merchant && $this->organizationMember) {
+            report(new \RuntimeException("User {$this->id} has both a merchant and an organization_member row."));
+        }
+
+        return $this->merchant?->alliance ?? $this->organizationMember?->alliance;
     }
 
     public function scans(): HasMany
