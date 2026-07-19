@@ -3,7 +3,7 @@ export const routes = [
   {
     path: '/',
     component: () => import('@/layouts/default.vue'),
-    meta: { requiresAuth: true, isDashboard: true },
+    meta: { requiresAuth: true },
     children: [
       {
         path: 'Panel',
@@ -15,7 +15,7 @@ export const routes = [
   {
     path: '/',
     component: () => import('@/layouts/blank.vue'),
-    meta: { requiresAuth: true, isDashboard: false },
+    meta: { guestOnly: true },
     children: [
       {
         path: 'login',
