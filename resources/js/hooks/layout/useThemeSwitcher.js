@@ -18,9 +18,14 @@ export function useThemeSwitcher() {
     darkModeStore.setDarkMode(globalTheme.name.value === 'dark')
   }
 
+  // Solo cambia el tema visual (Vuetify + la clase `dark` de Tailwind en
+  // <html>), sin tocar la preferencia guardada: se usa en páginas públicas/
+  // de invitado (landing, login...) que siempre se ven en claro sin importar
+  // el modo elegido para el dashboard. Si persistiera, visitar estas páginas
+  // borraría la preferencia oscura del usuario.
   function changeThemeToLight() {
     globalTheme.name.value = 'light'
-    darkModeStore.setDarkMode(false)
+    darkModeStore.updateDOMDarkMode(false)
   }
 
   const darkMode = computed({

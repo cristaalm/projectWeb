@@ -2,9 +2,11 @@
 import Footer from '@/layouts/components/Footer.vue'
 import NavItems from '@/layouts/components/NavItems/NavItems.vue'
 import UserProfile from '@/layouts/components/UserProfile.vue'
+import { useDarkModeStore } from '@/store/dark-mode'
 import { useAuthStore } from '@/store/auth'
 import VerticalNavLayout from '@layouts/components/VerticalNavLayout.vue'
 import { getHours } from 'date-fns'
+import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTheme } from 'vuetify'
 
@@ -14,7 +16,18 @@ const {
 } = useTheme()
 
 const authStore = useAuthStore()
+const darkModeStore = useDarkModeStore()
 const router = useRouter()
+
+// El dashboard sigue la preferencia guardada (a diferencia de las páginas
+// públicas/de invitado, que siempre se ven en claro — ver layouts/blank.vue
+// y Landing.vue). Restaura tanto el tema de Vuetify como la clase `dark` de
+// Tailwind en <html>, que las páginas de invitado pudieron haber forzado a
+// claro solo visualmente.
+onMounted(() => {
+  globalTheme.name.value = darkModeStore.darkMode ? 'dark' : 'light'
+  darkModeStore.updateDOMDarkMode(darkModeStore.darkMode)
+})
 
 const greeting = computed(() => {
   const hour = getHours(new Date())
