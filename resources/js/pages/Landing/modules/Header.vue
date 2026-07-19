@@ -110,7 +110,7 @@ onMounted(() => {
       </a>
 
       <VBtn
-        v-if="authStore.accessToken"
+        v-if="authStore.user"
         color="primary"
         variant="text"
         class="mt-4 text-primary-foreground font-poppins"
@@ -182,7 +182,7 @@ onMounted(() => {
       <!-- Acciones -->
       <div class="flex flex-row justify-between gap-4 align-center">
         <VBtn
-          v-if="authStore.accessToken"
+          v-if="authStore.user"
           color="primary"
           variant="text"
           class="text-primary-foreground d-none d-md-flex font-poppins"

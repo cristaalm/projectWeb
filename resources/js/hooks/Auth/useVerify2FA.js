@@ -1,6 +1,5 @@
 import { router } from '@/plugins/router'
 import { requestPost } from '@/services/requests'
-import { useAuthStore } from '@/store/auth'
 import { useToastStore } from '@/store/useToastStore'
 import { messageError } from '@/utils/constants'
 import { ref } from 'vue'
@@ -35,7 +34,7 @@ export function useVerify2FA() {
     loading.value = true
     
     try {
-      const response = await requestPost({ url: 'auth/verify-2fa', data: { token2FA }, token: useAuthStore().accessToken })
+      const response = await requestPost({ url: 'auth/verify-2fa', data: { token2FA } })
 
       if (!response.success) {
         error.value = true

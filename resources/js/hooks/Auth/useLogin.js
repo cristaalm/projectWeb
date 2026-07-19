@@ -1,3 +1,4 @@
+import { ensureCsrfCookie } from '@/services/http'
 import { requestPost } from '@/services/requests'
 import { useAuthStore } from '@/store/auth'
 import { useToastStore } from '@/store/useToastStore'
@@ -12,7 +13,7 @@ export default function useLogin() {
   const error = ref(false)
   const loading = ref(false)
   const toast = useToastStore()
-    
+
   const resetState = () => {
     success.value = false
     error.value = null
@@ -23,10 +24,10 @@ export default function useLogin() {
     if (!email || !pass) {
       error.value = true
       toast.showToast({ message: 'Por favor, complete los campos', tipo: 'warning' })
-      
+
       return false
     }
-    
+
     return true
   }
 
@@ -35,14 +36,16 @@ export default function useLogin() {
     if (!validate({ email, pass })) return
     resetState()
     loading.value = true
-    
+
     try {
-      const response = await requestPost({ url: 'auth/login', data: { email, password: pass, remember_me: remember }, auth: false })
+      await ensureCsrfCookie()
+
+      const response = await requestPost({ url: 'auth/login', data: { email, password: pass, remember_me: remember } })
 
       if (!response.success) {
         error.value = true
         toast.showToast({ message: response.message ?? messageError, tipo: 'error', duration: 8000 })
-        
+
         return
       }
 
@@ -50,12 +53,10 @@ export default function useLogin() {
 
       user.value = data.user
       useAuthStore().setUser(data.user)
-      useAuthStore().setExpiresAt(data.expires_at)
-      useAuthStore().setAccessToken(data.access_token)
 
       if (data.user.two_factor_status) {
         router.push({ name: 'verify2FA' })
-        
+
         return
       }
 
@@ -65,9 +66,10 @@ export default function useLogin() {
         router.push('/panel')
       }, 1000)
 
-    } catch (error) {
+    } catch (err) {
       error.value = true
-      console.log(error)
+      console.error(err)
+      toast.showToast({ message: messageError, tipo: 'error' })
     } finally {
       loading.value = false
     }

@@ -1,4 +1,3 @@
-import { useThemeSwitcher } from '@/hooks/layout/useThemeSwitcher'
 import { router } from '@/plugins/router'
 import { requestPost } from '@/services/requests'
 import { useAuthStore } from '@/store/auth'
@@ -10,7 +9,7 @@ export default function useLogout() {
   const successLogout = ref(false)
   const errorLogout = ref(false)
   const loadingLogout = ref(false)
-    
+
   const resetState = () => {
     successLogout.value = false
     errorLogout.value = null
@@ -18,50 +17,29 @@ export default function useLogout() {
   }
 
   const logoutUser = async () => {
-    const { logoutMode } = useThemeSwitcher()
-
     resetState()
     loadingLogout.value = true
 
     const toast = useToastStore()
     const authStore = useAuthStore()
 
-    const token = authStore.getAccessToken()
-    if (!token) {
-      errorLogout.value = true
-      toast.showToast({ message: 'No tiene una sesión activa', tipo: 'error' })
-
-      logoutMode()
-      router.push({ name: 'login' })
-
-      return
-    }
-
     try {
-      const response = await requestPost({ url: 'auth/logout', data: { token } })
+      const response = await requestPost({ url: 'auth/logout' })
 
-      if (!response.success && response.message !== "Token inválido o no encontrado.") {
+      if (!response.success) {
         errorLogout.value = true
         console.error(response.errors)
         toast.showToast({ message: response.message ?? messageError, tipo: 'error' })
-        router.go(-1)
-
-        return
+      } else {
+        successLogout.value = true
       }
-      successLogout.value = true
-      authStore.logout()
-      logoutMode()
-      router.push({ name: 'login' })
-
-
-      return
     } catch (error) {
       errorLogout.value = true
       toast.showToast({ message: messageError, tipo: 'error' })
       console.error(error)
-      
-      return
     } finally {
+      authStore.logout()
+      router.push({ name: 'login' })
       loadingLogout.value = false
     }
   }
