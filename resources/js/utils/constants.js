@@ -1,7 +1,8 @@
-// export const apiURL = "http://localhost:8000/api/"
-// export const storageURL = "http://localhost:8000/storage/"
-
-export const apiURL = "https://renova-3q4h.onrender.com/api/"
-export const storageURL = "https://renova-3q4h.onrender.com/storage/"
+// SPA y API viven en el mismo dominio (misma app Laravel), por eso son rutas
+// relativas: funcionan igual en local, staging y producción sin variables de
+// entorno adicionales.
+export const apiURL = "/api/"
+export const storageURL = "/storage/"
+export const csrfCookieURL = "/sanctum/csrf-cookie"
 
 export const messageError = "Ocurrió un error inesperado, por favor intente de nuevo mas tarde"

@@ -1,98 +1,59 @@
 import { router } from '@/plugins/router'
-import { useAuthStore } from '@/store/auth'
 import { useToastStore } from '@/store/useToastStore'
-import { apiURL } from "@/utils/constants"
+import http from '@/services/http'
 import { useDebounceFn } from '@vueuse/core'
 import { isRef, ref, unref, watch } from 'vue'
 
+// La sesión murió (cookie inválida/expirada o token revocado): tanto
+// AuthenticationException como EnsureUserIsActive responden con este shape.
+// Un 401 "credenciales incorrectas" (AuthException del login) no lo trae,
+// así que no dispara un logout de por medio.
 async function checkAuth(response) {
-  if (response.status === 401 && 'authenticated' in response) {
+  if (response && 'authenticated' in response && response.authenticated === false) {
     router.push({ name: 'logout' })
   }
 }
 
-export async function requestGet({ url, params = {}, token }) {
-  const response = await fetch(`${apiURL}${url}?${new URLSearchParams(params)}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  })
-
-  const jsonResponse = await response.json()
+export async function requestGet({ url, params = {} }) {
+  const response = await http.get(url, { params })
 
   await checkAuth(response)
-    
-  return jsonResponse
+
+  return response
 }
 
-export async function requestPost({ url, data = {}, params = {}, formData = false, token = false, responseType = 'json', auth = true }) {
-  const headers = {}
+export async function requestPost({ url, data = {}, params = {}, formData = false, responseType = 'json' }) {
+  const headers = formData ? { 'Content-Type': 'multipart/form-data' } : {}
 
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`
-  }
-
-  if (!formData) {
-    headers['Content-Type'] = 'application/json'
-  }
-
-  const response = await fetch(`${apiURL}${url}?${new URLSearchParams(params)}`, {
-    method: "POST",
+  const response = await http.post(url, data, {
+    params,
     headers,
-    body: formData ? data : JSON.stringify(data),
+    responseType: responseType === 'blob' ? 'blob' : 'json',
   })
 
-  // ✅ revisa autenticación antes de devolver
-  if (auth) await checkAuth(response)
-
-  // 👇 decide si devolver JSON o Blob
-  if (responseType === 'blob') {
-    return { blob: await response.blob(), headers: response.headers }
-  }
-
-  return await response.json()
-}
-
-
-export async function requestDelete({ url, data = {}, params = {}, token }) {
-  const response = await fetch(`${apiURL}${url}?${new URLSearchParams(params)}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(data),
-  })
-
-  const jsonResponse = await response.json()
+  if (responseType === 'blob') return { blob: response }
 
   await checkAuth(response)
-    
-  return jsonResponse
+
+  return response
 }
 
-export async function requestPut({ url, data = {}, params = {}, formData = false, token }) {
-  const headers = {
-    Authorization: `Bearer ${token}`,
-  }
-
-  if (!formData) {
-    headers['Content-Type'] = 'application/json'
-  }
-
-  const response = await fetch(`${apiURL}${url}?${new URLSearchParams(params)}`, {
-    method: "PUT",
-    headers,
-    body: formData ? data : JSON.stringify(data),
-  })
-
-  const jsonResponse = await response.json()
+export async function requestDelete({ url, data = {}, params = {} }) {
+  const response = await http.delete(url, { params, data })
 
   await checkAuth(response)
-    
-  return jsonResponse
+
+  return response
+}
+
+export async function requestPut({ url, data = {}, params = {}, formData = false }) {
+  const headers = formData ? { 'Content-Type': 'multipart/form-data' } : {}
+
+  const response = await http.put(url, data, { params, headers })
+
+  await checkAuth(response)
+
+  return response
 }
 
 export function requestOrderTable({ url, params = {}, defaults = { page: 1, perPage: 5, search: '', sortBy: [{ key: null, order: null }], status: null }, config = { autoload: true, isGhostLoading: false } }) {
@@ -111,7 +72,7 @@ export function requestOrderTable({ url, params = {}, defaults = { page: 1, perP
   const isGhostLoading = ref(config.isGhostLoading || false)
 
   const showToast = useToastStore()
-  
+
   const loadData = async () => {
     if (isGhostLoading.value && firstLoad.value) {
       firstLoad.value = false
@@ -134,7 +95,6 @@ export function requestOrderTable({ url, params = {}, defaults = { page: 1, perP
           order: sortBy.value[0]?.order || null,
           status: status.value,
         },
-        token: useAuthStore().getAccessToken(),
       })
 
       if (response.success) {
@@ -179,7 +139,7 @@ export function requestOrderTable({ url, params = {}, defaults = { page: 1, perP
     status,
     loadData,
   }
-  
+
 }
 
 function normalizeParams(params) {
