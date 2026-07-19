@@ -10,36 +10,6 @@ export const routes = [
         name: 'panel',
         component: () => import('@/pages/Dashboard/Panel/'),
       },
-      {
-        path: 'Users',
-        name: 'users',
-        component: () => import('@/pages/Dashboard/Users/'),
-      },
-      {
-        path: 'Containers',
-        name: 'containers',
-        component: () => import('@/pages/Dashboard/Containers/'),
-      },
-      {
-        path: 'Shops',
-        name: 'shops',
-        component: () => import('@/pages/Dashboard/Shops/'),
-      },
-      {
-        path: 'Rewards',
-        name: 'rewards',
-        component: () => import('@/pages/Dashboard/Rewards/'),
-      },
-      {
-        path: 'Badges',
-        name: 'badges',
-        component: () => import('@/pages/Dashboard/Badges/'),
-      },
-      {
-        path: 'Profile',
-        name: 'profile',
-        component: () => import('@/pages/Dashboard/Profile/'),
-      },
     ],
   },
   {

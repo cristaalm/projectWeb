@@ -34,10 +34,7 @@ const avatarImg = computed(() => {
       >
         <VList>
           <!-- 👉 User Avatar & Name -->
-          <VListItem
-            link
-            @click="router.push({ name: 'profile' })"
-          >
+          <VListItem>
             <template #prepend>
               <VListItemAction start>
                 <VBadge
@@ -53,28 +50,13 @@ const avatarImg = computed(() => {
                 </VBadge>
               </VListItemAction>
             </template>
-  
+
             <VListItemTitle class="font-weight-semibold">
               {{ user.name }} {{ user.last_name }}
             </VListItemTitle>
             <VListItemSubtitle v-if="user.role">
               {{ user.role.name }}
             </VListItemSubtitle>
-          </VListItem>
-          <VDivider class="my-2" />
-          <!-- 👉 Modo oscuro / claro -->
-          <VListItem
-            link
-            @click="router.push({ name: 'profile' })"
-          >
-            <template #prepend>
-              <VIcon
-                class="me-2"
-                icon="bx-user"
-                size="22"
-              />
-            </template>
-            <VListItemTitle>Perfil</VListItemTitle>
           </VListItem>
           <VDivider class="my-2" />
           <!-- 👉 Modo oscuro / claro -->
