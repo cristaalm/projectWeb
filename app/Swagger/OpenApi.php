@@ -5,27 +5,30 @@ namespace App\Swagger;
 use OpenApi\Attributes as OA;
 
 #[OA\Info(
-    version: "1.0.0",
-    title: "API ECOSORT",
-    description: "Documentación de la API de Laravel con Swagger"
+    version: '1.0.0',
+    title: 'RENOVA API',
+    description: 'API JSON de RENOVA (backend Laravel + Sanctum). Documentación en reconstrucción módulo por módulo tras el rediseño del esquema de base de datos; por ahora solo el módulo de Auth está documentado.'
+)]
+#[OA\Server(
+    url: '/api',
+    description: 'Servidor actual (relativo al host donde se sirve la API)'
 )]
 #[OA\SecurityScheme(
-    securityScheme: "bearerAuth",
-    type: "http",
-    scheme: "bearer",
-    bearerFormat: "JWT",
-    description: "Ingresa el token JWT sin la palabra 'Bearer'. El sistema lo añadirá automáticamente."
+    securityScheme: 'sessionCookie',
+    type: 'apiKey',
+    in: 'cookie',
+    name: 'laravel_session',
+    description: "Autenticación por sesión para la SPA web. Requiere primero pedir GET /sanctum/csrf-cookie y luego enviar el header X-XSRF-TOKEN (tomado de la cookie XSRF-TOKEN) en cada petición mutante. Sanctum activa este modo automáticamente para dominios listados en SANCTUM_STATEFUL_DOMAINS."
 )]
-#[OA\Server(
-    url: "https://renova-3q4h.onrender.com",
-    description: "Servidor principal (Render)"
+#[OA\SecurityScheme(
+    securityScheme: 'bearerToken',
+    type: 'http',
+    scheme: 'bearer',
+    bearerFormat: 'Personal Access Token',
+    description: 'Autenticación por token para clientes no-navegador (apps móviles). Token emitido por POST /api/auth/login o /api/auth/register cuando la petición no trae sesión de Sanctum activa. Enviar como header Authorization: Bearer {token}.'
 )]
-#[OA\Server(
-    url: "http://127.0.0.1:8000",
-    description: "Servidor local (php artisan serve)"
-)]
-#[OA\Server(
-    url: "http://127.0.0.1:8001",
-    description: "Local 8001 (php artisan serve)"
-)]
-class OpenApi {}
+class OpenApi
+{
+    // Contenedor de anotaciones globales de OpenAPI (Info, Servers, SecuritySchemes).
+    // No se instancia; l5-swagger solo escanea los atributos de esta clase.
+}

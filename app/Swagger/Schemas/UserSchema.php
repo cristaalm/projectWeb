@@ -4,55 +4,63 @@ namespace App\Swagger\Schemas;
 
 use OpenApi\Attributes as OA;
 
-#[OA\Schema(schema: "User", title: "User", description: "Representa un usuario")]
+#[OA\Schema(
+    schema: 'User',
+    description: 'Representación del usuario autenticado, tal como la produce UserResource.',
+    properties: [
+        new OA\Property(property: 'id', type: 'integer', example: 1),
+        new OA\Property(property: 'avatar', type: 'string', nullable: true, example: null),
+        new OA\Property(property: 'name', type: 'string', example: 'Eduardo'),
+        new OA\Property(property: 'last_name', type: 'string', example: 'Arcega'),
+        new OA\Property(property: 'email', type: 'string', format: 'email', example: 'eduardo@example.com'),
+        new OA\Property(property: 'phone', type: 'string', example: '5555555555'),
+        new OA\Property(property: 'tour', type: 'boolean', description: 'Si el usuario ya completó el tour guiado de la interfaz.', example: false),
+        new OA\Property(property: 'two_factor_status', type: 'boolean', description: 'Si el usuario tiene 2FA habilitado.', example: false),
+        new OA\Property(property: 'code_identity', type: 'string', description: 'Código EAN-13 único de identidad del usuario.', example: 'ECOSORT-SA-001'),
+        new OA\Property(property: 'status', type: 'integer', enum: [0, 1], description: '1 = activo, 0 = inactivo (App\\Enums\\UserStatus).', example: 1),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+        new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
+        new OA\Property(
+            property: 'alliance',
+            type: 'object',
+            nullable: true,
+            description: 'Presente solo si el usuario es dueño/admin (merchant) o empleado (organizationMember) de un comercio. Null en caso contrario.',
+            properties: [
+                new OA\Property(property: 'id', type: 'integer'),
+                new OA\Property(property: 'name', type: 'string'),
+                new OA\Property(property: 'phone', type: 'string', nullable: true),
+                new OA\Property(property: 'logo', type: 'string', nullable: true),
+                new OA\Property(property: 'address', type: 'string', nullable: true),
+                new OA\Property(
+                    property: 'type_shop',
+                    type: 'object',
+                    nullable: true,
+                    properties: [
+                        new OA\Property(property: 'id', type: 'integer'),
+                        new OA\Property(property: 'name', type: 'string'),
+                    ]
+                ),
+                new OA\Property(property: 'total_points', type: 'number', nullable: true),
+                new OA\Property(property: 'ext', type: 'string', nullable: true),
+                new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+                new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
+            ]
+        ),
+        new OA\Property(
+            property: 'role',
+            type: 'object',
+            nullable: true,
+            description: 'Solo presente cuando el endpoint carga la relación role.',
+            properties: [
+                new OA\Property(property: 'id', type: 'integer'),
+                new OA\Property(property: 'name', type: 'string', example: 'superadmin', description: 'superadmin | moderador | admin_merchant | merchant | member'),
+                new OA\Property(property: 'display_name', type: 'string', example: 'Super Administrador'),
+                new OA\Property(property: 'is_active', type: 'boolean'),
+            ]
+        ),
+    ]
+)]
 class UserSchema
 {
-    #[OA\Property(property: "id", type: "integer", example: 1)]
-    public int $id;
-
-
-    #[OA\Property(property: "alliance_id", type: "integer", example: 1)]
-    public int $alliance_id;
-
-    #[OA\Property(property: "name", type: "string", example: "John Doe")]
-    public string $name;
-
-    #[OA\Property(property: "last_name", type: "string", example: "Doe")]
-    public string $last_name;
-
-    #[OA\Property(property: "email", type: "string", example: "john.doe@example.com")]
-    public string $email;
-
-    #[OA\Property(property: "phone", type: "string", example: "1234567890")]
-    public string $phone;
-
-    #[OA\Property(property: "curp", type: "string", example: "CURP")]
-    public string $curp;
-
-    #[OA\Property(property: "email_verified_at", type: "string", format: "date-time", example: "2025-04-01T10:00:00.000000Z")]
-    public string $email_verified_at;
-
-    #[OA\Property(property: "role_id", type: "integer", example: 1)]
-    public int $role_id;
-
-    #[OA\Property(property: "total_points", type: "integer", example: 95)]
-    public int $total_points;
-
-    #[OA\Property(property: "verification_status", type: "integer", example: 1)]
-    public int $verification_status;
-
-    #[OA\Property(property: "two_factor_status", type: "boolean", example: true)]
-    public bool $two_factor_status;
-
-    #[OA\Property(property: "code_identity", type: "string", example: '4075224740324')]
-    public string $code_identity;
-
-    #[OA\Property(property: "status", type: "string", example: "ACTIVE")]
-    public string $status;
-
-    #[OA\Property(property: "created_at", type: "string", format: "date-time", example: "2025-04-01T10:00:00.000000Z")]
-    public string $created_at;
-
-    #[OA\Property(property: "updated_at", type: "string", format: "date-time", example: "2025-04-01T10:00:00.000000Z")]
-    public string $updated_at;
+    // Contenedor de anotaciones; no se instancia.
 }
