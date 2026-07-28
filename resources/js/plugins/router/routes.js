@@ -8,11 +8,13 @@ export const routes = [
       {
         path: 'Panel',
         name: 'panel',
+        meta: { title: 'Panel' },
         component: () => import('@/pages/Dashboard/Panel/'),
       },
       {
         path: 'perfil',
         name: 'profile',
+        meta: { title: 'Perfil' },
         component: () => import('@/pages/Dashboard/Profile/'),
       },
     ],
