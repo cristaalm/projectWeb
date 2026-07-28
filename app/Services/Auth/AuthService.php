@@ -286,7 +286,11 @@ class AuthService
         TwoFactorRecoveryCode::where('user_id', $user->id)->delete();
     }
 
-    private function verifyTwoFactorCode(User $user, ?string $code, ?string $recoveryCode): bool
+    /**
+     * Verifica el 2FA vigente del usuario (TOTP o recovery code) — reusado también
+     * por ProfileService para confirmar identidad al cambiar correo/contraseña.
+     */
+    public function verifyTwoFactorCode(User $user, ?string $code, ?string $recoveryCode): bool
     {
         if ($recoveryCode) {
             return $this->verifyRecoveryCode($user, $recoveryCode);

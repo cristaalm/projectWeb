@@ -10,6 +10,7 @@ require __DIR__ . '/api/Rewards.php';
 require __DIR__ . '/api/History.php';
 require __DIR__ . '/api/Containers.php';
 require __DIR__ . '/api/Users.php';
+require __DIR__ . '/api/Profile.php';
 require __DIR__ . '/api/Dash.php';
 require __DIR__ . '/api/Notifications.php';
 require __DIR__ . '/api/Badge.php';

@@ -27,6 +27,13 @@ class UserRepository
         return User::create($attributes);
     }
 
+    public function update(User $user, array $attributes): User
+    {
+        $user->update($attributes);
+
+        return $user;
+    }
+
     public function defaultRegistrationRole(): ?Role
     {
         return Role::firstWhere('name', 'member');
