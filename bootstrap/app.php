@@ -28,6 +28,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->group('api', [
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         ]);
+
+        // Confía en el proxy que termina TLS en producción (Render) para que Laravel
+        // detecte el esquema (https) vía X-Forwarded-Proto, en vez de forzarlo a mano.
+        // En local no hay proxy delante, así que las URLs generadas siguen siendo http.
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // Manejo de excepciones para rutas API
