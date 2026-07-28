@@ -1,4 +1,5 @@
 import useAuthToken from '@/hooks/Auth/useAuthToken'
+import { useTwoFactorChallengeStore } from '@/store/twoFactorChallenge'
 import { createRouter, createWebHistory } from 'vue-router'
 import { routes } from './routes'
 
@@ -10,17 +11,21 @@ const router = createRouter({
 router.beforeEach(async to => {
   if (to.name === 'logout') return true
 
+  // verify-2fa no depende de sesión/token (no existe ninguno todavía) sino de
+  // tener un challenge de login pendiente — sin eso no hay nada que verificar.
+  if (to.meta.twoFactorChallenge) {
+    return useTwoFactorChallengeStore().challengeToken ? true : { name: 'login' }
+  }
+
   const needsCheck = to.matched.some(record => record.meta.requiresAuth || record.meta.guestOnly)
   if (!needsCheck) return true
 
-  const { checkSession, twoFactor } = useAuthToken()
+  const { checkSession } = useAuthToken()
   const authenticated = await checkSession()
 
   if (to.meta.requiresAuth && !authenticated) return { name: 'login' }
 
-  if (authenticated && twoFactor.value && to.name !== 'verify2FA') return { name: 'verify2FA' }
-
-  if (to.meta.guestOnly && authenticated && !twoFactor.value) return { name: 'panel' }
+  if (to.meta.guestOnly && authenticated) return { name: 'panel' }
 
   return true
 })

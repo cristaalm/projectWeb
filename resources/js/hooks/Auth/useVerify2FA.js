@@ -1,5 +1,7 @@
 import { router } from '@/plugins/router'
 import { requestPost } from '@/services/requests'
+import { useAuthStore } from '@/store/auth'
+import { useTwoFactorChallengeStore } from '@/store/twoFactorChallenge'
 import { useToastStore } from '@/store/useToastStore'
 import { messageError } from '@/utils/constants'
 import { ref } from 'vue'
@@ -9,7 +11,7 @@ export function useVerify2FA() {
   const loading = ref(false)
   const validate2FA = ref(false)
   const toast = useToastStore()
-    
+
   const resetState = () => {
     validate2FA.value = false
     error.value = null
@@ -20,34 +22,50 @@ export function useVerify2FA() {
     if (!token2FA) {
       error.value = true
       toast.showToast({ message: 'Por favor, complete los campos', tipo: 'warning' })
-      
+
       return false
     }
-    
+
     return true
   }
 
   const verify2FA = async form => {
     const { token2FA } = form
     if (!validate({ token2FA })) return
+
+    const challengeStore = useTwoFactorChallengeStore()
+    const challengeToken = challengeStore.challengeToken
+
+    if (!challengeToken) {
+      toast.showToast({ message: 'Tu sesión de verificación expiró, inicia sesión de nuevo.', tipo: 'error', duration: 8000 })
+      router.push({ name: 'login' })
+
+      return
+    }
+
     resetState()
     loading.value = true
-    
+
     try {
-      const response = await requestPost({ url: 'auth/verify-2fa', data: { token2FA } })
+      const response = await requestPost({ url: 'auth/verify-2fa', data: { challenge_token: challengeToken, token2FA } })
 
       if (!response.success) {
         error.value = true
         toast.showToast({ message: response.message ?? messageError, tipo: 'error', duration: 8000 })
-        
+
         return
       }
+
+      useAuthStore().setUser(response.data.user)
+      challengeStore.clear()
+
       validate2FA.value = true
       router.push({ name: 'panel' })
 
-    } catch (error) {
+    } catch (err) {
       error.value = true
-      console.log(error)
+      console.error(err)
+      toast.showToast({ message: messageError, tipo: 'error' })
     } finally {
       loading.value = false
     }

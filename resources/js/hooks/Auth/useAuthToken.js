@@ -7,13 +7,11 @@ export default function useAuthToken() {
   const success = ref(false)
   const error = ref(false)
   const loading = ref(false)
-  const twoFactor = ref(false)
 
   const resetState = () => {
     success.value = false
     error.value = null
     loading.value = false
-    twoFactor.value = false
   }
 
   // Válido tanto para sesión por cookie (web) como para bearer token (móvil):
@@ -30,10 +28,6 @@ export default function useAuthToken() {
 
     try {
       const response = await http.get('auth/me')
-
-      if (typeof response.data === 'object' && response.data && 'two_factor' in response.data) {
-        twoFactor.value = response.data.two_factor
-      }
 
       if (!response.success) {
         error.value = true
@@ -61,7 +55,6 @@ export default function useAuthToken() {
     success,
     error,
     loading,
-    twoFactor,
     checkSession,
   }
 }

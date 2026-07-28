@@ -39,13 +39,20 @@ export const routes = [
         props: route => ({ token: route.query.token, email: route.query.email }),
       },
       {
-        path: 'verify-2fa',
-        name: 'verify2FA',
-        component: () => import('@/pages/Auth/verify2FA.vue'),
-      },
-      {
         path: '/:pathMatch(.*)*',
         component: () => import('@/pages/[...error].vue'),
+      },
+    ],
+  },
+  {
+    path: '/',
+    component: () => import('@/layouts/blank.vue'),
+    children: [
+      {
+        path: 'verify-2fa',
+        name: 'verify2FA',
+        meta: { twoFactorChallenge: true },
+        component: () => import('@/pages/Auth/verify2FA.vue'),
       },
     ],
   },

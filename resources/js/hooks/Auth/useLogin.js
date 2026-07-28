@@ -1,6 +1,7 @@
 import { ensureCsrfCookie } from '@/services/http'
 import { requestPost } from '@/services/requests'
 import { useAuthStore } from '@/store/auth'
+import { useTwoFactorChallengeStore } from '@/store/twoFactorChallenge'
 import { useToastStore } from '@/store/useToastStore'
 import { messageError } from '@/utils/constants'
 import { ref } from 'vue'
@@ -51,14 +52,15 @@ export default function useLogin() {
 
       const data = response.data
 
-      user.value = data.user
-      useAuthStore().setUser(data.user)
-
-      if (data.user.two_factor_status) {
+      if (data.two_factor_required) {
+        useTwoFactorChallengeStore().setChallenge(data.challenge_token, data.expires_at)
         router.push({ name: 'verify2FA' })
 
         return
       }
+
+      user.value = data.user
+      useAuthStore().setUser(data.user)
 
       success.value = true
 
