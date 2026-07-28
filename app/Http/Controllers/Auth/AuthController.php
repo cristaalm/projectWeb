@@ -4,14 +4,17 @@ namespace App\Http\Controllers\Auth;
 
 use App\Exceptions\Auth\AuthException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\DisableTwoFactorRequest;
+use App\Http\Requests\Auth\EnableTwoFactorRequest;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegenerateRecoveryCodesRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
+use App\Http\Requests\Auth\VerifyTwoFactorChallengeRequest;
 use App\Http\Resources\UserResource;
 use App\Services\Auth\AuthService;
 use Illuminate\Http\Request;
-use Laravel\Sanctum\PersonalAccessToken;
 use PragmaRX\Google2FA\Google2FA;
 
 class AuthController extends Controller
@@ -30,6 +33,22 @@ class AuthController extends Controller
 
             if ($request->hasSession()) {
                 $this->authService->assertRoleAllowedForSession($user);
+            }
+
+            if ($user->two_factor_status) {
+                [$challengeToken, $expiresAt] = $this->authService->issueTwoFactorChallenge(
+                    $user,
+                    (bool) $request->boolean('remember_me')
+                );
+
+                return $this->apiResponse(true, 'Ingresa el código de tu app de autenticación.', [
+                    'two_factor_required' => true,
+                    'challenge_token' => $challengeToken,
+                    'expires_at' => $expiresAt,
+                ], null, 200);
+            }
+
+            if ($request->hasSession()) {
                 $this->authService->loginSession($request, $user);
 
                 return $this->apiResponse(true, 'Inicio de sesión exitoso.', [
@@ -77,6 +96,45 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Resuelve el challenge temporal emitido por login() cuando el usuario tiene
+     * 2FA activo. No requiere sesión ni token — el challenge_token es la
+     * credencial temporal. En éxito, establece la sesión/token real, igual que
+     * un login exitoso.
+     */
+    public function verifyTwoFactorChallenge(VerifyTwoFactorChallengeRequest $request)
+    {
+        try {
+            $result = $this->authService->resolveTwoFactorChallenge(
+                $request->validated('challenge_token'),
+                $request->validated('token2FA'),
+                $request->validated('recovery_code'),
+            );
+
+            $user = $result['user'];
+
+            if ($request->hasSession()) {
+                $this->authService->assertRoleAllowedForSession($user);
+                $this->authService->loginSession($request, $user);
+
+                return $this->apiResponse(true, 'Inicio de sesión exitoso.', [
+                    'user' => new UserResource($user),
+                ], null, 200);
+            }
+
+            [$token, $expiresAt] = $this->authService->loginToken($user, $result['remember_me']);
+
+            return $this->apiResponse(true, 'Inicio de sesión exitoso.', [
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'expires_at' => $expiresAt,
+                'user' => new UserResource($user),
+            ], null, 200);
+        } catch (AuthException $e) {
+            return $this->apiResponse(false, $e->getMessage(), null, $e->details, $e->status);
+        }
+    }
+
     public function logout(Request $request)
     {
         $this->authService->logout($request);
@@ -89,15 +147,7 @@ class AuthController extends Controller
         try {
             $result = $this->authService->validateSession($request);
 
-            if ($result['two_factor_pending']) {
-                return $this->apiResponse(true, 'Verifique su sesión.', [
-                    'two_factor' => true,
-                    'user' => new UserResource($result['user']),
-                ], 'Se requiere verificar su sesión', 401);
-            }
-
             return $this->apiResponse(true, 'Su sesión es válida.', [
-                'two_factor' => false,
                 'user' => new UserResource($result['user']),
             ], null, 200);
         } catch (AuthException $e) {
@@ -153,50 +203,55 @@ class AuthController extends Controller
         ], null, 200);
     }
 
-    public function enable2FA(Request $request)
+    public function enable2FA(EnableTwoFactorRequest $request)
     {
-        $validated = $request->validate(['token2FA' => 'required|string|max:6|min:6']);
         $user = $request->user();
 
         $google2fa = app(Google2FA::class);
 
-        if (! $google2fa->verifyKey($user->google2fa_secret, $validated['token2FA'])) {
+        if (! $google2fa->verifyKey($user->google2fa_secret, $request->validated('token2FA'))) {
             return $this->apiResponse(false, 'Código de autenticación inválido.', null, null, 403);
         }
-
-        $this->authService->markTwoFactorVerified($request);
 
         $user->two_factor_status = true;
         $user->save();
 
-        return $this->apiResponse(true, 'Autenticación de dos factores habilitada correctamente.', null, null, 200);
+        $recoveryCodes = $this->authService->generateRecoveryCodes($user);
+
+        return $this->apiResponse(true, 'Autenticación de dos factores habilitada correctamente.', [
+            'recovery_codes' => $recoveryCodes,
+        ], null, 200);
     }
 
-    public function verify2FA(Request $request)
+    public function disable2FA(DisableTwoFactorRequest $request)
     {
-        $validated = $request->validate(['token2FA' => 'required|string|max:6|min:6']);
+        try {
+            $this->authService->disableTwoFactor(
+                $request->user(),
+                $request->validated('token2FA'),
+                $request->validated('recovery_code'),
+            );
+
+            return $this->apiResponse(true, 'Autenticación de dos factores deshabilitada correctamente.', null, null, 200);
+        } catch (AuthException $e) {
+            return $this->apiResponse(false, $e->getMessage(), null, $e->details, $e->status);
+        }
+    }
+
+    public function regenerateRecoveryCodes(RegenerateRecoveryCodesRequest $request)
+    {
         $user = $request->user();
 
         $google2fa = app(Google2FA::class);
 
-        if (! $google2fa->verifyKey($user->google2fa_secret, $validated['token2FA'])) {
+        if (! $google2fa->verifyKey($user->google2fa_secret, $request->validated('token2FA'))) {
             return $this->apiResponse(false, 'Código de autenticación inválido.', null, null, 403);
         }
 
-        $this->authService->markTwoFactorVerified($request);
+        $recoveryCodes = $this->authService->generateRecoveryCodes($user);
 
-        return $this->apiResponse(true, 'Código de autenticación válido.', null, null, 200);
-    }
-
-    public function disable2FA(Request $request)
-    {
-        $user = $request->user();
-        $user->two_factor_status = false;
-        $user->google2fa_secret = null;
-        $user->save();
-
-        $this->authService->clearTwoFactorVerified($request);
-
-        return $this->apiResponse(true, 'Autenticación de dos factores deshabilitada correctamente.', null, null, 200);
+        return $this->apiResponse(true, 'Códigos de recuperación regenerados correctamente.', [
+            'recovery_codes' => $recoveryCodes,
+        ], null, 200);
     }
 }

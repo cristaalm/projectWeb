@@ -52,7 +52,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'status' => UserStatus::class,
         'tour' => 'boolean',
         'avatar' => 'string',
-        'google2fa_secret' => 'string',
+        'google2fa_secret' => 'encrypted',
     ];
 
     public function role(): BelongsTo

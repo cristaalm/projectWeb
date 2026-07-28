@@ -5,6 +5,8 @@ namespace App\Services\Auth;
 use App\Enums\AllianceStatus;
 use App\Enums\UserStatus;
 use App\Exceptions\Auth\AuthException;
+use App\Models\TwoFactorChallenge;
+use App\Models\TwoFactorRecoveryCode;
 use App\Models\User;
 use App\Notifications\ResetPasswordNotification;
 use App\Repositories\UserRepository;
@@ -13,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\PersonalAccessToken;
 use PragmaRX\Google2FA\Google2FA;
 
@@ -23,6 +26,10 @@ class AuthService
 
     /** Roles that must be linked to an alliance (via merchant/organizationMember) to log in. */
     private const ALLIANCE_LINKED_ROLES = ['admin_merchant', 'merchant'];
+
+    private const TWO_FACTOR_CHALLENGE_TTL_MINUTES = 5;
+
+    private const RECOVERY_CODES_COUNT = 8;
 
     public function __construct(private readonly UserRepository $users)
     {
@@ -165,7 +172,7 @@ class AuthService
     }
 
     /**
-     * @return array{user: User, two_factor_pending: bool}
+     * @return array{user: User}
      */
     public function validateSession(Request $request): array
     {
@@ -176,62 +183,120 @@ class AuthService
             throw new AuthException('Tu cuenta no está activa.', 403);
         }
 
-        return [
-            'user' => $user,
-            'two_factor_pending' => $this->twoFactorPending($request),
-        ];
+        return ['user' => $user];
     }
 
     /**
-     * Single source of truth for "is 2FA still pending this session/token" —
-     * storage differs by guard (session flag vs. token ability) but the decision
-     * logic lives in exactly one place.
+     * Login-time 2FA challenge: emitido en vez de una sesión/token real cuando
+     * el usuario tiene 2FA activo, para que nunca exista una sesión/token
+     * "a medias" capaz de golpear rutas protegidas antes de verificar el código.
+     *
+     * @return array{0: string, 1: \Illuminate\Support\Carbon}
      */
-    public function twoFactorPending(Request $request): bool
+    public function issueTwoFactorChallenge(User $user, bool $rememberMe): array
     {
-        $user = $request->user();
+        TwoFactorChallenge::where('user_id', $user->id)->delete();
 
-        if (! $user->two_factor_status) {
+        $plainToken = Str::random(40);
+        $expiresAt = Carbon::now()->addMinutes(self::TWO_FACTOR_CHALLENGE_TTL_MINUTES);
+
+        TwoFactorChallenge::create([
+            'user_id' => $user->id,
+            'token' => hash('sha256', $plainToken),
+            'remember_me' => $rememberMe,
+            'expires_at' => $expiresAt,
+        ]);
+
+        return [$plainToken, $expiresAt];
+    }
+
+    /**
+     * @return array{user: User, remember_me: bool}
+     */
+    public function resolveTwoFactorChallenge(string $plainToken, ?string $code, ?string $recoveryCode): array
+    {
+        $challenge = TwoFactorChallenge::where('token', hash('sha256', $plainToken))->first();
+
+        if (! $challenge || $challenge->expires_at->isPast()) {
+            $challenge?->delete();
+
+            throw new AuthException('El código expiró, inicia sesión nuevamente.', 401);
+        }
+
+        $user = $challenge->user;
+
+        if (! $this->verifyTwoFactorCode($user, $code, $recoveryCode)) {
+            throw new AuthException('Código de autenticación inválido.', 403);
+        }
+
+        $rememberMe = $challenge->remember_me;
+        $challenge->delete();
+
+        return ['user' => $user, 'remember_me' => $rememberMe];
+    }
+
+    /**
+     * @return string[] Códigos en texto plano — solo se pueden leer en este momento, se guardan hasheados.
+     */
+    public function generateRecoveryCodes(User $user): array
+    {
+        TwoFactorRecoveryCode::where('user_id', $user->id)->delete();
+
+        $codes = [];
+
+        for ($i = 0; $i < self::RECOVERY_CODES_COUNT; $i++) {
+            $codes[] = strtoupper(Str::random(5)) . '-' . strtoupper(Str::random(5));
+        }
+
+        foreach ($codes as $code) {
+            TwoFactorRecoveryCode::create([
+                'user_id' => $user->id,
+                'code' => Hash::make($code),
+            ]);
+        }
+
+        return $codes;
+    }
+
+    public function verifyRecoveryCode(User $user, string $code): bool
+    {
+        $unused = TwoFactorRecoveryCode::where('user_id', $user->id)->whereNull('used_at')->get();
+
+        foreach ($unused as $recoveryCode) {
+            if (Hash::check($code, $recoveryCode->code)) {
+                $recoveryCode->update(['used_at' => now()]);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function disableTwoFactor(User $user, ?string $code, ?string $recoveryCode): void
+    {
+        if (! $this->verifyTwoFactorCode($user, $code, $recoveryCode)) {
+            throw new AuthException('Código de autenticación inválido.', 403);
+        }
+
+        $user->two_factor_status = false;
+        $user->google2fa_secret = null;
+        $user->save();
+
+        TwoFactorRecoveryCode::where('user_id', $user->id)->delete();
+    }
+
+    private function verifyTwoFactorCode(User $user, ?string $code, ?string $recoveryCode): bool
+    {
+        if ($recoveryCode) {
+            return $this->verifyRecoveryCode($user, $recoveryCode);
+        }
+
+        if (! $code) {
             return false;
         }
 
-        if ($request->hasSession()) {
-            return ! session('2fa_verified', false);
-        }
-
-        $token = $user->currentAccessToken();
-
-        return ! ($token instanceof PersonalAccessToken && in_array('two_factor', $token->abilities ?? [], true));
-    }
-
-    public function markTwoFactorVerified(Request $request): void
-    {
-        if ($request->hasSession()) {
-            $request->session()->put('2fa_verified', true);
-
-            return;
-        }
-
-        $token = $request->user()->currentAccessToken();
-
-        if ($token instanceof PersonalAccessToken) {
-            $token->forceFill(['abilities' => ['two_factor']])->save();
-        }
-    }
-
-    public function clearTwoFactorVerified(Request $request): void
-    {
-        if ($request->hasSession()) {
-            $request->session()->forget('2fa_verified');
-
-            return;
-        }
-
-        $token = $request->user()->currentAccessToken();
-
-        if ($token instanceof PersonalAccessToken) {
-            $token->forceFill(['abilities' => ['*']])->save();
-        }
+        return app(Google2FA::class)->verifyKey($user->google2fa_secret, $code);
     }
 
     public function logout(Request $request): void
