@@ -10,6 +10,11 @@ export const routes = [
         name: 'panel',
         component: () => import('@/pages/Dashboard/Panel/'),
       },
+      {
+        path: 'perfil',
+        name: 'profile',
+        component: () => import('@/pages/Dashboard/Profile/'),
+      },
     ],
   },
   {

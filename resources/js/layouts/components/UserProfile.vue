@@ -7,7 +7,6 @@ import { useRouter } from 'vue-router'
 
 const { themeName, changeTheme } = useThemeSwitcher()
 const authStore = useAuthStore()
-const user = authStore.getUser()
 const router = useRouter()
 
 const avatarImg = computed(() => {
@@ -52,13 +51,30 @@ const avatarImg = computed(() => {
             </template>
 
             <VListItemTitle class="font-weight-semibold">
-              {{ user.name }} {{ user.last_name }}
+              {{ authStore.user.name }} {{ authStore.user.last_name }}
             </VListItemTitle>
-            <VListItemSubtitle v-if="user.role">
-              {{ user.role.name }}
+            <VListItemSubtitle v-if="authStore.user.role">
+              {{ authStore.user.role.name }}
             </VListItemSubtitle>
           </VListItem>
           <VDivider class="my-2" />
+
+          <!-- 👉 Perfil -->
+          <VListItem @click.prevent="router.push({ name: 'profile' })">
+            <template #prepend>
+              <VIcon
+                class="me-2"
+                icon="bx-user"
+                size="22"
+              />
+            </template>
+            <VListItemTitle>
+              Perfil
+            </VListItemTitle>
+          </VListItem>
+
+          <VDivider class="my-2" />
+
           <!-- 👉 Modo oscuro / claro -->
           <VListItem
             link
