@@ -1,10 +1,16 @@
 <script setup>
+import { computed } from 'vue'
+import { useTheme } from 'vuetify'
+
 defineProps({
   sections: { type: Array, required: true },
   activeId: { type: String, default: null },
-}) 
+})
 
 const emit = defineEmits(['navigate'])
+
+const { name: themeName } = useTheme()
+const activeColor = computed(() => themeName.value === 'dark' ? 'info' : 'primary')
 </script>
 
 <template>
@@ -18,11 +24,13 @@ const emit = defineEmits(['navigate'])
       v-for="section in sections"
       :key="section.id"
       :active="activeId === section.id"
-      color="primary"
+      :color="activeColor"
       rounded="lg"
       @click="emit('navigate', section.id)"
     >
-      <VListItemTitle>{{ section.label }}</VListItemTitle>
+      <VListItemTitle class="dark:text-white">
+        {{ section.label }}
+      </VListItemTitle>
     </VListItem>
   </VList>
 </template>
