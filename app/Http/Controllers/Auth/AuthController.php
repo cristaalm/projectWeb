@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Exceptions\Auth\AuthException;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\OldControllers\Controller;
 use App\Http\Requests\Auth\DisableTwoFactorRequest;
 use App\Http\Requests\Auth\EnableTwoFactorRequest;
 use App\Http\Requests\Auth\ForgotPasswordRequest;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\OldControllers;
 
 use App\Models\DeviceToken;
 use Illuminate\Http\Request;
