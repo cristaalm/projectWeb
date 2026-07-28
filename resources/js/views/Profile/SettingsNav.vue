@@ -2,7 +2,7 @@
 defineProps({
   sections: { type: Array, required: true },
   activeId: { type: String, default: null },
-})
+}) 
 
 const emit = defineEmits(['navigate'])
 </script>
@@ -10,7 +10,7 @@ const emit = defineEmits(['navigate'])
 <template>
   <VList
     class="position-sticky"
-    style="top: 80px;"
+    style="top: 100px;"
     density="compact"
     nav
   >
