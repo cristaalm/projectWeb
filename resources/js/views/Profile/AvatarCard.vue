@@ -1,5 +1,6 @@
 <script setup>
 import avatarPlaceholder from '@images/placeholders/avatar.png?url'
+import { useTheme } from 'vuetify'
 import { useUpdateAvatar } from '@/hooks/Profile/useUpdateAvatar'
 import { useAuthStore } from '@/store/auth'
 import { storageURL } from '@/utils/constants'
@@ -17,17 +18,20 @@ function onAvatarSelected(event) {
   if (file) updateAvatar(file)
   event.target.value = ''
 }
+
+const { name: themeName } = useTheme()
+const activeColor = computed(() => themeName.value === 'dark' ? 'info' : 'primary')
 </script>
 
 <template>
   <VCard title="Avatar">
-    <VCardText class="d-flex align-center gap-4">
+    <VCardText class="gap-4 d-flex align-center">
       <VAvatar size="80">
         <VImg :src="avatarImg" />
       </VAvatar>
-      <div class="d-flex gap-2">
+      <div class="gap-2 d-flex">
         <VBtn
-          color="primary"
+          :color="activeColor"
           variant="tonal"
           :loading="avatarLoading"
           @click="avatarInput.click()"

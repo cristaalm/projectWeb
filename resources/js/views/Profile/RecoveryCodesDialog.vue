@@ -1,4 +1,7 @@
 <script setup>
+import { computed } from 'vue'
+import { useTheme } from 'vuetify'
+
 const props = defineProps({
   modelValue: { type: Boolean, required: true },
   codes: { type: Array, default: () => [] },
@@ -13,6 +16,9 @@ function close() {
 function copy() {
   navigator.clipboard.writeText(props.codes.join('\n'))
 }
+
+const { name: themeName } = useTheme()
+const activeColor = computed(() => themeName.value === 'dark' ? 'info' : 'primary')
 </script>
 
 <template>
@@ -25,10 +31,11 @@ function copy() {
     <VCard title="Guarda tus códigos de recuperación">
       <VCardText>
         <p class="mb-4">
-          Guárdalos en un lugar seguro — no se van a volver a mostrar. Cada uno se puede usar una sola vez si pierdes acceso a tu app de autenticación.
+          Guárdalos en un lugar seguro — no se van a volver a mostrar. Cada uno se puede usar una sola vez si pierdes
+          acceso a tu app de autenticación.
         </p>
         <VSheet
-          class="pa-4 mb-4"
+          class="mb-4 pa-4"
           rounded
           color="grey-100"
         >
@@ -41,7 +48,7 @@ function copy() {
           </div>
         </VSheet>
         <VBtn
-          color="primary"
+          :color="activeColor"
           variant="tonal"
           @click="copy"
         >
@@ -51,7 +58,7 @@ function copy() {
       <VCardActions>
         <VSpacer />
         <VBtn
-          color="primary"
+          :color="activeColor"
           @click="close"
         >
           Ya los guardé
