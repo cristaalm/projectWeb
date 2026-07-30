@@ -1,5 +1,5 @@
 <script setup>
-import avatarPlaceholder from '@images/placeholders/avatar.png?url'
+import UserAvatar from '@/components/UserAvatar.vue'
 import { useTheme } from 'vuetify'
 import { useUpdateAvatar } from '@/hooks/Profile/useUpdateAvatar'
 import { useAuthStore } from '@/store/auth'
@@ -7,7 +7,8 @@ import { storageURL } from '@/utils/constants'
 import { computed, ref } from 'vue'
 
 const authStore = useAuthStore()
-const avatarImg = computed(() => authStore.user?.avatar ? storageURL + authStore.user.avatar : avatarPlaceholder)
+const fullName = computed(() => `${authStore.user?.name ?? ''} ${authStore.user?.last_name ?? ''}`.trim())
+const avatarUrl = computed(() => authStore.user?.avatar ? storageURL + authStore.user.avatar : null)
 
 const { loading: avatarLoading, updateAvatar, deleteAvatar } = useUpdateAvatar()
 const avatarInput = ref(null)
@@ -26,9 +27,11 @@ const activeColor = computed(() => themeName.value === 'dark' ? 'info' : 'primar
 <template>
   <VCard title="Avatar">
     <VCardText class="gap-4 d-flex align-center">
-      <VAvatar size="80">
-        <VImg :src="avatarImg" />
-      </VAvatar>
+      <UserAvatar
+        size="80"
+        :name="fullName"
+        :avatar-url="avatarUrl"
+      />
       <div class="gap-2 d-flex">
         <VBtn
           :color="activeColor"

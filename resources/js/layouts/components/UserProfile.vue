@@ -1,5 +1,5 @@
 <script setup>
-import avatar from '@images/placeholders/avatar.png?url'
+import UserAvatar from '@/components/UserAvatar.vue'
 import { useThemeSwitcher } from '@/hooks/layout/useThemeSwitcher'
 import { storageURL } from '@/utils/constants'
 import { useAuthStore } from '@/store/auth'
@@ -9,21 +9,18 @@ const { themeName, changeTheme } = useThemeSwitcher()
 const authStore = useAuthStore()
 const router = useRouter()
 
-const avatarImg = computed(() => {
-  if (authStore.user.avatar !== null) return storageURL + authStore.user.avatar
-  
-  return avatar
-})
+const fullName = computed(() => `${authStore.user.name} ${authStore.user.last_name}`)
+const avatarUrl = computed(() => authStore.user.avatar ? storageURL + authStore.user.avatar : null)
 </script>
 
 <template>
   <div class="relative">
-    <VAvatar
+    <UserAvatar
       class="cursor-pointer"
       variant="tonal"
+      :name="fullName"
+      :avatar-url="avatarUrl"
     >
-      <VImg :src="avatarImg" />
-  
       <!-- SECTION Menu -->
       <VMenu
         activator="parent"
@@ -43,9 +40,11 @@ const avatarImg = computed(() => {
                   offset-y="3"
                   color="success"
                 >
-                  <VAvatar variant="tonal">
-                    <VImg :src="avatarImg" />
-                  </VAvatar>
+                  <UserAvatar
+                    variant="tonal"
+                    :name="fullName"
+                    :avatar-url="avatarUrl"
+                  />
                 </VBadge>
               </VListItemAction>
             </template>
@@ -108,6 +107,6 @@ const avatarImg = computed(() => {
         </VList>
       </VMenu>
       <!-- !SECTION -->
-    </VAvatar>
+    </UserAvatar>
   </div>
 </template>
