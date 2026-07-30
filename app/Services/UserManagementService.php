@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Enums\RewardRedemptionStatus;
 use App\Enums\UserAccountActionType;
 use App\Exceptions\UserManagementException;
 use App\Models\Merchant;
@@ -19,7 +18,6 @@ use App\Notifications\TwoFactorDisabledByAdminNotification;
 use App\Notifications\UserCredentialsNotification;
 use App\Notifications\UserWelcomeNotification;
 use App\Repositories\UserRepository;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserManagementService
@@ -31,7 +29,7 @@ class UserManagementService
     {
     }
 
-    public function createUser(array $data): User
+    public function createUser(array $data, User $admin): User
     {
         $role = Role::findOrFail($data['role_id']);
         $digits12 = str_pad((string) random_int(0, 999999999999), 12, '0', STR_PAD_LEFT);
@@ -58,6 +56,8 @@ class UserManagementService
 
         $user->notify(new UserWelcomeNotification($plainPassword, $role->name));
 
+        $this->logAction($user, $admin, UserAccountActionType::USER_CREATED, null);
+
         return $user;
     }
 
@@ -67,7 +67,7 @@ class UserManagementService
             throw new UserManagementException('No se puede realizar esta acción sobre un usuario dado de baja.', 422);
         }
 
-        $previousBalance = $this->calculateBalance($target->id);
+        $previousBalance = $this->users->pointsBalance($target->id);
 
         if ($previousBalance + $points < 0) {
             throw new UserManagementException(
@@ -152,19 +152,6 @@ class UserManagementService
         $target->notify(new TwoFactorDisabledByAdminNotification());
 
         return $target;
-    }
-
-    private function calculateBalance(int $userId): int
-    {
-        $earnings = (int) DB::table('point_earnings')->where('user_id', $userId)->sum('points');
-        $adjustments = (int) DB::table('point_adjustments')->where('user_id', $userId)->sum('points');
-        $redeemed = (int) DB::table('point_redemptions')
-            ->where('user_id', $userId)
-            ->whereIn('status', [RewardRedemptionStatus::REDEEMED->value, RewardRedemptionStatus::DELIVERED->value])
-            ->selectRaw('COALESCE(SUM(points_spent * quantity), 0) as total')
-            ->value('total');
-
-        return $earnings + $adjustments - $redeemed;
     }
 
     private function logAction(User $target, User $admin, UserAccountActionType $type, ?string $reason): void

@@ -8,6 +8,8 @@ Route::prefix('users')
     ->group(function () {
         Route::get('/', [UserController::class, 'index']);
         Route::post('/', [UserController::class, 'store']);
+        Route::get('{userId}', [UserController::class, 'show']);
+        Route::get('{userId}/history', [UserController::class, 'history']);
         Route::post('{userId}/points', [UserController::class, 'modifyPoints']);
         Route::post('{userId}/deactivate', [UserController::class, 'deactivate']);
         Route::post('{userId}/restore', [UserController::class, 'restore']);

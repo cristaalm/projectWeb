@@ -3,9 +3,12 @@
 namespace App\Repositories;
 
 use App\Enums\RewardRedemptionStatus;
+use App\Models\PointAdjustment;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\UserAccountAction;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class UserRepository
@@ -61,6 +64,64 @@ class UserRepository
     public function defaultRegistrationRole(): ?Role
     {
         return Role::firstWhere('name', 'member');
+    }
+
+    /**
+     * Saldo de puntos de un usuario: point_earnings + point_adjustments -
+     * redenciones (canjes REDEEMED/DELIVERED). No es una columna real.
+     */
+    public function pointsBalance(int $userId): int
+    {
+        $earnings = (int) DB::table('point_earnings')->where('user_id', $userId)->sum('points');
+        $adjustments = (int) DB::table('point_adjustments')->where('user_id', $userId)->sum('points');
+        $redeemed = (int) DB::table('point_redemptions')
+            ->where('user_id', $userId)
+            ->whereIn('status', [RewardRedemptionStatus::REDEEMED->value, RewardRedemptionStatus::DELIVERED->value])
+            ->selectRaw('COALESCE(SUM(points_spent * quantity), 0) as total')
+            ->value('total');
+
+        return $earnings + $adjustments - $redeemed;
+    }
+
+    /**
+     * Usuario con las relaciones necesarias para el modal de detalle del CRUD
+     * de administración: rol, alianza (si aplica) y saldo de puntos calculado.
+     */
+    public function findDetailed(int $id, bool $withTrashed = false): ?User
+    {
+        $query = $withTrashed ? User::withTrashed() : User::query();
+
+        $user = $query->with(['role', 'merchant.alliance', 'organizationMember.alliance'])->find($id);
+
+        if (! $user) {
+            return null;
+        }
+
+        $user->points_balance = $this->pointsBalance($id);
+
+        return $user;
+    }
+
+    /**
+     * Historial combinado de acciones administrativas sobre una cuenta:
+     * user_account_actions (baja/restauración/reset/2FA/creación) y
+     * point_adjustments (cambios de puntos), unificados y ordenados por fecha
+     * descendente. Sin paginar a propósito — un usuario individual no
+     * acumula un volumen que lo justifique.
+     */
+    public function history(int $userId): Collection
+    {
+        $accountActions = UserAccountAction::where('target_user_id', $userId)
+            ->with('actorUser')
+            ->get();
+
+        $pointAdjustments = PointAdjustment::where('user_id', $userId)
+            ->with('admin')
+            ->get();
+
+        return $accountActions->concat($pointAdjustments)
+            ->sortByDesc('created_at')
+            ->values();
     }
 
     /**

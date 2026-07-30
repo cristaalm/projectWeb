@@ -11,6 +11,7 @@ use App\Http\Requests\Users\ListUsersRequest;
 use App\Http\Requests\Users\ModifyPointsRequest;
 use App\Http\Requests\Users\ResetCredentialsRequest;
 use App\Http\Requests\Users\RestoreUserRequest;
+use App\Http\Resources\UserAccountActionResource;
 use App\Http\Resources\UserResource;
 use App\Repositories\UserRepository;
 use App\Services\UserManagementService;
@@ -35,11 +36,39 @@ class UserController extends Controller
 
     public function store(CreateUserRequest $request)
     {
-        $user = $this->userManagementService->createUser($request->validated());
+        $user = $this->userManagementService->createUser($request->validated(), $request->user());
 
         return $this->apiResponse(true, 'Usuario creado correctamente.', [
             'user' => new UserResource($user),
         ], null, 201);
+    }
+
+    public function show(int $userId)
+    {
+        $user = $this->users->findDetailed($userId, withTrashed: true);
+
+        if (! $user) {
+            return $this->apiResponse(false, 'Usuario no encontrado.', null, null, 404);
+        }
+
+        return $this->apiResponse(true, 'Usuario obtenido correctamente.', [
+            'user' => new UserResource($user),
+        ], null, 200);
+    }
+
+    public function history(int $userId)
+    {
+        $user = $this->users->findById($userId, withTrashed: true);
+
+        if (! $user) {
+            return $this->apiResponse(false, 'Usuario no encontrado.', null, null, 404);
+        }
+
+        $history = $this->users->history($userId);
+
+        return $this->apiResponse(true, 'Historial obtenido correctamente.', [
+            'history' => UserAccountActionResource::collection($history),
+        ], null, 200);
     }
 
     public function modifyPoints(ModifyPointsRequest $request, int $userId)
