@@ -80,6 +80,53 @@ class UsersDocumentation
     {
     }
 
+    #[OA\Get(
+        path: '/users/{userId}',
+        tags: ['Users'],
+        summary: 'Detalle de un usuario (administración)',
+        description: 'Información no sensible de un usuario (incluye dados de baja) con rol, alianza y saldo de puntos calculado. Pensado para el modal de detalle del CRUD de administración.',
+        security: [['sessionCookie' => []], ['bearerToken' => []]],
+        parameters: [new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Usuario encontrado.',
+                content: new OA\JsonContent(allOf: [new OA\Schema(ref: '#/components/schemas/SuccessResponse')])
+            ),
+            new OA\Response(response: 401, description: 'No autenticado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 403, description: 'El rol del usuario autenticado no es superadmin ni moderador.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 404, description: 'Usuario no encontrado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+        ]
+    )]
+    public function show()
+    {
+    }
+
+    #[OA\Get(
+        path: '/users/{userId}/history',
+        tags: ['Users'],
+        summary: 'Historial de acciones administrativas sobre un usuario',
+        description: 'Combina user_account_actions (creación de cuenta, baja, restauración, reset de credenciales, deshabilitar 2FA) y point_adjustments (cambios de puntos) en una sola lista ordenada por fecha descendente, sin paginar. Cada entrada trae quién la ejecutó (actor) y, si aplica, el motivo o los puntos ajustados.',
+        security: [['sessionCookie' => []], ['bearerToken' => []]],
+        parameters: [new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Historial del usuario.',
+                content: new OA\JsonContent(
+                    allOf: [new OA\Schema(ref: '#/components/schemas/SuccessResponse')],
+                    examples: [new OA\Examples(example: 'historial', summary: 'Historial combinado', value: ['success' => true, 'message' => 'Historial obtenido correctamente.', 'data' => ['history' => [['id' => 'points_adjustment_3', 'type' => 'points_adjustment', 'action_type' => 'points_adjustment', 'label' => 'Ajuste de puntos', 'reason' => 'Bono de bienvenida', 'points' => 50, 'actor' => ['id' => 1, 'name' => 'Eduardo', 'last_name' => 'Arcega'], 'created_at' => '2026-07-29T10:00:00Z'], ['id' => 'account_action_2', 'type' => 'account_action', 'action_type' => 'user_created', 'label' => 'Cuenta creada', 'reason' => null, 'points' => null, 'actor' => ['id' => 1, 'name' => 'Eduardo', 'last_name' => 'Arcega'], 'created_at' => '2026-07-28T09:00:00Z']]], 'errors' => null, 'code' => 200])]
+                )
+            ),
+            new OA\Response(response: 401, description: 'No autenticado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 403, description: 'El rol del usuario autenticado no es superadmin ni moderador.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 404, description: 'Usuario no encontrado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+        ]
+    )]
+    public function history()
+    {
+    }
+
     #[OA\Post(
         path: '/users/{userId}/points',
         tags: ['Users'],

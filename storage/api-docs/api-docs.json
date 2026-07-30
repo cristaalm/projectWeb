@@ -1325,6 +1325,197 @@
                 ]
             }
         },
+        "/users/{userId}": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Detalle de un usuario (administración)",
+                "description": "Información no sensible de un usuario (incluye dados de baja) con rol, alianza y saldo de puntos calculado. Pensado para el modal de detalle del CRUD de administración.",
+                "operationId": "b1545809a866ab3c251ce8d5cd09b4ac",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usuario encontrado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El rol del usuario autenticado no es superadmin ni moderador.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/users/{userId}/history": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Historial de acciones administrativas sobre un usuario",
+                "description": "Combina user_account_actions (creación de cuenta, baja, restauración, reset de credenciales, deshabilitar 2FA) y point_adjustments (cambios de puntos) en una sola lista ordenada por fecha descendente, sin paginar. Cada entrada trae quién la ejecutó (actor) y, si aplica, el motivo o los puntos ajustados.",
+                "operationId": "de82d60337ccf088494bd520aa6503b2",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Historial del usuario.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "historial": {
+                                        "summary": "Historial combinado",
+                                        "value": {
+                                            "success": true,
+                                            "message": "Historial obtenido correctamente.",
+                                            "data": {
+                                                "history": [
+                                                    {
+                                                        "id": "points_adjustment_3",
+                                                        "type": "points_adjustment",
+                                                        "action_type": "points_adjustment",
+                                                        "label": "Ajuste de puntos",
+                                                        "reason": "Bono de bienvenida",
+                                                        "points": 50,
+                                                        "actor": {
+                                                            "id": 1,
+                                                            "name": "Eduardo",
+                                                            "last_name": "Arcega"
+                                                        },
+                                                        "created_at": "2026-07-29T10:00:00Z"
+                                                    },
+                                                    {
+                                                        "id": "account_action_2",
+                                                        "type": "account_action",
+                                                        "action_type": "user_created",
+                                                        "label": "Cuenta creada",
+                                                        "reason": null,
+                                                        "points": null,
+                                                        "actor": {
+                                                            "id": 1,
+                                                            "name": "Eduardo",
+                                                            "last_name": "Arcega"
+                                                        },
+                                                        "created_at": "2026-07-28T09:00:00Z"
+                                                    }
+                                                ]
+                                            },
+                                            "errors": null,
+                                            "code": 200
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El rol del usuario autenticado no es superadmin ni moderador.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
         "/users/{userId}/points": {
             "post": {
                 "tags": [
