@@ -19,6 +19,8 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'code_identity', type: 'string', description: 'Código EAN-13 único de identidad del usuario.', example: 'ECOSORT-SA-001'),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
         new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
+        new OA\Property(property: 'deleted_at', type: 'string', format: 'date-time', nullable: true, description: 'Fecha de baja (soft-delete). Null si la cuenta está activa.'),
+        new OA\Property(property: 'points_balance', type: 'integer', nullable: true, description: 'Saldo de puntos calculado (point_earnings + point_adjustments - point_redemptions). Solo presente cuando el endpoint lo calcula explícitamente, ej. el listado de administración de usuarios.', example: 120),
         new OA\Property(
             property: 'alliance',
             type: 'object',

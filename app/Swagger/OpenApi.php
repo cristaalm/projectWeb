@@ -7,7 +7,7 @@ use OpenApi\Attributes as OA;
 #[OA\Info(
     version: '1.0.0',
     title: 'RENOVA API',
-    description: 'API JSON de RENOVA (backend Laravel + Sanctum). Documentación en reconstrucción módulo por módulo tras el rediseño del esquema de base de datos; por ahora solo el módulo de Auth está documentado.'
+    description: 'API JSON de RENOVA (backend Laravel + Sanctum). Documentación en reconstrucción módulo por módulo tras el rediseño del esquema de base de datos; por ahora están documentados Auth, Users (administración de usuarios) y el catálogo de Alliances.'
 )]
 #[OA\Server(
     url: '/api',
