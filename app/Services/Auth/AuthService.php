@@ -3,7 +3,6 @@
 namespace App\Services\Auth;
 
 use App\Enums\AllianceStatus;
-use App\Enums\UserStatus;
 use App\Exceptions\Auth\AuthException;
 use App\Models\TwoFactorChallenge;
 use App\Models\TwoFactorRecoveryCode;
@@ -47,7 +46,7 @@ class AuthService
             throw new AuthException('Correo electrónico o contraseña incorrectos.', 401);
         }
 
-        if ($user->status !== UserStatus::ACTIVE) {
+        if ($user->trashed()) {
             throw new AuthException('Tu cuenta ha sido desactivada por un administrador.', 403);
         }
 
@@ -179,7 +178,7 @@ class AuthService
         $user = $request->user();
         $user->load('role');
 
-        if ($user->status !== UserStatus::ACTIVE) {
+        if ($user->trashed()) {
             throw new AuthException('Tu cuenta no está activa.', 403);
         }
 

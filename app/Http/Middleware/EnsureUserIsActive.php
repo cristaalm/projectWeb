@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Enums\UserStatus;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +17,7 @@ class EnsureUserIsActive
     {
         $user = $request->user();
 
-        if ($user && $user->status !== UserStatus::ACTIVE) {
+        if ($user && $user->trashed()) {
             return response()->json([
                 'message' => 'Tu cuenta ha sido desactivada por un administrador.',
                 'status' => 401,

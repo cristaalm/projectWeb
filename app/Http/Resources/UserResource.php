@@ -19,9 +19,9 @@ class UserResource extends JsonResource
             'tour' => $this->tour,
             'two_factor_status' => $this->two_factor_status,
             'code_identity' => $this->code_identity,
-            'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'points_balance' => $this->when(! is_null($this->points_balance), fn () => (int) $this->points_balance),
             'alliance' => $this->when(
                 $this->relationLoaded('merchant') || $this->relationLoaded('organizationMember'),
                 function () {

@@ -17,7 +17,6 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'tour', type: 'boolean', description: 'Si el usuario ya completó el tour guiado de la interfaz.', example: false),
         new OA\Property(property: 'two_factor_status', type: 'boolean', description: 'Si el usuario tiene 2FA habilitado.', example: false),
         new OA\Property(property: 'code_identity', type: 'string', description: 'Código EAN-13 único de identidad del usuario.', example: 'ECOSORT-SA-001'),
-        new OA\Property(property: 'status', type: 'integer', enum: [0, 1], description: '1 = activo, 0 = inactivo (App\\Enums\\UserStatus).', example: 1),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
         new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
         new OA\Property(

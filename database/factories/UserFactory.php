@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\User;
 use App\Models\Role;
-use App\Enums\UserStatus;
 use App\Enums\VerificationStatus;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -32,7 +31,6 @@ class UserFactory extends Factory
             'tour' => false,
             'total_points' => $this->faker->numberBetween(0, 500),
             'verification_status' => $this->faker->randomElement(VerificationStatus::cases())->value,
-            'status' => UserStatus::ACTIVE->value,
             'two_factor_status' => 0,
             'google2fa_secret' => (new Google2FA())->generateSecretKey(),
             'code_identity'=> $digits12 . $checkDigit,
@@ -41,13 +39,6 @@ class UserFactory extends Factory
                        Role::factory()->create(['name' => 'user', 'display_name' => 'Usuario solicitante'])->id;
             },
         ];
-    }
-
-    public function inactive(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'status' => UserStatus::INACTIVE->value,
-        ]);
     }
 
     public function pendingVerification(): static

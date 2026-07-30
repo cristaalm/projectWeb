@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,12 +15,9 @@ use Illuminate\Support\Str;
 
 use App\Notifications\CustomResetPassword;
 
-// ENUMS
-use App\Enums\UserStatus;
-
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -33,7 +31,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'avatar',
         'two_factor_status',
         'code_identity',
-        'status',
         'google2fa_secret',
         'role_id',
     ];
@@ -49,7 +46,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'phone_verified_at' => 'datetime',
         'password' => 'hashed',
         'two_factor_status' => 'boolean',
-        'status' => UserStatus::class,
         'tour' => 'boolean',
         'avatar' => 'string',
         'google2fa_secret' => 'encrypted',
@@ -96,6 +92,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function notifications(): HasMany
     {
         return $this->hasMany(Notification::class);
+    }
+
+    public function userAccountActions(): HasMany
+    {
+        return $this->hasMany(UserAccountAction::class, 'target_user_id');
     }
 
     public function sendPasswordResetNotification($token)

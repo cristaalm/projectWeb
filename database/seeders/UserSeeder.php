@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Role;
-use App\Enums\UserStatus;
 use App\Enums\VerificationStatus;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -45,7 +44,6 @@ class UserSeeder extends Seeder
             'google2fa_secret' => '5LVIDG4DFV23RFSE',
             'two_factor_status' => 1,
             'verification_status' => VerificationStatus::APPROVED->value,
-            'status' => UserStatus::ACTIVE->value,
         ]);
 
         $usersData = [
@@ -104,7 +102,6 @@ class UserSeeder extends Seeder
                 'google2fa_secret' => $userData['google2fa_secret'],
                 'two_factor_status' => $userData['two_factor_status'],
                 'verification_status' => VerificationStatus::APPROVED->value,
-                'status' => UserStatus::ACTIVE->value,
             ]);
         }
 
@@ -112,35 +109,30 @@ class UserSeeder extends Seeder
         $users[] = User::factory(10)
             ->state([
                 'role_id' => $comercianteRole->id,
-                'status' => UserStatus::ACTIVE->value,
                 'verification_status' => VerificationStatus::APPROVED->value,
             ])
             ->create();
 
         $users[] = User::factory(25)
             ->state([
-                'status' => UserStatus::ACTIVE->value,
                 'verification_status' => VerificationStatus::PENDING->value,
             ])
             ->create();
 
         $users[] = User::factory(25)
             ->state([
-                'status' => UserStatus::ACTIVE->value,
                 'verification_status' => VerificationStatus::APPROVED->value,
             ])
             ->create();
 
         $users[] = User::factory(25)
             ->state([
-                'status' => UserStatus::ACTIVE->value,
                 'verification_status' => VerificationStatus::REJECTED->value,
             ])
             ->create();
 
         $users[] = User::factory(25)
             ->state([
-                'status' => UserStatus::ACTIVE->value,
                 'verification_status' => VerificationStatus::EMPTY->value,
             ])
             ->create();
@@ -155,7 +147,6 @@ class UserSeeder extends Seeder
             'google2fa_secret' => '5T3O6QWXQ52B7A53',
             'two_factor_status' => 0,
             'verification_status' => VerificationStatus::APPROVED->value,
-            'status' => UserStatus::ACTIVE->value,
         ]);
 
         return $users;
