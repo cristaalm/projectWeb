@@ -37,147 +37,206 @@ const goToHome = () => {
       <VImg
         :src="authV1TopShape"
         class="text-primary auth-v1-top-shape !absolute d-none d-sm-block"
+        :class="{ 'shapes-hidden': success }"
       />
 
       <!-- 👉 Bottom shape -->
       <VImg
         :src="authV1BottomShape"
         class="text-primary auth-v1-bottom-shape !absolute d-none d-sm-block"
+        :class="{ 'shapes-hidden': success }"
       />
 
-      <!-- Auth Card -->
-      <!-- cuando success sea true, agregamos la clase animate-scaleUp -->
-      <VCard
-        class="auth-card !bg-white/30 !shadow-2xl"
-        :class="[success ? 'animate-scaleDown mt-[120px]' : 'animate-scaleUp', $vuetify.display.smAndUp ? 'pa-6' : 'pa-0']"
-        max-width="480"
-      >
-        <VCardItem class="justify-center">
-          <span
-            class="app-logo d-flex align-center gap-2 cursor-pointer"
-            @click="goToHome"
-          >
-            <VSheet class="w-12 h-12 !bg-transparent rounded-lg d-flex align-center justify-center">
-              <img
-                src="/images/logo.png"
-                alt="Logo"
-                class="w-full h-full object-contain bg-transparent"
-              >
-            </VSheet>
-            <span class="text-5xl font-weight-bold tracking-wider mt-1 font-stella text-[#13b868]">EcoSort</span>
-          </span>
-        </VCardItem>
+      <!-- 👉 Cards wrapper -->
+      <div class="auth-cards-wrapper">
+        <!-- Card principal: Login -->
+        <VCard
+          class="auth-card auth-card--primary !bg-white/30 !shadow-2xl"
+          :class="[success ? 'card-exit' : 'card-enter', $vuetify.display.smAndUp ? 'pa-6' : 'pa-0']"
+          max-width="480"
+        >
+          <VCardItem class="justify-center">
+            <span
+              class="app-logo d-flex align-center gap-2 cursor-pointer"
+              @click="goToHome"
+            >
+              <VSheet class="w-12 h-12 !bg-transparent rounded-lg d-flex align-center justify-center">
+                <img
+                  src="/images/logo.png"
+                  alt="Logo"
+                  class="w-full h-full object-contain bg-transparent"
+                >
+              </VSheet>
+              <span class="text-5xl font-weight-bold tracking-wider mt-1 font-stella text-[#13b868]">EcoSort</span>
+            </span>
+          </VCardItem>
 
-        <VCardText>
-          <h4 class="font-poppins relative mb-1 text-h4">
-            ¡EcoSort le da la bienvenida! <span class="absolute md:inline-block hidden -top-2 ml-2 text-4xl transition-all duration-200 transform animate-wave">👋🏻</span>
-          </h4>
-          <p class="mb-0 font-poppins">
-            Inicie sesión en su cuenta y comience con su día.
-          </p>
-        </VCardText>
+          <VCardText>
+            <h4 class="font-poppins relative mb-1 text-h4">
+              ¡EcoSort le da la bienvenida! <span class="absolute md:inline-block hidden -top-2 ml-2 text-4xl transition-all duration-200 transform animate-wave">👋🏻</span>
+            </h4>
+            <p class="mb-0 font-poppins">
+              Inicie sesión en su cuenta y comience con su día.
+            </p>
+          </VCardText>
 
-        <VCardText>
-          <VForm @submit.prevent="$router.push('/')">
-            <VRow>
-              <!-- email -->
-              <VCol cols="12">
-                <VTextField
-                  v-model="form.email"
-                  autofocus
-                  label="Correo electrónico"
-                  type="email"
-                  placeholder="johndoe@email.com"
-                  class="font-poppins"
-                  :error="error"
-                  @input="error = false"
-                />
-              </VCol>
-
-              <!-- password -->
-              <VCol cols="12">
-                <VTextField
-                  v-model="form.pass"
-                  label="Contraseña"
-                  placeholder="**********"
-                  :type="isPasswordVisible ? 'text' : 'password'"
-                  :error="error"
-                  autocomplete="password"
-                  :append-inner-icon="isPasswordVisible ? 'bx-hide' : 'bx-show'"
-                  class="font-poppins"
-                  @input="error = false"
-                  @click:append-inner="isPasswordVisible = !isPasswordVisible"
-                />
-
-                <!-- remember me checkbox -->
-                <div class="flex-wrap my-6 d-flex align-center justify-space-between">
-                  <VCheckbox
-                    v-model="form.remember"
+          <VCardText>
+            <VForm @submit.prevent="$router.push('/')">
+              <VRow>
+                <!-- email -->
+                <VCol cols="12">
+                  <VTextField
+                    v-model="form.email"
+                    autofocus
+                    label="Correo electrónico"
+                    type="email"
+                    placeholder="johndoe@email.com"
                     class="font-poppins"
-                    label="Mantener sesión"
+                    :error="error"
+                    @input="error = false"
+                  />
+                </VCol>
+
+                <!-- password -->
+                <VCol cols="12">
+                  <VTextField
+                    v-model="form.pass"
+                    label="Contraseña"
+                    placeholder="**********"
+                    :type="isPasswordVisible ? 'text' : 'password'"
+                    :error="error"
+                    autocomplete="password"
+                    :append-inner-icon="isPasswordVisible ? 'bx-hide' : 'bx-show'"
+                    class="font-poppins"
+                    @input="error = false"
+                    @click:append-inner="isPasswordVisible = !isPasswordVisible"
                   />
 
-                  <a
-                    class="text-primary font-poppins"
-                    href="./forgot-password"
-                    @click.prevent="router.push({ name: 'forgot-password' })"
-                  >
-                    Olvidé mi contraseña
-                  </a>
-                </div>
+                  <!-- remember me checkbox -->
+                  <div class="flex-wrap my-6 d-flex align-center justify-space-between">
+                    <VCheckbox
+                      v-model="form.remember"
+                      class="font-poppins"
+                      label="Mantener sesión"
+                    />
 
-                <!-- login button -->
-                <VBtn
-                  block
-                  type="submit"
-                  class="hover:!bg-[#08b662] font-poppins"
-                  :disabled="loading || !form.email || !form.pass || success || error"
-                  @click="loginUser(form)"
-                >
-                  <span v-if="loading">
-                    <LoadingIcon icon="three-dots" />
-                  </span>
-                  <span v-else>
-                    Iniciar Sesión
-                  </span>
-                </VBtn>
-              </VCol>
-            </VRow>
-          </VForm>
-        </VCardText>
-      </VCard>
-      <VCard
-        class="auth-card !bg-white/30 !shadow-2xl"
-        :class="[success ? 'animate-scaleUp' : '!hidden', $vuetify.display.smAndUp ? 'pa-6' : 'pa-0']"
-        max-width="460"
-      >
-        <div class="text-center pa-6">
-          <VAvatar
-            size="80"
-            color="primary"
-            class="p-3 mb-4"
-          >
-            <Lucide
-              icon="CircleCheckBig"
-              class="w-full h-full"
-            />
-          </VAvatar>
-    
-          <h2 class="mb-2 !text-3xl !font-bold text-h5 font-poppins">
-            ¡Bienvenido, {{ user?.name || "" }}!
-          </h2>
-    
-          <p class="mb-6 text-body-1 !text-xl font-poppins">
-            Has iniciado sesión con éxito.
-            <br>
-            ¡Disfruta de tu día!
-          </p>
-        </div>
-      </VCard>
+                    <a
+                      class="text-primary font-poppins"
+                      href="./forgot-password"
+                      @click.prevent="router.push({ name: 'forgot-password' })"
+                    >
+                      Olvidé mi contraseña
+                    </a>
+                  </div>
+
+                  <!-- login button -->
+                  <VBtn
+                    block
+                    type="submit"
+                    class="hover:!bg-[#08b662] font-poppins"
+                    :disabled="loading || !form.email || !form.pass || success || error"
+                    @click="loginUser(form)"
+                  >
+                    <span v-if="loading">
+                      <LoadingIcon icon="three-dots" />
+                    </span>
+                    <span v-else>
+                      Iniciar Sesión
+                    </span>
+                  </VBtn>
+                </VCol>
+              </VRow>
+            </VForm>
+          </VCardText>
+        </VCard>
+
+        <!-- Card secundaria: Éxito -->
+        <VCard
+          class="auth-card auth-card--secondary !bg-white/30 !shadow-2xl"
+          :class="[success ? 'card-enter' : 'card-exit', $vuetify.display.smAndUp ? 'pa-6' : 'pa-0']"
+          max-width="480"
+        >
+          <div class="text-center pa-6">
+            <VAvatar
+              size="80"
+              color="primary"
+              class="p-3 mb-4"
+            >
+              <Lucide
+                icon="CircleCheckBig"
+                class="w-full h-full"
+              />
+            </VAvatar>
+
+            <h2 class="mb-2 !text-3xl !font-bold text-h5 font-poppins">
+              ¡Bienvenido, {{ user?.name || "" }}!
+            </h2>
+
+            <p class="mb-6 text-body-1 !text-xl font-poppins">
+              Has iniciado sesión con éxito.
+              <br>
+              ¡Disfruta de tu día!
+            </p>
+          </div>
+        </VCard>
+      </div>
     </div>
   </div>
 </template>
 
 <style lang="scss">
 @use "@core-scss/template/pages/page-auth";
+</style>
+
+<style scoped>
+/* Contenedor que define el espacio ocupado (evita colapso de altura) */
+.auth-cards-wrapper {
+  position: relative;
+  width: 480px;
+  /* La altura se toma de la card primary en su estado normal */
+}
+
+/* Ambas cards se apilan en el mismo espacio */
+.auth-card--primary,
+.auth-card--secondary {
+  width: 100%;
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease,
+    visibility 0.4s;
+}
+
+.auth-card--secondary {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Estado visible */
+.card-enter {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Estado oculto: se contrae hacia arriba y desaparece */
+.card-exit {
+  opacity: 0;
+  transform: scale(0.85) translateY(-24px);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Shapes: fade out suave en lugar de display:none abrupto */
+.auth-v1-top-shape,
+.auth-v1-bottom-shape {
+  transition: opacity 0.3s ease;
+}
+.shapes-hidden {
+  opacity: 0 !important;
+  pointer-events: none;
+}
 </style>
