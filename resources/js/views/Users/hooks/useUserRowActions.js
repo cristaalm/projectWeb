@@ -19,6 +19,15 @@ export function useUserRowActions(onSuccess) {
 
   const activeUser = ref(null)
 
+  // ---------- Ver detalle / historial ----------
+  const detailDialog = ref(false)
+  const detailUserId = ref(null)
+
+  function openDetailDialog(item) {
+    detailUserId.value = item.id
+    detailDialog.value = true
+  }
+
   // ---------- Modificar puntos ----------
   const pointsDialog = ref(false)
 
@@ -86,6 +95,9 @@ export function useUserRowActions(onSuccess) {
   return {
     loading,
     activeUser,
+    detailDialog,
+    detailUserId,
+    openDetailDialog,
     pointsDialog,
     openPointsDialog,
     reasonDialog,

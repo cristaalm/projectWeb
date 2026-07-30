@@ -19,6 +19,7 @@ const emit = defineEmits([
   'update:itemsPerPage',
   'update:sortBy',
   'update:search',
+  'view',
   'points',
   'deactivate',
   'restore',
@@ -70,10 +71,11 @@ function avatarUrl(item) {
     :items="items"
     :items-length="total"
     :loading="loading"
-    class="px-2"
+    class="px-2 cursor-pointer"
     @update:page="emit('update:page', $event)"
     @update:items-per-page="emit('update:itemsPerPage', $event)"
     @update:sort-by="emit('update:sortBy', $event)"
+    @click:row="(_, { item }) => emit('view', item)"
   >
     <template #item.name="{ item }">
       <div class="d-flex align-center gap-3 py-2">
@@ -129,76 +131,78 @@ function avatarUrl(item) {
     </template>
 
     <template #item.actions="{ item }">
-      <VMenu location="bottom end">
-        <template #activator="{ props: menuProps }">
-          <VBtn
-            icon
-            variant="tonal"
-            size="small"
-            color="primary"
-            class="opacity-80"
-            v-bind="menuProps"
-          >
-            <VIcon icon="bx-dots-vertical-rounded" />
-          </VBtn>
-        </template>
-        <VList density="compact">
-          <template v-if="!item.deleted_at">
-            <VListItem @click="emit('points', item)">
-              <template #prepend>
-                <VIcon
-                  icon="bx-coin-stack"
-                  class="me-2 text-primary"
-                />
-              </template>
-              <VListItemTitle>Modificar puntos</VListItemTitle>
-            </VListItem>
-            <VListItem @click="emit('reset-credentials', item)">
-              <template #prepend>
-                <VIcon
-                  icon="bx-key"
-                  class="me-2 text-warning"
-                />
-              </template>
-              <VListItemTitle>Resetear credenciales</VListItemTitle>
-            </VListItem>
-            <VListItem
-              v-if="item.two_factor_status"
-              @click="emit('disable-two-factor', item)"
+      <div @click.stop>
+        <VMenu location="bottom end">
+          <template #activator="{ props: menuProps }">
+            <VBtn
+              icon
+              variant="tonal"
+              size="small"
+              color="primary"
+              class="opacity-80"
+              v-bind="menuProps"
             >
-              <template #prepend>
-                <VIcon
-                  icon="bx-shield-x"
-                  class="me-2 text-warning"
-                />
-              </template>
-              <VListItemTitle>Deshabilitar 2FA</VListItemTitle>
-            </VListItem>
-            <VListItem @click="emit('deactivate', item)">
-              <template #prepend>
-                <VIcon
-                  icon="bx-user-x"
-                  class="me-2 text-error"
-                />
-              </template>
-              <VListItemTitle class="text-error">
-                Dar de baja
-              </VListItemTitle>
-            </VListItem>
+              <VIcon icon="bx-dots-vertical-rounded" />
+            </VBtn>
           </template>
-          <template v-else>
-            <VListItem @click="emit('restore', item)">
-              <template #prepend>
-                <VIcon
-                  icon="bx-user-check"
-                  class="me-2 text-success"
-                />
-              </template>
-              <VListItemTitle>Restaurar</VListItemTitle>
-            </VListItem>
-          </template>
-        </VList>
-      </VMenu>
+          <VList density="compact">
+            <template v-if="!item.deleted_at">
+              <VListItem @click="emit('points', item)">
+                <template #prepend>
+                  <VIcon
+                    icon="bx-coin-stack"
+                    class="me-2 text-primary"
+                  />
+                </template>
+                <VListItemTitle>Modificar puntos</VListItemTitle>
+              </VListItem>
+              <VListItem @click="emit('reset-credentials', item)">
+                <template #prepend>
+                  <VIcon
+                    icon="bx-key"
+                    class="me-2 text-warning"
+                  />
+                </template>
+                <VListItemTitle>Resetear credenciales</VListItemTitle>
+              </VListItem>
+              <VListItem
+                v-if="item.two_factor_status"
+                @click="emit('disable-two-factor', item)"
+              >
+                <template #prepend>
+                  <VIcon
+                    icon="bx-shield-x"
+                    class="me-2 text-warning"
+                  />
+                </template>
+                <VListItemTitle>Deshabilitar 2FA</VListItemTitle>
+              </VListItem>
+              <VListItem @click="emit('deactivate', item)">
+                <template #prepend>
+                  <VIcon
+                    icon="bx-user-x"
+                    class="me-2 text-error"
+                  />
+                </template>
+                <VListItemTitle class="text-error">
+                  Dar de baja
+                </VListItemTitle>
+              </VListItem>
+            </template>
+            <template v-else>
+              <VListItem @click="emit('restore', item)">
+                <template #prepend>
+                  <VIcon
+                    icon="bx-user-check"
+                    class="me-2 text-success"
+                  />
+                </template>
+                <VListItemTitle>Restaurar</VListItemTitle>
+              </VListItem>
+            </template>
+          </VList>
+        </VMenu>
+      </div>
     </template>
   </VDataTableServer>
 </template>

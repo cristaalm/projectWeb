@@ -2,6 +2,7 @@
 import CreateUserDialog from './CreateUserDialog.vue'
 import ModifyPointsDialog from './ModifyPointsDialog.vue'
 import ReasonActionDialog from './ReasonActionDialog.vue'
+import UserDetailDialog from './UserDetailDialog.vue'
 import UsersDataTable from './components/UsersDataTable.vue'
 import UsersFiltersPanel from './components/UsersFiltersPanel.vue'
 import UsersTableHeader from './components/UsersTableHeader.vue'
@@ -38,6 +39,9 @@ const {
 const {
   loading: actionLoading,
   activeUser,
+  detailDialog,
+  detailUserId,
+  openDetailDialog,
   pointsDialog,
   openPointsDialog,
   reasonDialog,
@@ -98,6 +102,7 @@ const {
         :items="data"
         :total="total"
         :loading="loading"
+        @view="openDetailDialog"
         @points="openPointsDialog"
         @deactivate="openDeactivateDialog"
         @restore="openRestoreDialog"
@@ -110,6 +115,11 @@ const {
   <CreateUserDialog
     v-model="createDialog"
     @created="loadData"
+  />
+
+  <UserDetailDialog
+    v-model="detailDialog"
+    :user-id="detailUserId"
   />
 
   <ModifyPointsDialog

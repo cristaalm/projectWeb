@@ -1,4 +1,4 @@
-import { requestPost } from '@/services/requests'
+import { requestGet, requestPost } from '@/services/requests'
 import { useToastStore } from '@/store/useToastStore'
 import { messageError } from '@/utils/constants'
 import { ref } from 'vue'
@@ -181,6 +181,58 @@ export function useUserManagement() {
     return false
   }
 
+  const getUserDetail = async userId => {
+    resetState()
+    loading.value = true
+
+    try {
+      const response = await requestGet({ url: `users/${userId}` })
+
+      if (!response.success) {
+        error.value = true
+        toast.showToast({ message: response.message ?? messageError, tipo: 'error', duration: 8000 })
+
+        return null
+      }
+
+      return response.data.user
+    } catch (err) {
+      error.value = true
+      console.error(err)
+      toast.showToast({ message: messageError, tipo: 'error' })
+    } finally {
+      loading.value = false
+    }
+
+    return null
+  }
+
+  const getUserHistory = async userId => {
+    resetState()
+    loading.value = true
+
+    try {
+      const response = await requestGet({ url: `users/${userId}/history` })
+
+      if (!response.success) {
+        error.value = true
+        toast.showToast({ message: response.message ?? messageError, tipo: 'error', duration: 8000 })
+
+        return []
+      }
+
+      return response.data.history
+    } catch (err) {
+      error.value = true
+      console.error(err)
+      toast.showToast({ message: messageError, tipo: 'error' })
+    } finally {
+      loading.value = false
+    }
+
+    return []
+  }
+
   return {
     error,
     loading,
@@ -190,5 +242,7 @@ export function useUserManagement() {
     restoreUser,
     resetCredentials,
     disableTwoFactor,
+    getUserDetail,
+    getUserHistory,
   }
 }
