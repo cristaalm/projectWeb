@@ -63,6 +63,10 @@ class UserManagementService
 
     public function modifyPoints(User $target, User $admin, int $points, string $reason): User
     {
+        if ($target->trashed()) {
+            throw new UserManagementException('No se puede realizar esta acción sobre un usuario dado de baja.', 422);
+        }
+
         $previousBalance = $this->calculateBalance($target->id);
 
         if ($previousBalance + $points < 0) {
@@ -118,6 +122,10 @@ class UserManagementService
 
     public function resetCredentials(User $target, User $admin): User
     {
+        if ($target->trashed()) {
+            throw new UserManagementException('No se puede realizar esta acción sobre un usuario dado de baja.', 422);
+        }
+
         $plainPassword = User::generatePassword();
         $target->password = Hash::make($plainPassword);
         $target->save();
@@ -130,6 +138,10 @@ class UserManagementService
 
     public function disableTwoFactor(User $target, User $admin): User
     {
+        if ($target->trashed()) {
+            throw new UserManagementException('No se puede realizar esta acción sobre un usuario dado de baja.', 422);
+        }
+
         $target->two_factor_status = false;
         $target->google2fa_secret = null;
         $target->save();

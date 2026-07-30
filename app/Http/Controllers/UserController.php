@@ -110,9 +110,13 @@ class UserController extends Controller
             return $this->apiResponse(false, 'Usuario no encontrado.', null, null, 404);
         }
 
-        $this->userManagementService->resetCredentials($target, $request->user());
+        try {
+            $this->userManagementService->resetCredentials($target, $request->user());
 
-        return $this->apiResponse(true, 'Credenciales restablecidas correctamente.', null, null, 200);
+            return $this->apiResponse(true, 'Credenciales restablecidas correctamente.', null, null, 200);
+        } catch (UserManagementException $e) {
+            return $this->apiResponse(false, $e->getMessage(), null, $e->details, $e->status);
+        }
     }
 
     public function disableTwoFactor(DisableTwoFactorRequest $request, int $userId)
@@ -123,10 +127,14 @@ class UserController extends Controller
             return $this->apiResponse(false, 'Usuario no encontrado.', null, null, 404);
         }
 
-        $updated = $this->userManagementService->disableTwoFactor($target, $request->user());
+        try {
+            $updated = $this->userManagementService->disableTwoFactor($target, $request->user());
 
-        return $this->apiResponse(true, '2FA deshabilitado correctamente.', [
-            'user' => new UserResource($updated),
-        ], null, 200);
+            return $this->apiResponse(true, '2FA deshabilitado correctamente.', [
+                'user' => new UserResource($updated),
+            ], null, 200);
+        } catch (UserManagementException $e) {
+            return $this->apiResponse(false, $e->getMessage(), null, $e->details, $e->status);
+        }
     }
 }

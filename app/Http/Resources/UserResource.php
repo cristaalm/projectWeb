@@ -21,6 +21,7 @@ class UserResource extends JsonResource
             'code_identity' => $this->code_identity,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'deleted_at' => $this->deleted_at,
             'points_balance' => $this->when(! is_null($this->points_balance), fn () => (int) $this->points_balance),
             'alliance' => $this->when(
                 $this->relationLoaded('merchant') || $this->relationLoaded('organizationMember'),
