@@ -54,26 +54,25 @@
                 </p>
 
                 @php
-                    $diff = $newPoints - $originalPoints;
-                    $action = $diff >= 0 ? 'sumaron' : 'restaron';
-                    $absDiff = abs($diff);
-                    $color = $diff >= 0 ? '#10b981' : '#ef4444';
+                    $action = $delta >= 0 ? 'sumaron' : 'restaron';
+                    $absDelta = abs($delta);
+                    $color = $delta >= 0 ? '#10b981' : '#ef4444';
                 @endphp
 
-                <div style="background-color: {{ $diff >= 0 ? '#f0fdf4' : '#fef2f2' }}; border-left: 4px solid {{ $color }}; padding: 16px; margin: 20px 0; border-radius: 4px;">
+                <div style="background-color: {{ $delta >= 0 ? '#f0fdf4' : '#fef2f2' }}; border-left: 4px solid {{ $color }}; padding: 16px; margin: 20px 0; border-radius: 4px;">
                   <p style="margin: 8px 0; font-size: 15px;">
-                    <strong>Puntos anteriores:</strong> {{ $originalPoints }}
+                    <strong>Saldo anterior:</strong> {{ $previousBalance }}
                   </p>
                   <p style="margin: 8px 0; font-size: 15px;">
-                    <strong>Puntos actuales:</strong> {{ $newPoints }}
+                    <strong>Saldo actual:</strong> {{ $newBalance }}
                   </p>
                   <p style="margin: 8px 0; font-size: 15px; color: {{ $color }};">
-                    <strong>{{ $absDiff }} puntos {{ $action }}</strong>
+                    <strong>{{ $absDelta }} puntos {{ $action }}</strong>
                   </p>
                 </div>
                 <div style="background-color: #f0f1fd; border-left: 4px solid #209CEE; padding: 16px; margin: 10px 0; border-radius: 4px;">
                   <p style="margin: 8px 0; font-size: 15px;">
-                    <strong>Nota:</strong> {{ $justify }}
+                    <strong>Nota:</strong> {{ $reason }}
                   </p>
                 </div>
 

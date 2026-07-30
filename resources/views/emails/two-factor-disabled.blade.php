@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cuenta activada</title>
+    <title>Verificación en dos pasos deshabilitada</title>
   </head>
 
   <body
@@ -46,27 +46,21 @@
             <tr>
               <td style="padding: 32px; color: #333">
                 <h2 style="margin-top: 0; font-size: 22px; color: #1f2937">
-                  ¡Hola, {{ explode(' ', $user->name)[0] ?? 'usuario' }}! 👋
+                  Hola, {{ explode(' ', $user->name)[0] ?? 'usuario' }} 👋
                 </h2>
 
                 <p style="font-size: 16px; margin-bottom: 20px;">
-                  Tenemos una buena noticia: <strong>tu cuenta en ECOSORT ha sido activada</strong>.
+                  Un administrador deshabilitó la verificación en dos pasos (2FA) de tu cuenta en <strong>ECOSORT</strong>, como parte de un proceso de recuperación de acceso.
                 </p>
 
-                <p style="font-size: 16px; margin-bottom: 20px;">
-                  Ya puedes acceder a todas las funcionalidades de la plataforma y comenzar a disfrutar de nuestros servicios.
-                </p>
-
-                @if($justification ?? null)
-                  <div style="background-color: #f0fdf4; border-left: 4px solid #10b981; padding: 14px 16px; margin: 20px 0; border-radius: 0 6px 6px 0;">
-                    <p style="margin: 0; font-style: italic; color: #065f46; font-size: 15px;">
-                      <strong>Motivo:</strong> {{ $justification }}
-                    </p>
-                  </div>
-                @endif
+                <div style="background-color: #fef9f9; border-left: 4px solid #ef4444; padding: 14px 16px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                  <p style="margin: 0; font-style: italic; color: #dc2626; font-size: 15px;">
+                    Si tú no solicitaste este cambio, contacta a nuestro equipo de soporte de inmediato.
+                  </p>
+                </div>
 
                 <p style="font-size: 16px; margin-bottom: 24px;">
-                  Si tienes alguna duda o necesitas ayuda para empezar, nuestro equipo está listo para apoyarte.
+                  Por seguridad, te recomendamos volver a activar la verificación en dos pasos desde tu perfil en cuanto puedas iniciar sesión.
                 </p>
 
                 <div style="text-align: center; margin-top: 24px;">
@@ -102,7 +96,7 @@
                 "
               >
                 © {{ date('Y') }} ECOSORT. Todos los derechos reservados.<br />
-                <span style="color: #9ca3af">¡Bienvenido(a) de nuevo!</span>
+                <span style="color: #9ca3af">Gracias por ser parte de nuestra comunidad.</span>
               </td>
             </tr>
           </table>

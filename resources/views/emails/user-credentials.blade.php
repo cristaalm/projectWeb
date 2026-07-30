@@ -66,6 +66,12 @@
                   </p>
                 </div>
 
+                @if($accessText ?? null)
+                  <p style="font-size: 16px; margin-bottom: 20px;">
+                    {{ $accessText }}
+                  </p>
+                @endif
+
                 <p style="font-size: 16px; margin-bottom: 24px;">
                   Por seguridad, te recomendamos <strong>cambiar tu contraseña</strong> después del primer inicio de sesión.
                 </p>

@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth' => \App\Http\Middleware\ApiAuthenticate::class,
             'ensureUserIsActive' => \App\Http\Middleware\EnsureUserIsActive::class,
+            'role' => \App\Http\Middleware\EnsureUserHasRole::class,
         ]);
 
         // Middleware global para el grupo 'api': arranca la sesión/cookie para
