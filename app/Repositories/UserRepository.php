@@ -106,7 +106,7 @@ class UserRepository
             ->groupBy('users.id')
             ->with('role');
 
-        if ($filters['with_trashed'] ?? false) {
+        if (filter_var($filters['with_trashed'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
             $query->withTrashed();
         }
 
@@ -130,8 +130,8 @@ class UserRepository
             $query->havingRaw("($balanceExpr) <= ?", [$filters['points_max']]);
         }
 
-        if (! empty($filters['search'])) {
-            $term = '%' . $filters['search'] . '%';
+        if (! empty($filters['query'])) {
+            $term = '%' . $filters['query'] . '%';
             $query->where(function ($q) use ($term) {
                 $q->where('users.name', 'ilike', $term)
                     ->orWhere('users.last_name', 'ilike', $term)
@@ -140,8 +140,8 @@ class UserRepository
             });
         }
 
-        $sortBy = in_array($filters['sort_by'] ?? null, self::SORTABLE_COLUMNS, true) ? $filters['sort_by'] : 'id';
-        $sortDir = ($filters['sort_dir'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
+        $sortBy = in_array($filters['key'] ?? null, self::SORTABLE_COLUMNS, true) ? $filters['key'] : 'id';
+        $sortDir = ($filters['order'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
 
         if ($sortBy === 'role') {
             // MAX() por la misma razón que en $balanceExpr: el join a roles es 1:1
