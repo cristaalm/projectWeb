@@ -1,8 +1,11 @@
 <script setup>
 import UserAvatar from '@/components/UserAvatar.vue'
+import { useAuthStore } from '@/store/auth'
 import { storageURL } from '@/utils/constants'
 import { ROLE_COLORS } from '@/utils/roles'
+import { canManageAccount, canModifyPoints } from '@/utils/userPermissions'
 import { format, parseISO } from 'date-fns'
+import { computed } from 'vue'
 
 defineProps({
   items: { type: Array, default: () => [] },
@@ -27,6 +30,9 @@ const emit = defineEmits([
   'disable-two-factor',
 ])
 
+const authStore = useAuthStore()
+const currentUser = computed(() => authStore.getUser())
+
 const HEADERS = [
   { title: 'Usuario', key: 'name' },
   { title: 'Teléfono', key: 'phone', sortable: false },
@@ -45,6 +51,18 @@ function formatDate(value) {
 
 function avatarUrl(item) {
   return item.avatar ? storageURL + item.avatar : null
+}
+
+function showPoints(item) {
+  return canModifyPoints(currentUser.value, item)
+}
+
+function showManage(item) {
+  return canManageAccount(currentUser.value, item)
+}
+
+function hasAnyAction(item) {
+  return item.deleted_at ? showManage(item) : showPoints(item) || showManage(item)
 }
 </script>
 
@@ -131,7 +149,10 @@ function avatarUrl(item) {
     </template>
 
     <template #item.actions="{ item }">
-      <div @click.stop>
+      <div
+        v-if="hasAnyAction(item)"
+        @click.stop
+      >
         <VMenu location="bottom end">
           <template #activator="{ props: menuProps }">
             <VBtn
@@ -147,7 +168,10 @@ function avatarUrl(item) {
           </template>
           <VList density="compact">
             <template v-if="!item.deleted_at">
-              <VListItem @click="emit('points', item)">
+              <VListItem
+                v-if="showPoints(item)"
+                @click="emit('points', item)"
+              >
                 <template #prepend>
                   <VIcon
                     icon="bx-coin-stack"
@@ -156,7 +180,10 @@ function avatarUrl(item) {
                 </template>
                 <VListItemTitle>Modificar puntos</VListItemTitle>
               </VListItem>
-              <VListItem @click="emit('reset-credentials', item)">
+              <VListItem
+                v-if="showManage(item)"
+                @click="emit('reset-credentials', item)"
+              >
                 <template #prepend>
                   <VIcon
                     icon="bx-key"
@@ -166,7 +193,7 @@ function avatarUrl(item) {
                 <VListItemTitle>Resetear credenciales</VListItemTitle>
               </VListItem>
               <VListItem
-                v-if="item.two_factor_status"
+                v-if="item.two_factor_status && showManage(item)"
                 @click="emit('disable-two-factor', item)"
               >
                 <template #prepend>
@@ -177,7 +204,10 @@ function avatarUrl(item) {
                 </template>
                 <VListItemTitle>Deshabilitar 2FA</VListItemTitle>
               </VListItem>
-              <VListItem @click="emit('deactivate', item)">
+              <VListItem
+                v-if="showManage(item)"
+                @click="emit('deactivate', item)"
+              >
                 <template #prepend>
                   <VIcon
                     icon="bx-user-x"
@@ -190,7 +220,10 @@ function avatarUrl(item) {
               </VListItem>
             </template>
             <template v-else>
-              <VListItem @click="emit('restore', item)">
+              <VListItem
+                v-if="showManage(item)"
+                @click="emit('restore', item)"
+              >
                 <template #prepend>
                   <VIcon
                     icon="bx-user-check"
