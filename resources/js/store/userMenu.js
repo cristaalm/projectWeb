@@ -13,11 +13,14 @@ const useMenuStore = defineStore('menu', {
         return
       }
 
-      this.value = this.panelMenu()
+      this.value = this.panelMenu().filter(
+        item => !item.roles || item.roles.includes(user.role.name),
+      )
     },
     panelMenu() {
       return [
         { title: 'Panel', icon: 'bx-bxs-dashboard', to: '/panel' },
+        { title: 'Usuarios', icon: 'bx-user', to: '/usuarios', roles: ['superadmin', 'moderador'] },
       ]
     },
   },

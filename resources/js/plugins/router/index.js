@@ -1,4 +1,5 @@
 import useAuthToken from '@/hooks/Auth/useAuthToken'
+import { useAuthStore } from '@/store/auth'
 import { useTwoFactorChallengeStore } from '@/store/twoFactorChallenge'
 import { createRouter, createWebHistory } from 'vue-router'
 import { routes } from './routes'
@@ -26,6 +27,14 @@ router.beforeEach(async to => {
   if (to.meta.requiresAuth && !authenticated) return { name: 'login' }
 
   if (to.meta.guestOnly && authenticated) return { name: 'panel' }
+
+  // Rutas restringidas por rol (ej. Usuarios: solo superadmin/moderador) — el
+  // backend ya las rechaza con 403, esto solo evita que el usuario llegue a
+  // ver una pantalla que de todas formas le va a fallar.
+  if (to.meta.roles) {
+    const userRole = useAuthStore().user?.role?.name
+    if (!userRole || !to.meta.roles.includes(userRole)) return { name: 'panel' }
+  }
 
   return true
 })

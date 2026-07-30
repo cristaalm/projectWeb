@@ -17,6 +17,12 @@ export const routes = [
         meta: { title: 'Perfil' },
         component: () => import('@/pages/Dashboard/Profile/'),
       },
+      {
+        path: 'usuarios',
+        name: 'users',
+        meta: { title: 'Usuarios', roles: ['superadmin', 'moderador'] },
+        component: () => import('@/pages/Dashboard/Users/'),
+      },
     ],
   },
   {
