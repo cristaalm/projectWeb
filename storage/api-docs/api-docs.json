@@ -1522,7 +1522,7 @@
                     "Users"
                 ],
                 "summary": "Modificar puntos de un usuario",
-                "description": "Registra un ajuste (positivo o negativo) en point_adjustments, con quién lo hizo y el motivo. Valida que el saldo resultante nunca quede negativo. Notifica al usuario por correo con el saldo anterior/nuevo y el motivo (PointsAdjustedNotification). Rechazado si el usuario está dado de baja.",
+                "description": "Registra un ajuste (positivo o negativo) en point_adjustments, con quién lo hizo y el motivo. Valida que el saldo resultante nunca quede negativo. Notifica al usuario por correo con el saldo anterior/nuevo y el motivo (PointsAdjustedNotification). Rechazado si el usuario está dado de baja. Es la única acción de este módulo que un admin/moderador puede ejecutar sobre su propia cuenta; un moderador tampoco puede ajustar puntos de otro moderador o del superadmin.",
                 "operationId": "ad117234fcb059bb39cc4ad8bee3dda9",
                 "parameters": [
                     {
@@ -1586,7 +1586,7 @@
                         }
                     },
                     "403": {
-                        "description": "El rol del usuario autenticado no es superadmin ni moderador.",
+                        "description": "El rol del usuario autenticado no es superadmin ni moderador, o un moderador intentando ajustar puntos de otro moderador o del superadmin.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1632,7 +1632,7 @@
                     "Users"
                 ],
                 "summary": "Dar de baja a un usuario (soft-delete)",
-                "description": "Marca deleted_at en el usuario (ya no puede iniciar sesión), registra la acción en user_account_actions (quién, cuándo, motivo) y notifica al usuario por correo con el motivo (AccountDeactivatedNotification).",
+                "description": "Marca deleted_at en el usuario (ya no puede iniciar sesión), registra la acción en user_account_actions (quién, cuándo, motivo) y notifica al usuario por correo con el motivo (AccountDeactivatedNotification). Nadie puede darse de baja a sí mismo; un moderador tampoco puede dar de baja a otro moderador ni al superadmin.",
                 "operationId": "25f9bb0fec8ae22f9187530365298ea4",
                 "parameters": [
                     {
@@ -1686,7 +1686,7 @@
                         }
                     },
                     "403": {
-                        "description": "El rol del usuario autenticado no es superadmin ni moderador.",
+                        "description": "El rol del usuario autenticado no es superadmin ni moderador, o intenta actuar sobre sí mismo, o un moderador intentando gestionar a otro moderador/superadmin.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1732,7 +1732,7 @@
                     "Users"
                 ],
                 "summary": "Restaurar un usuario dado de baja",
-                "description": "Limpia deleted_at, registra la acción en user_account_actions y notifica al usuario por correo con el motivo (AccountRestoredNotification).",
+                "description": "Limpia deleted_at, registra la acción en user_account_actions y notifica al usuario por correo con el motivo (AccountRestoredNotification). Nadie puede restaurarse a sí mismo; un moderador tampoco puede restaurar a otro moderador ni al superadmin.",
                 "operationId": "078d7286f2e434c4bbcd4b0f2220967a",
                 "parameters": [
                     {
@@ -1790,7 +1790,7 @@
                         }
                     },
                     "403": {
-                        "description": "El rol del usuario autenticado no es superadmin ni moderador.",
+                        "description": "El rol del usuario autenticado no es superadmin ni moderador, o intenta actuar sobre sí mismo, o un moderador intentando gestionar a otro moderador/superadmin.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1836,7 +1836,7 @@
                     "Users"
                 ],
                 "summary": "Resetear las credenciales de un usuario",
-                "description": "Genera una contraseña aleatoria nueva y la envía por correo (UserCredentialsNotification) — pensado como recuperación de cuenta asistida por un administrador. Registra quién y cuándo en user_account_actions (sin motivo obligatorio). Rechazado si el usuario está dado de baja.",
+                "description": "Genera una contraseña aleatoria nueva y la envía por correo (UserCredentialsNotification) — pensado como recuperación de cuenta asistida por un administrador. Registra quién y cuándo en user_account_actions (sin motivo obligatorio). Rechazado si el usuario está dado de baja. Nadie puede resetearse sus propias credenciales desde este panel; un moderador tampoco puede resetear las de otro moderador ni las del superadmin.",
                 "operationId": "871c378c9c5b22055c28b7918ff038ea",
                 "parameters": [
                     {
@@ -1870,7 +1870,7 @@
                         }
                     },
                     "403": {
-                        "description": "El rol del usuario autenticado no es superadmin ni moderador.",
+                        "description": "El rol del usuario autenticado no es superadmin ni moderador, o intenta actuar sobre sí mismo, o un moderador intentando gestionar a otro moderador/superadmin.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1916,7 +1916,7 @@
                     "Users"
                 ],
                 "summary": "Deshabilitar el 2FA de un usuario (administrador)",
-                "description": "A diferencia del autoservicio (POST /auth/disable-2fa), no exige el código TOTP/recuperación vigente — pensado para desbloquear a un usuario que perdió acceso a su app de autenticación. Limpia el secreto y los códigos de recuperación, registra la acción en user_account_actions y notifica al usuario por correo (TwoFactorDisabledByAdminNotification). Rechazado si el usuario está dado de baja.",
+                "description": "A diferencia del autoservicio (POST /auth/disable-2fa), no exige el código TOTP/recuperación vigente — pensado para desbloquear a un usuario que perdió acceso a su app de autenticación. Limpia el secreto y los códigos de recuperación, registra la acción en user_account_actions y notifica al usuario por correo (TwoFactorDisabledByAdminNotification). Rechazado si el usuario está dado de baja. Nadie puede deshabilitarse su propio 2FA desde este panel; un moderador tampoco puede deshabilitar el de otro moderador ni el del superadmin.",
                 "operationId": "46d1810d28e723ed8668f8b806a61f32",
                 "parameters": [
                     {
@@ -1954,7 +1954,7 @@
                         }
                     },
                     "403": {
-                        "description": "El rol del usuario autenticado no es superadmin ni moderador.",
+                        "description": "El rol del usuario autenticado no es superadmin ni moderador, o intenta actuar sobre sí mismo, o un moderador intentando gestionar a otro moderador/superadmin.",
                         "content": {
                             "application/json": {
                                 "schema": {

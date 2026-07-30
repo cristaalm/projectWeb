@@ -25,6 +25,9 @@ class UserManagementService
     /** Roles que necesitan estar ligados a una alianza (comercio) al crearse. */
     private const ALLIANCE_REQUIRED_ROLES = ['admin_merchant', 'merchant'];
 
+    /** Roles de staff con acceso al CRUD de administración de usuarios. */
+    private const STAFF_ROLES = ['superadmin', 'moderador'];
+
     public function __construct(private readonly UserRepository $users)
     {
     }
@@ -63,6 +66,8 @@ class UserManagementService
 
     public function modifyPoints(User $target, User $admin, int $points, string $reason): User
     {
+        $this->assertActionAllowed($admin, $target, 'modifyPoints');
+
         if ($target->trashed()) {
             throw new UserManagementException('No se puede realizar esta acción sobre un usuario dado de baja.', 422);
         }
@@ -94,6 +99,8 @@ class UserManagementService
 
     public function deactivate(User $target, User $admin, string $reason): User
     {
+        $this->assertActionAllowed($admin, $target, 'deactivate');
+
         if ($target->trashed()) {
             throw new UserManagementException('El usuario ya está dado de baja.', 422);
         }
@@ -108,6 +115,8 @@ class UserManagementService
 
     public function restore(User $target, User $admin, string $reason): User
     {
+        $this->assertActionAllowed($admin, $target, 'restore');
+
         if (! $target->trashed()) {
             throw new UserManagementException('El usuario no está dado de baja.', 422);
         }
@@ -122,6 +131,8 @@ class UserManagementService
 
     public function resetCredentials(User $target, User $admin): User
     {
+        $this->assertActionAllowed($admin, $target, 'resetCredentials');
+
         if ($target->trashed()) {
             throw new UserManagementException('No se puede realizar esta acción sobre un usuario dado de baja.', 422);
         }
@@ -138,6 +149,8 @@ class UserManagementService
 
     public function disableTwoFactor(User $target, User $admin): User
     {
+        $this->assertActionAllowed($admin, $target, 'disableTwoFactor');
+
         if ($target->trashed()) {
             throw new UserManagementException('No se puede realizar esta acción sobre un usuario dado de baja.', 422);
         }
@@ -152,6 +165,34 @@ class UserManagementService
         $target->notify(new TwoFactorDisabledByAdminNotification());
 
         return $target;
+    }
+
+    /**
+     * Reglas de quién puede ejecutar qué acción de gestión sobre qué cuenta:
+     * - Nadie puede actuar sobre su propia cuenta desde este panel, salvo
+     *   ajustarse sus propios puntos (evita que un admin/moderador se dé de
+     *   baja o se resetee credenciales a sí mismo).
+     * - Un moderador no puede gestionar (ninguna acción, ni siquiera puntos)
+     *   la cuenta de otro moderador ni la del superadmin — solo puede
+     *   gestionar admin_merchant/merchant/member sin restricción.
+     * - Un superadmin no tiene restricciones sobre otras cuentas.
+     */
+    private function assertActionAllowed(User $admin, User $target, string $action): void
+    {
+        if ($admin->id === $target->id) {
+            if ($action !== 'modifyPoints') {
+                throw new UserManagementException('No puedes realizar esta acción sobre tu propia cuenta.', 403);
+            }
+
+            return;
+        }
+
+        $admin->loadMissing('role');
+        $target->loadMissing('role');
+
+        if ($admin->role?->name === 'moderador' && in_array($target->role?->name, self::STAFF_ROLES, true)) {
+            throw new UserManagementException('No tienes permisos para gestionar cuentas de moderadores o del superadministrador.', 403);
+        }
     }
 
     private function logAction(User $target, User $admin, UserAccountActionType $type, ?string $reason): void

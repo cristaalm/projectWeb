@@ -131,7 +131,7 @@ class UsersDocumentation
         path: '/users/{userId}/points',
         tags: ['Users'],
         summary: 'Modificar puntos de un usuario',
-        description: 'Registra un ajuste (positivo o negativo) en point_adjustments, con quién lo hizo y el motivo. Valida que el saldo resultante nunca quede negativo. Notifica al usuario por correo con el saldo anterior/nuevo y el motivo (PointsAdjustedNotification). Rechazado si el usuario está dado de baja.',
+        description: 'Registra un ajuste (positivo o negativo) en point_adjustments, con quién lo hizo y el motivo. Valida que el saldo resultante nunca quede negativo. Notifica al usuario por correo con el saldo anterior/nuevo y el motivo (PointsAdjustedNotification). Rechazado si el usuario está dado de baja. Es la única acción de este módulo que un admin/moderador puede ejecutar sobre su propia cuenta; un moderador tampoco puede ajustar puntos de otro moderador o del superadmin.',
         security: [['sessionCookie' => []], ['bearerToken' => []]],
         parameters: [new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
         requestBody: new OA\RequestBody(
@@ -151,7 +151,7 @@ class UsersDocumentation
                 content: new OA\JsonContent(allOf: [new OA\Schema(ref: '#/components/schemas/SuccessResponse')])
             ),
             new OA\Response(response: 401, description: 'No autenticado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
-            new OA\Response(response: 403, description: 'El rol del usuario autenticado no es superadmin ni moderador.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 403, description: 'El rol del usuario autenticado no es superadmin ni moderador, o un moderador intentando ajustar puntos de otro moderador o del superadmin.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
             new OA\Response(response: 404, description: 'Usuario no encontrado (o está dado de baja: se excluye por defecto de la búsqueda).', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
             new OA\Response(response: 422, description: 'Error de validación, o el ajuste dejaría el saldo en negativo.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
         ]
@@ -164,7 +164,7 @@ class UsersDocumentation
         path: '/users/{userId}/deactivate',
         tags: ['Users'],
         summary: 'Dar de baja a un usuario (soft-delete)',
-        description: 'Marca deleted_at en el usuario (ya no puede iniciar sesión), registra la acción en user_account_actions (quién, cuándo, motivo) y notifica al usuario por correo con el motivo (AccountDeactivatedNotification).',
+        description: 'Marca deleted_at en el usuario (ya no puede iniciar sesión), registra la acción en user_account_actions (quién, cuándo, motivo) y notifica al usuario por correo con el motivo (AccountDeactivatedNotification). Nadie puede darse de baja a sí mismo; un moderador tampoco puede dar de baja a otro moderador ni al superadmin.',
         security: [['sessionCookie' => []], ['bearerToken' => []]],
         parameters: [new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
         requestBody: new OA\RequestBody(
@@ -177,7 +177,7 @@ class UsersDocumentation
         responses: [
             new OA\Response(response: 200, description: 'Usuario dado de baja.', content: new OA\JsonContent(ref: '#/components/schemas/SuccessResponse')),
             new OA\Response(response: 401, description: 'No autenticado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
-            new OA\Response(response: 403, description: 'El rol del usuario autenticado no es superadmin ni moderador.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 403, description: 'El rol del usuario autenticado no es superadmin ni moderador, o intenta actuar sobre sí mismo, o un moderador intentando gestionar a otro moderador/superadmin.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
             new OA\Response(response: 404, description: 'Usuario no encontrado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
             new OA\Response(response: 422, description: 'Falta el motivo, o el usuario ya está dado de baja.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
         ]
@@ -190,7 +190,7 @@ class UsersDocumentation
         path: '/users/{userId}/restore',
         tags: ['Users'],
         summary: 'Restaurar un usuario dado de baja',
-        description: 'Limpia deleted_at, registra la acción en user_account_actions y notifica al usuario por correo con el motivo (AccountRestoredNotification).',
+        description: 'Limpia deleted_at, registra la acción en user_account_actions y notifica al usuario por correo con el motivo (AccountRestoredNotification). Nadie puede restaurarse a sí mismo; un moderador tampoco puede restaurar a otro moderador ni al superadmin.',
         security: [['sessionCookie' => []], ['bearerToken' => []]],
         parameters: [new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
         requestBody: new OA\RequestBody(
@@ -207,7 +207,7 @@ class UsersDocumentation
                 content: new OA\JsonContent(allOf: [new OA\Schema(ref: '#/components/schemas/SuccessResponse')])
             ),
             new OA\Response(response: 401, description: 'No autenticado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
-            new OA\Response(response: 403, description: 'El rol del usuario autenticado no es superadmin ni moderador.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 403, description: 'El rol del usuario autenticado no es superadmin ni moderador, o intenta actuar sobre sí mismo, o un moderador intentando gestionar a otro moderador/superadmin.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
             new OA\Response(response: 404, description: 'Usuario no encontrado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
             new OA\Response(response: 422, description: 'Falta el motivo, o el usuario no está dado de baja.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
         ]
@@ -220,13 +220,13 @@ class UsersDocumentation
         path: '/users/{userId}/reset-credentials',
         tags: ['Users'],
         summary: 'Resetear las credenciales de un usuario',
-        description: 'Genera una contraseña aleatoria nueva y la envía por correo (UserCredentialsNotification) — pensado como recuperación de cuenta asistida por un administrador. Registra quién y cuándo en user_account_actions (sin motivo obligatorio). Rechazado si el usuario está dado de baja.',
+        description: 'Genera una contraseña aleatoria nueva y la envía por correo (UserCredentialsNotification) — pensado como recuperación de cuenta asistida por un administrador. Registra quién y cuándo en user_account_actions (sin motivo obligatorio). Rechazado si el usuario está dado de baja. Nadie puede resetearse sus propias credenciales desde este panel; un moderador tampoco puede resetear las de otro moderador ni las del superadmin.',
         security: [['sessionCookie' => []], ['bearerToken' => []]],
         parameters: [new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
         responses: [
             new OA\Response(response: 200, description: 'Credenciales restablecidas.', content: new OA\JsonContent(ref: '#/components/schemas/SuccessResponse')),
             new OA\Response(response: 401, description: 'No autenticado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
-            new OA\Response(response: 403, description: 'El rol del usuario autenticado no es superadmin ni moderador.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 403, description: 'El rol del usuario autenticado no es superadmin ni moderador, o intenta actuar sobre sí mismo, o un moderador intentando gestionar a otro moderador/superadmin.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
             new OA\Response(response: 404, description: 'Usuario no encontrado (o está dado de baja: se excluye por defecto de la búsqueda).', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
             new OA\Response(response: 422, description: 'El usuario está dado de baja.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
         ]
@@ -239,7 +239,7 @@ class UsersDocumentation
         path: '/users/{userId}/disable-two-factor',
         tags: ['Users'],
         summary: 'Deshabilitar el 2FA de un usuario (administrador)',
-        description: 'A diferencia del autoservicio (POST /auth/disable-2fa), no exige el código TOTP/recuperación vigente — pensado para desbloquear a un usuario que perdió acceso a su app de autenticación. Limpia el secreto y los códigos de recuperación, registra la acción en user_account_actions y notifica al usuario por correo (TwoFactorDisabledByAdminNotification). Rechazado si el usuario está dado de baja.',
+        description: 'A diferencia del autoservicio (POST /auth/disable-2fa), no exige el código TOTP/recuperación vigente — pensado para desbloquear a un usuario que perdió acceso a su app de autenticación. Limpia el secreto y los códigos de recuperación, registra la acción en user_account_actions y notifica al usuario por correo (TwoFactorDisabledByAdminNotification). Rechazado si el usuario está dado de baja. Nadie puede deshabilitarse su propio 2FA desde este panel; un moderador tampoco puede deshabilitar el de otro moderador ni el del superadmin.',
         security: [['sessionCookie' => []], ['bearerToken' => []]],
         parameters: [new OA\Parameter(name: 'userId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
         responses: [
@@ -249,7 +249,7 @@ class UsersDocumentation
                 content: new OA\JsonContent(allOf: [new OA\Schema(ref: '#/components/schemas/SuccessResponse')])
             ),
             new OA\Response(response: 401, description: 'No autenticado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
-            new OA\Response(response: 403, description: 'El rol del usuario autenticado no es superadmin ni moderador.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 403, description: 'El rol del usuario autenticado no es superadmin ni moderador, o intenta actuar sobre sí mismo, o un moderador intentando gestionar a otro moderador/superadmin.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
             new OA\Response(response: 404, description: 'Usuario no encontrado (o está dado de baja: se excluye por defecto de la búsqueda).', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
             new OA\Response(response: 422, description: 'El usuario está dado de baja.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
         ]
