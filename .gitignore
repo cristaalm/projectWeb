@@ -99,3 +99,4 @@ firebase*.json
 
 # Documentación interna de referencia (no versionada)
 /docs
+CONTEXTO.md

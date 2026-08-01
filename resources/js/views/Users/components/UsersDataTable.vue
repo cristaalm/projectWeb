@@ -33,6 +33,13 @@ const emit = defineEmits([
 const authStore = useAuthStore()
 const currentUser = computed(() => authStore.getUser())
 
+const ITEMS_PER_PAGE_OPTIONS = [
+  { value: 10, title: '10' },
+  { value: 25, title: '25' },
+  { value: 50, title: '50' },
+  { value: 100, title: '100' },
+]
+
 const HEADERS = [
   { title: 'Usuario', key: 'name' },
   { title: 'Teléfono', key: 'phone', sortable: false },
@@ -84,6 +91,9 @@ function hasAnyAction(item) {
   <VDataTableServer
     :page="page"
     :items-per-page="itemsPerPage"
+    :items-per-page-options="ITEMS_PER_PAGE_OPTIONS"
+    items-per-page-text="Filas por página:"
+    page-text="{0}-{1} de {2}"
     :sort-by="sortBy"
     :headers="HEADERS"
     :items="items"
