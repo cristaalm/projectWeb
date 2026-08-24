@@ -23,6 +23,12 @@ export const routes = [
         meta: { title: 'Usuarios', roles: ['superadmin', 'moderador'] },
         component: () => import('@/pages/Dashboard/Users/'),
       },
+      {
+        path: 'contenedores',
+        name: 'containers',
+        meta: { title: 'Contenedores', roles: ['superadmin', 'moderador'] },
+        component: () => import('@/pages/Dashboard/Containers/'),
+      },
     ],
   },
   {
