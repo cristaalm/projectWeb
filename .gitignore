@@ -98,5 +98,4 @@ id_ed25519
 firebase*.json
 
 # Documentación interna de referencia (no versionada)
-/docs
-CONTEXTO.md
+/docs/context
