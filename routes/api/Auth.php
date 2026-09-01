@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\AuthController;
 
 Route::prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->middleware('throttle:6,1'); // path: /api/auth/login
+    Route::post('social', [AuthController::class, 'loginSocial'])->middleware('throttle:6,1'); // path: /api/auth/social
     Route::post('register', [AuthController::class, 'register']); // path: /api/auth/register
     Route::post('forgot-password', [AuthController::class, 'forgotPassword']); // path: /api/auth/forgot-password
     Route::post('reset-password', [AuthController::class, 'resetPassword']); // path: /api/auth/reset-password

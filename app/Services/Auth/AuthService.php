@@ -30,8 +30,10 @@ class AuthService
 
     private const RECOVERY_CODES_COUNT = 8;
 
-    public function __construct(private readonly UserRepository $users)
-    {
+    public function __construct(
+        private readonly UserRepository $users,
+        private readonly GoogleIdTokenVerifier $googleVerifier,
+    ) {
     }
 
     /**
@@ -46,6 +48,17 @@ class AuthService
             throw new AuthException('Correo electrónico o contraseña incorrectos.', 401);
         }
 
+        $this->assertAccountUsable($user);
+
+        return $user;
+    }
+
+    /**
+     * Estado de cuenta/rol/alianza — compartido por el login por credenciales
+     * y el login social, para no desincronizar las reglas entre ambos.
+     */
+    private function assertAccountUsable(User $user): void
+    {
         if ($user->trashed()) {
             throw new AuthException('Tu cuenta ha sido desactivada por un administrador.', 403);
         }
@@ -76,6 +89,67 @@ class AuthService
                 );
             }
         }
+    }
+
+    /**
+     * Verifica el idToken del proveedor y resuelve el usuario correspondiente:
+     * si ya está vinculado por provider_id, o por email (y lo vincula), o si es
+     * la primera vez y viene de móvil, crea una cuenta incompleta (phone null).
+     * La rama web nunca autocrea — si no hay cuenta previa, rechaza.
+     */
+    public function resolveSocialUser(string $provider, string $idToken, bool $isWebSession): User
+    {
+        $claims = match ($provider) {
+            'google' => $this->googleVerifier->verify($idToken),
+            default => throw new AuthException('Proveedor de inicio de sesión no soportado.', 422),
+        };
+
+        $user = $this->users->findBySocialProvider($provider, $claims['sub']);
+
+        if ($user) {
+            $this->assertAccountUsable($user);
+
+            return $user;
+        }
+
+        $existingByEmail = $this->users->findByEmail($claims['email']);
+
+        if ($existingByEmail) {
+            $this->assertAccountUsable($existingByEmail);
+            $this->users->linkSocialAccount($existingByEmail, $provider, $claims['sub']);
+
+            return $existingByEmail;
+        }
+
+        if ($isWebSession) {
+            throw new AuthException('No existe una cuenta asociada a este correo.', 403);
+        }
+
+        return $this->createSocialUser($claims, $provider);
+    }
+
+    /**
+     * @param array{sub: string, email: string, given_name: string, family_name: string} $claims
+     */
+    private function createSocialUser(array $claims, string $provider): User
+    {
+        $digits12 = str_pad((string) random_int(0, 999999999999), 12, '0', STR_PAD_LEFT);
+        $checkDigit = User::calculateEan13CheckDigit($digits12);
+        $role = $this->users->defaultRegistrationRole();
+
+        $user = $this->users->create([
+            'name' => $claims['given_name'],
+            'last_name' => $claims['family_name'],
+            'email' => $claims['email'],
+            'phone' => null,
+            'password' => Hash::make(User::generatePassword()),
+            'code_identity' => $digits12 . $checkDigit,
+            'role_id' => $role?->id,
+            'google2fa_secret' => (new Google2FA())->generateSecretKey(),
+        ]);
+
+        $this->users->linkSocialAccount($user, $provider, $claims['sub']);
+        $user->load('role');
 
         return $user;
     }

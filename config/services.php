@@ -35,6 +35,13 @@ return [
         ],
     ],
 
+    'google' => [
+        'client_ids' => array_filter([
+            env('GOOGLE_CLIENT_ID_WEB'),
+            env('GOOGLE_CLIENT_ID_ANDROID'),
+        ]),
+    ],
+
     'firebase' => [
         'project_id' => env('FIREBASE_PROJECT_ID'),
         'client_email' => env('FIREBASE_CLIENT_EMAIL'),

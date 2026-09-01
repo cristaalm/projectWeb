@@ -1,7 +1,9 @@
 <script setup>
 import LoadingIcon from '@/components/Base/LoadingIcon/'
 import Lucide from '@/components/Base/Lucide/'
+import useGoogleLogin from '@/hooks/Auth/useGoogleLogin'
 import useLogin from '@/hooks/Auth/useLogin'
+import { loadGoogleIdentityServices } from '@/utils/loadGoogleIdentityServices'
 import authV1BottomShape from '@images/svg/auth-v1-bottom-shape.svg?url'
 import authV1TopShape from '@images/svg/auth-v1-top-shape.svg?url'
 import { useRouter } from 'vue-router'
@@ -22,11 +24,41 @@ const {
   loginUser,
 } = useLogin()
 
+const {
+  user: googleUser,
+  success: googleSuccess,
+  loading: googleLoading,
+  loginWithGoogle,
+} = useGoogleLogin()
+
+const displayUser = computed(() => user.value || googleUser.value)
+const anySuccess = computed(() => success.value || googleSuccess.value)
+
 const isPasswordVisible = ref(false)
+const googleBtnRef = ref(null)
 
 const goToHome = () => {
   router.push({ name: 'panel' })
 }
+
+onMounted(async () => {
+  try {
+    await loadGoogleIdentityServices()
+
+    window.google.accounts.id.initialize({
+      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID_WEB,
+      callback: response => loginWithGoogle(response.credential),
+    })
+
+    window.google.accounts.id.renderButton(googleBtnRef.value, {
+      theme: 'outline',
+      size: 'large',
+      width: 340,
+    })
+  } catch (err) {
+    console.error(err)
+  }
+})
 </script>
 
 <template>
@@ -37,14 +69,14 @@ const goToHome = () => {
       <VImg
         :src="authV1TopShape"
         class="text-primary auth-v1-top-shape !absolute d-none d-sm-block"
-        :class="{ 'shapes-hidden': success }"
+        :class="{ 'shapes-hidden': anySuccess }"
       />
 
       <!-- 👉 Bottom shape -->
       <VImg
         :src="authV1BottomShape"
         class="text-primary auth-v1-bottom-shape !absolute d-none d-sm-block"
-        :class="{ 'shapes-hidden': success }"
+        :class="{ 'shapes-hidden': anySuccess }"
       />
 
       <!-- 👉 Cards wrapper -->
@@ -52,7 +84,7 @@ const goToHome = () => {
         <!-- Card principal: Login -->
         <VCard
           class="auth-card auth-card--primary !bg-white/30 !shadow-2xl"
-          :class="[success ? 'card-exit' : 'card-enter', $vuetify.display.smAndUp ? 'pa-6' : 'pa-0']"
+          :class="[anySuccess ? 'card-exit' : 'card-enter', $vuetify.display.smAndUp ? 'pa-6' : 'pa-0']"
           max-width="480"
         >
           <VCardItem class="justify-center">
@@ -134,7 +166,7 @@ const goToHome = () => {
                     block
                     type="submit"
                     class="hover:!bg-[#08b662] font-poppins"
-                    :disabled="loading || !form.email || !form.pass || success || error"
+                    :disabled="loading || googleLoading || !form.email || !form.pass || anySuccess || error"
                     @click="loginUser(form)"
                   >
                     <span v-if="loading">
@@ -144,6 +176,19 @@ const goToHome = () => {
                       Iniciar Sesión
                     </span>
                   </VBtn>
+
+                  <!-- login con Google -->
+                  <div class="my-4 d-flex align-center">
+                    <VDivider />
+                    <span class="mx-3 text-medium-emphasis font-poppins">o</span>
+                    <VDivider />
+                  </div>
+
+                  <div
+                    v-show="!loading"
+                    ref="googleBtnRef"
+                    class="d-flex justify-center"
+                  />
                 </VCol>
               </VRow>
             </VForm>
@@ -153,7 +198,7 @@ const goToHome = () => {
         <!-- Card secundaria: Éxito -->
         <VCard
           class="auth-card auth-card--secondary !bg-white/30 !shadow-2xl"
-          :class="[success ? 'card-enter' : 'card-exit', $vuetify.display.smAndUp ? 'pa-6' : 'pa-0']"
+          :class="[anySuccess ? 'card-enter' : 'card-exit', $vuetify.display.smAndUp ? 'pa-6' : 'pa-0']"
           max-width="480"
         >
           <div class="text-center pa-6">
@@ -169,7 +214,7 @@ const goToHome = () => {
             </VAvatar>
 
             <h2 class="mb-2 !text-3xl !font-bold text-h5 font-poppins">
-              ¡Bienvenido, {{ user?.name || "" }}!
+              ¡Bienvenido, {{ displayUser?.name || "" }}!
             </h2>
 
             <p class="mb-6 text-body-1 !text-xl font-poppins">

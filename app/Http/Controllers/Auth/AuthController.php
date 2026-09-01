@@ -11,6 +11,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegenerateRecoveryCodesRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
+use App\Http\Requests\Auth\SocialLoginRequest;
 use App\Http\Requests\Auth\VerifyTwoFactorChallengeRequest;
 use App\Http\Resources\UserResource;
 use App\Services\Auth\AuthService;
@@ -29,6 +30,58 @@ class AuthController extends Controller
             $user = $this->authService->attemptCredentials(
                 $request->validated('email'),
                 $request->validated('password')
+            );
+
+            if ($request->hasSession()) {
+                $this->authService->assertRoleAllowedForSession($user);
+            }
+
+            if ($user->two_factor_status) {
+                [$challengeToken, $expiresAt] = $this->authService->issueTwoFactorChallenge(
+                    $user,
+                    (bool) $request->boolean('remember_me')
+                );
+
+                return $this->apiResponse(true, 'Ingresa el código de tu app de autenticación.', [
+                    'two_factor_required' => true,
+                    'challenge_token' => $challengeToken,
+                    'expires_at' => $expiresAt,
+                ], null, 200);
+            }
+
+            if ($request->hasSession()) {
+                $this->authService->loginSession($request, $user);
+
+                return $this->apiResponse(true, 'Inicio de sesión exitoso.', [
+                    'user' => new UserResource($user),
+                ], null, 200);
+            }
+
+            [$token, $expiresAt] = $this->authService->loginToken($user, (bool) $request->boolean('remember_me'));
+
+            return $this->apiResponse(true, 'Inicio de sesión exitoso.', [
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'expires_at' => $expiresAt,
+                'user' => new UserResource($user),
+            ], null, 200);
+        } catch (AuthException $e) {
+            return $this->apiResponse(false, $e->getMessage(), null, $e->details, $e->status);
+        }
+    }
+
+    /**
+     * Verifica el idToken de Google y resuelve/vincula/crea el usuario
+     * correspondiente. Mismo shape de respuesta que login() — la rama web
+     * nunca autocrea (ver AuthService::resolveSocialUser()).
+     */
+    public function loginSocial(SocialLoginRequest $request)
+    {
+        try {
+            $user = $this->authService->resolveSocialUser(
+                $request->validated('provider'),
+                $request->validated('id_token'),
+                $request->hasSession()
             );
 
             if ($request->hasSession()) {

@@ -99,6 +99,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(UserAccountAction::class, 'target_user_id');
     }
 
+    public function socialAccounts(): HasMany
+    {
+        return $this->hasMany(UserSocialAccount::class);
+    }
+
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new CustomResetPassword($token, $this->email));

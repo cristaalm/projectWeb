@@ -27,6 +27,25 @@ class UserRepository
         return User::withTrashed()->where('email', $email)->first();
     }
 
+    /**
+     * `withTrashed()` igual que `findByEmail()`: permite distinguir "no existe"
+     * de "existe pero desactivado" en `AuthService::assertAccountUsable()`.
+     */
+    public function findBySocialProvider(string $provider, string $providerId): ?User
+    {
+        return User::withTrashed()
+            ->whereHas('socialAccounts', fn ($q) => $q->where('provider', $provider)->where('provider_id', $providerId))
+            ->first();
+    }
+
+    public function linkSocialAccount(User $user, string $provider, string $providerId): void
+    {
+        $user->socialAccounts()->create([
+            'provider' => $provider,
+            'provider_id' => $providerId,
+        ]);
+    }
+
     public function findById(int $id, bool $withTrashed = false): ?User
     {
         $query = $withTrashed ? User::withTrashed() : User::query();
