@@ -29,11 +29,11 @@ class GoogleIdTokenVerifier
      */
     public function verify(string $idToken): array
     {
-        $jwks = Cache::remember('google_jwks', self::JWKS_CACHE_TTL_MINUTES * 60, function () {
-            return Http::get(self::JWKS_URL)->throw()->json();
-        });
-
         try {
+            $jwks = Cache::remember('google_jwks', self::JWKS_CACHE_TTL_MINUTES * 60, function () {
+                return Http::timeout(10)->get(self::JWKS_URL)->throw()->json();
+            });
+
             $claims = (array) JWT::decode($idToken, JWK::parseKeySet($jwks));
         } catch (Throwable $e) {
             throw new AuthException('El token de Google no es válido o expiró.', 401);
