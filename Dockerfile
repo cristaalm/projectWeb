@@ -24,6 +24,25 @@ FROM node:22.14 as nodebuild
 
 WORKDIR /app
 
+# Render inyecta las variables de entorno del dashboard al contenedor ya
+# corriendo, pero NO al build de Docker en sí — sin declararlas acá con ARG,
+# `pnpm run build` las ve vacías y Vite las hornea así en el bundle estático
+# (import.meta.env.VITE_* se resuelve en build time, no en runtime).
+ARG VITE_BASE_URL
+ARG VITE_GOOGLE_CLIENT_ID_WEB
+ARG VITE_PUSHER_APP_CLUSTER
+ARG VITE_PUSHER_APP_KEY
+ARG VITE_PUSHER_HOST
+ARG VITE_PUSHER_PORT
+ARG VITE_PUSHER_SCHEME
+ENV VITE_BASE_URL=$VITE_BASE_URL \
+    VITE_GOOGLE_CLIENT_ID_WEB=$VITE_GOOGLE_CLIENT_ID_WEB \
+    VITE_PUSHER_APP_CLUSTER=$VITE_PUSHER_APP_CLUSTER \
+    VITE_PUSHER_APP_KEY=$VITE_PUSHER_APP_KEY \
+    VITE_PUSHER_HOST=$VITE_PUSHER_HOST \
+    VITE_PUSHER_PORT=$VITE_PUSHER_PORT \
+    VITE_PUSHER_SCHEME=$VITE_PUSHER_SCHEME
+
 # Instalar PNPM globalmente para Node 22
 RUN npm install -g pnpm
 
