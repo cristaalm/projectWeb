@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Notifications\ResetPasswordNotification;
 use App\Repositories\UserRepository;
 use Carbon\Carbon;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -111,11 +112,33 @@ class AuthService
      * si ya está vinculado por provider_id, o por email (y lo vincula), o si es
      * la primera vez y viene de móvil, crea una cuenta incompleta (phone null).
      * La rama web nunca autocrea — si no hay cuenta previa, rechaza.
+     *
+     * Reintenta una vez ante una violación de unique: dos requests en paralelo
+     * (doble clic o doble callback de Google, ej. botón + One Tap disparando
+     * ambos) pueden ver "no vinculado todavía" al mismo tiempo e intentar
+     * vincular/crear dos veces — quien pierde la carrera reintenta y en la
+     * segunda vuelta ya encuentra lo que dejó el que ganó.
      */
     public function resolveSocialUser(string $provider, string $idToken, bool $isWebSession): User
     {
         $claims = $this->verifySocialClaims($provider, $idToken);
 
+        try {
+            return $this->resolveOrCreateSocialUser($claims, $provider, $isWebSession);
+        } catch (UniqueConstraintViolationException $e) {
+            try {
+                return $this->resolveOrCreateSocialUser($claims, $provider, $isWebSession);
+            } catch (UniqueConstraintViolationException $e) {
+                throw new AuthException('No se pudo vincular la cuenta de Google, intenta nuevamente.', 409);
+            }
+        }
+    }
+
+    /**
+     * @param array{sub: string, email: string, given_name: string, family_name: string} $claims
+     */
+    private function resolveOrCreateSocialUser(array $claims, string $provider, bool $isWebSession): User
+    {
         $user = $this->users->findBySocialProvider($provider, $claims['sub']);
 
         if ($user) {
