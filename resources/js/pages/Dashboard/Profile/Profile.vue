@@ -1,15 +1,16 @@
 <script setup>
-import AvatarCard from '@/views/Profile/AvatarCard.vue'
 import EmailCard from '@/views/Profile/EmailCard.vue'
 import PasswordCard from '@/views/Profile/PasswordCard.vue'
 import PersonalInfoCard from '@/views/Profile/PersonalInfoCard.vue'
+import ProfileHeaderCard from '@/views/Profile/ProfileHeaderCard.vue'
 import SettingsNav from '@/views/Profile/SettingsNav.vue'
 import SocialAccountsCard from '@/views/Profile/SocialAccountsCard.vue'
 import TwoFactorCard from '@/views/Profile/TwoFactorCard.vue'
 import { useScrollSpy } from '@/composables/useScrollSpy'
+import { useProfileEditor } from '@/views/Profile/hooks/useProfileEditor'
 
 const sections = [
-  { id: 'avatar', label: 'Avatar' },
+  { id: 'avatar', label: 'Perfil' },
   { id: 'personal-info', label: 'Información personal' },
   { id: 'email', label: 'Correo' },
   { id: 'password', label: 'Contraseña' },
@@ -18,6 +19,14 @@ const sections = [
 ]
 
 const { activeId, scrollTo } = useScrollSpy(sections.map(section => section.id))
+
+const {
+  form: profileForm,
+  fullName: profileFullName,
+  loading: profileLoading,
+  canSubmit: profileCanSubmit,
+  submit: submitProfile,
+} = useProfileEditor()
 </script>
 
 <template>
@@ -39,10 +48,18 @@ const { activeId, scrollTo } = useScrollSpy(sections.map(section => section.id))
       >
         <div class="d-flex flex-column gap-6">
           <div id="avatar">
-            <AvatarCard />
+            <ProfileHeaderCard :full-name="profileFullName" />
           </div>
           <div id="personal-info">
-            <PersonalInfoCard />
+            <PersonalInfoCard
+              :name="profileForm.name"
+              :last-name="profileForm.last_name"
+              :loading="profileLoading"
+              :can-submit="profileCanSubmit"
+              @update:name="v => profileForm.name = v"
+              @update:last-name="v => profileForm.last_name = v"
+              @submit="submitProfile"
+            />
           </div>
           <div id="email">
             <EmailCard />

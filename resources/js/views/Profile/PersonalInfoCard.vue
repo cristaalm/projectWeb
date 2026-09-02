@@ -1,46 +1,28 @@
 <script setup>
-import { useUpdateProfile } from '@/hooks/Profile/useUpdateProfile'
-import { useAuthStore } from '@/store/auth'
-import { computed, ref } from 'vue'
-
-const authStore = useAuthStore()
-const { loading: profileLoading, updateProfile } = useUpdateProfile()
-
-const profileForm = ref({
-  name: authStore.user?.name ?? '',
-  last_name: authStore.user?.last_name ?? '',
+defineProps({
+  name: { type: String, required: true },
+  lastName: { type: String, required: true },
+  loading: { type: Boolean, default: false },
+  canSubmit: { type: Boolean, default: false },
 })
 
-// Comparar contra authStore.user (reactivo) en vez de una copia fija tomada
-// al montar — así, tras guardar, el botón vuelve a bloquearse solo (el
-// formulario y el store quedan iguales) sin tener que sincronizar nada a mano.
-const hasChanges = computed(() =>
-  profileForm.value.name !== (authStore.user?.name ?? '')
-  || profileForm.value.last_name !== (authStore.user?.last_name ?? ''),
-)
-
-const canSubmit = computed(() =>
-  hasChanges.value && !!profileForm.value.name.trim() && !!profileForm.value.last_name.trim(),
-)
-
-function submitProfile() {
-  updateProfile(profileForm.value)
-}
+const emit = defineEmits(['update:name', 'update:lastName', 'submit'])
 </script>
 
 <template>
   <VCard title="Información personal">
     <VCardText>
-      <VForm @submit.prevent="submitProfile">
+      <VForm @submit.prevent="emit('submit')">
         <VRow>
           <VCol
             cols="12"
             md="6"
           >
             <VTextField
-              v-model="profileForm.name"
+              :model-value="name"
               label="Nombre"
               required
+              @update:model-value="v => emit('update:name', v)"
             />
           </VCol>
           <VCol
@@ -48,16 +30,17 @@ function submitProfile() {
             md="6"
           >
             <VTextField
-              v-model="profileForm.last_name"
+              :model-value="lastName"
               label="Apellido"
               required
+              @update:model-value="v => emit('update:lastName', v)"
             />
           </VCol>
           <VCol cols="12">
             <VBtn
               type="submit"
               color="primary"
-              :loading="profileLoading"
+              :loading="loading"
               :disabled="!canSubmit"
             >
               Guardar
