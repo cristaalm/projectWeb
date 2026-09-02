@@ -10,6 +10,7 @@ use App\Models\UserAccountAction;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class UserRepository
 {
@@ -22,9 +23,14 @@ class UserRepository
         'id', 'name', 'last_name', 'email', 'phone', 'created_at', 'points_balance', 'role',
     ];
 
+    /**
+     * Comparación case-insensitive (`LOWER(email) = LOWER(?)`, no `where('email', ...)`)
+     * a propósito: el login por credenciales y el social comparten este método, y ninguno
+     * de los dos debe distinguir mayúsculas/minúsculas en el correo.
+     */
     public function findByEmail(string $email): ?User
     {
-        return User::withTrashed()->where('email', $email)->first();
+        return User::withTrashed()->whereRaw('LOWER(email) = ?', [Str::lower($email)])->first();
     }
 
     /**
@@ -58,9 +64,10 @@ class UserRepository
         return $query->find($id);
     }
 
+    /** Mismo criterio case-insensitive que `findByEmail()` — evita registrar un correo que ya existe con otra combinación de mayúsculas/minúsculas. */
     public function emailExists(string $email): bool
     {
-        return User::where('email', $email)->exists();
+        return User::whereRaw('LOWER(email) = ?', [Str::lower($email)])->exists();
     }
 
     public function phoneExists(string $phone): bool
