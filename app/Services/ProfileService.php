@@ -67,11 +67,12 @@ class ProfileService
         return $updated;
     }
 
-    public function updatePassword(User $user, string $currentPassword, string $newPassword, ?string $code, ?string $recoveryCode): void
+    public function updatePassword(User $user, ?string $currentPassword, string $newPassword, ?string $code, ?string $recoveryCode): User
     {
         $this->assertIdentityConfirmed($user, $currentPassword, $code, $recoveryCode);
 
         $user->password = Hash::make($newPassword);
+        $user->has_usable_password = true;
         $user->save();
 
         $currentTokenId = $user->currentAccessToken() instanceof PersonalAccessToken
@@ -81,11 +82,61 @@ class ProfileService
         $user->tokens()->when($currentTokenId, fn ($query) => $query->where('id', '!=', $currentTokenId))->delete();
 
         $user->notify(new PasswordChangedNotification());
+
+        return $user;
     }
 
-    private function assertIdentityConfirmed(User $user, string $password, ?string $code, ?string $recoveryCode): void
+    /**
+     * Vincula una cuenta social a un usuario ya autenticado. No pide
+     * confirmación de identidad — mismo criterio que enable2FA: agregar un
+     * método de acceso es de menor riesgo que quitarlo o cambiarlo, y la
+     * sesión activa ya es la prueba de identidad.
+     */
+    public function linkSocialAccount(User $user, string $provider, string $idToken): User
     {
-        if (! Hash::check($password, $user->password)) {
+        $claims = $this->authService->verifySocialClaims($provider, $idToken);
+
+        $existing = $this->users->findBySocialProvider($provider, $claims['sub']);
+
+        if ($existing && $existing->id !== $user->id) {
+            throw new ProfileException('Esta cuenta de Google ya está vinculada a otro usuario.', 422);
+        }
+
+        if (! $existing) {
+            $this->users->linkSocialAccount($user, $provider, $claims['sub']);
+        }
+
+        return $user->load('socialAccounts');
+    }
+
+    /**
+     * Desvincula una cuenta social — bloquea si es la única forma de acceso
+     * del usuario (sin contraseña real y sin ningún otro proveedor), y si no,
+     * exige la misma confirmación de identidad que updateEmail/updatePassword.
+     */
+    public function unlinkSocialAccount(User $user, string $provider, ?string $password, ?string $code, ?string $recoveryCode): User
+    {
+        $user->loadMissing('socialAccounts');
+
+        $remainingProviders = $user->socialAccounts->where('provider', '!=', $provider)->count();
+
+        if (! $user->has_usable_password && $remainingProviders === 0) {
+            throw new ProfileException(
+                'No podés desvincular tu única forma de acceso. Configurá una contraseña primero.',
+                422
+            );
+        }
+
+        $this->assertIdentityConfirmed($user, $password, $code, $recoveryCode);
+
+        $this->users->unlinkSocialAccount($user, $provider);
+
+        return $user->load('socialAccounts');
+    }
+
+    private function assertIdentityConfirmed(User $user, ?string $password, ?string $code, ?string $recoveryCode): void
+    {
+        if ($user->has_usable_password && (! $password || ! Hash::check($password, $user->password))) {
             throw new ProfileException('Contraseña incorrecta.', 403);
         }
 

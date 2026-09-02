@@ -4,6 +4,7 @@ import EmailCard from '@/views/Profile/EmailCard.vue'
 import PasswordCard from '@/views/Profile/PasswordCard.vue'
 import PersonalInfoCard from '@/views/Profile/PersonalInfoCard.vue'
 import SettingsNav from '@/views/Profile/SettingsNav.vue'
+import SocialAccountsCard from '@/views/Profile/SocialAccountsCard.vue'
 import TwoFactorCard from '@/views/Profile/TwoFactorCard.vue'
 import { useScrollSpy } from '@/composables/useScrollSpy'
 
@@ -13,6 +14,7 @@ const sections = [
   { id: 'email', label: 'Correo' },
   { id: 'password', label: 'Contraseña' },
   { id: 'two-factor', label: 'Autenticación de dos factores' },
+  { id: 'social-accounts', label: 'Cuentas vinculadas' },
 ]
 
 const { activeId, scrollTo } = useScrollSpy(sections.map(section => section.id))
@@ -50,6 +52,9 @@ const { activeId, scrollTo } = useScrollSpy(sections.map(section => section.id))
           </div>
           <div id="two-factor">
             <TwoFactorCard />
+          </div>
+          <div id="social-accounts">
+            <SocialAccountsCard />
           </div>
         </div>
       </VCol>

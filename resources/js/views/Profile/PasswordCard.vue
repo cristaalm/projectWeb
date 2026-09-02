@@ -24,6 +24,7 @@ const isNewPasswordVisible = ref(false)
 const isPasswordConfirmationVisible = ref(false)
 
 const needsTwoFactor = computed(() => !!authStore.user?.two_factor_status)
+const needsCurrentPassword = computed(() => authStore.user?.has_usable_password !== false)
 
 const { touched, touch, reset: resetTouched } = useFieldTouch([
   'current_password',
@@ -35,7 +36,7 @@ const { touched, touch, reset: resetTouched } = useFieldTouch([
 const errors = computed(() => {
   const e = {}
 
-  if (!passwordForm.value.current_password) e.current_password = 'La contraseña actual es obligatoria.'
+  if (needsCurrentPassword.value && !passwordForm.value.current_password) e.current_password = 'La contraseña actual es obligatoria.'
 
   if (!passwordForm.value.password) e.password = 'La contraseña nueva es obligatoria.'
   else if (!strength.value.isValid) e.password = 'La contraseña no cumple los requisitos de seguridad.'
@@ -63,11 +64,20 @@ function submitPassword() {
 </script>
 
 <template>
-  <VCard title="Contraseña">
+  <VCard :title="needsCurrentPassword ? 'Contraseña' : 'Establecer contraseña'">
     <VCardText>
+      <p
+        v-if="!needsCurrentPassword"
+        class="text-caption text-medium-emphasis"
+      >
+        Tu cuenta no tiene una contraseña propia todavía (ingresaste con Google) — configurá una para poder entrar también con correo y contraseña.
+      </p>
       <VForm @submit.prevent="submitPassword">
         <VRow>
-          <VCol cols="12">
+          <VCol
+            v-if="needsCurrentPassword"
+            cols="12"
+          >
             <VTextField
               v-model="passwordForm.current_password"
               :type="isCurrentPasswordVisible ? 'text' : 'password'"
@@ -159,7 +169,7 @@ function submitPassword() {
               :loading="passwordLoading"
               :disabled="!canSubmit"
             >
-              Actualizar contraseña
+              {{ needsCurrentPassword ? 'Actualizar contraseña' : 'Establecer contraseña' }}
             </VBtn>
           </VCol>
         </VRow>

@@ -17,6 +17,8 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'phone' => $this->phone,
             'tour' => $this->tour,
+            'has_usable_password' => $this->has_usable_password,
+            'social_providers' => $this->whenLoaded('socialAccounts', fn () => $this->socialAccounts->pluck('provider')),
             'two_factor_status' => $this->two_factor_status,
             'code_identity' => $this->code_identity,
             'created_at' => $this->created_at,

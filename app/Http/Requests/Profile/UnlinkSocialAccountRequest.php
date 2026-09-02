@@ -4,9 +4,9 @@ namespace App\Http\Requests\Profile;
 
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\Rule;
 
-class UpdatePasswordRequest extends FormRequest
+class UnlinkSocialAccountRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -16,8 +16,8 @@ class UpdatePasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'current_password' => ['nullable', 'string'],
-            'password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
+            'provider' => ['required', 'string', Rule::in(['google'])],
+            'password' => ['nullable', 'string'],
             'token2FA' => ['nullable', 'string', 'size:6'],
             'recovery_code' => ['nullable', 'string'],
         ];
@@ -26,8 +26,8 @@ class UpdatePasswordRequest extends FormRequest
     public function withValidator(ValidatorContract $validator): void
     {
         $validator->after(function (ValidatorContract $validator) {
-            if ($this->user()->has_usable_password && ! $this->filled('current_password')) {
-                $validator->errors()->add('current_password', 'La contraseña actual es obligatoria.');
+            if ($this->user()->has_usable_password && ! $this->filled('password')) {
+                $validator->errors()->add('password', 'La contraseña es obligatoria.');
             }
 
             if (! $this->user()->two_factor_status) {

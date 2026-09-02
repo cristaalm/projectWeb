@@ -31,6 +31,7 @@ declare module 'vue' {
     FormSelect: typeof import('./resources/js/components/Base/Form/FormSelect.vue')['default']
     FormSwitch: typeof import('./resources/js/components/Base/Form/FormSwitch/FormSwitch.vue')['default']
     FormTextarea: typeof import('./resources/js/components/Base/Form/FormTextarea.vue')['default']
+    GoogleSignInButton: typeof import('./resources/js/components/Base/GoogleSignInButton/GoogleSignInButton.vue')['default']
     Group: typeof import('./resources/js/components/Base/Headless/Disclosure/Group.vue')['default']
     Header: typeof import('./resources/js/components/Base/Headless/Menu/Header.vue')['default']
     ImageZoom: typeof import('./resources/js/components/Base/ImageZoom/ImageZoom.vue')['default']

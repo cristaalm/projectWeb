@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\ProfileException;
 use App\Http\Controllers\OldControllers\Controller;
+use App\Http\Requests\Profile\LinkSocialAccountRequest;
+use App\Http\Requests\Profile\UnlinkSocialAccountRequest;
 use App\Http\Requests\Profile\UpdateAvatarRequest;
 use App\Http\Requests\Profile\UpdateEmailRequest;
 use App\Http\Requests\Profile\UpdatePasswordRequest;
@@ -67,7 +69,7 @@ class ProfileController extends Controller
     public function updatePassword(UpdatePasswordRequest $request)
     {
         try {
-            $this->profileService->updatePassword(
+            $user = $this->profileService->updatePassword(
                 $request->user(),
                 $request->validated('current_password'),
                 $request->validated('password'),
@@ -75,7 +77,45 @@ class ProfileController extends Controller
                 $request->validated('recovery_code'),
             );
 
-            return $this->apiResponse(true, 'Contraseña actualizada correctamente.', null, null, 200);
+            return $this->apiResponse(true, 'Contraseña actualizada correctamente.', [
+                'user' => new UserResource($user),
+            ], null, 200);
+        } catch (ProfileException $e) {
+            return $this->apiResponse(false, $e->getMessage(), null, $e->details, $e->status);
+        }
+    }
+
+    public function linkSocialAccount(LinkSocialAccountRequest $request)
+    {
+        try {
+            $user = $this->profileService->linkSocialAccount(
+                $request->user(),
+                $request->validated('provider'),
+                $request->validated('id_token'),
+            );
+
+            return $this->apiResponse(true, 'Cuenta vinculada correctamente.', [
+                'user' => new UserResource($user),
+            ], null, 200);
+        } catch (ProfileException $e) {
+            return $this->apiResponse(false, $e->getMessage(), null, $e->details, $e->status);
+        }
+    }
+
+    public function unlinkSocialAccount(UnlinkSocialAccountRequest $request)
+    {
+        try {
+            $user = $this->profileService->unlinkSocialAccount(
+                $request->user(),
+                $request->validated('provider'),
+                $request->validated('password'),
+                $request->validated('token2FA'),
+                $request->validated('recovery_code'),
+            );
+
+            return $this->apiResponse(true, 'Cuenta desvinculada correctamente.', [
+                'user' => new UserResource($user),
+            ], null, 200);
         } catch (ProfileException $e) {
             return $this->apiResponse(false, $e->getMessage(), null, $e->details, $e->status);
         }

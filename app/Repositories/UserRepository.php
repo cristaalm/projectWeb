@@ -46,6 +46,11 @@ class UserRepository
         ]);
     }
 
+    public function unlinkSocialAccount(User $user, string $provider): void
+    {
+        $user->socialAccounts()->where('provider', $provider)->delete();
+    }
+
     public function findById(int $id, bool $withTrashed = false): ?User
     {
         $query = $withTrashed ? User::withTrashed() : User::query();

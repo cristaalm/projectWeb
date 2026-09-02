@@ -1,9 +1,9 @@
 <script setup>
+import GoogleSignInButton from '@/components/Base/GoogleSignInButton/'
 import LoadingIcon from '@/components/Base/LoadingIcon/'
 import Lucide from '@/components/Base/Lucide/'
 import useGoogleLogin from '@/hooks/Auth/useGoogleLogin'
 import useLogin from '@/hooks/Auth/useLogin'
-import { loadGoogleIdentityServices } from '@/utils/loadGoogleIdentityServices'
 import authV1BottomShape from '@images/svg/auth-v1-bottom-shape.svg?url'
 import authV1TopShape from '@images/svg/auth-v1-top-shape.svg?url'
 import { useRouter } from 'vue-router'
@@ -35,30 +35,10 @@ const displayUser = computed(() => user.value || googleUser.value)
 const anySuccess = computed(() => success.value || googleSuccess.value)
 
 const isPasswordVisible = ref(false)
-const googleBtnRef = ref(null)
 
 const goToHome = () => {
   router.push({ name: 'panel' })
 }
-
-onMounted(async () => {
-  try {
-    await loadGoogleIdentityServices()
-
-    window.google.accounts.id.initialize({
-      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID_WEB,
-      callback: response => loginWithGoogle(response.credential),
-    })
-
-    window.google.accounts.id.renderButton(googleBtnRef.value, {
-      theme: 'outline',
-      size: 'large',
-      width: 340,
-    })
-  } catch (err) {
-    console.error(err)
-  }
-})
 </script>
 
 <template>
@@ -184,10 +164,10 @@ onMounted(async () => {
                     <VDivider />
                   </div>
 
-                  <div
-                    v-show="!loading"
-                    ref="googleBtnRef"
-                    class="d-flex justify-center"
+                  <GoogleSignInButton
+                    :loading="googleLoading"
+                    text="Continuar con Google"
+                    @credential="loginWithGoogle"
                   />
                 </VCol>
               </VRow>

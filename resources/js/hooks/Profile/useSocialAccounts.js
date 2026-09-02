@@ -4,26 +4,24 @@ import { useToastStore } from '@/store/useToastStore'
 import { messageError } from '@/utils/constants'
 import { ref } from 'vue'
 
-export function useUpdatePassword() {
+export function useSocialAccounts() {
   const error = ref(false)
   const loading = ref(false)
-  const success = ref(false)
   const toast = useToastStore()
 
   const resetState = () => {
-    success.value = false
     error.value = false
     loading.value = false
   }
 
-  const updatePassword = async ({ current_password, password, password_confirmation, token2FA, recovery_code }) => {
+  const linkGoogleAccount = async idToken => {
     resetState()
     loading.value = true
 
     try {
       const response = await requestPost({
-        url: 'profile/password',
-        data: { current_password, password, password_confirmation, token2FA, recovery_code },
+        url: 'profile/social',
+        data: { provider: 'google', id_token: idToken },
       })
 
       if (!response.success) {
@@ -34,7 +32,38 @@ export function useUpdatePassword() {
       }
 
       useAuthStore().setUser(response.data.user)
-      success.value = true
+      toast.showToast({ message: response.message, tipo: 'success' })
+
+      return true
+    } catch (err) {
+      error.value = true
+      console.error(err)
+      toast.showToast({ message: messageError, tipo: 'error' })
+    } finally {
+      loading.value = false
+    }
+
+    return false
+  }
+
+  const unlinkGoogleAccount = async ({ password, token2FA, recovery_code }) => {
+    resetState()
+    loading.value = true
+
+    try {
+      const response = await requestPost({
+        url: 'profile/social/unlink',
+        data: { provider: 'google', password, token2FA, recovery_code },
+      })
+
+      if (!response.success) {
+        error.value = true
+        toast.showToast({ message: response.message ?? messageError, tipo: 'error', duration: 8000 })
+
+        return false
+      }
+
+      useAuthStore().setUser(response.data.user)
       toast.showToast({ message: response.message, tipo: 'success' })
 
       return true
@@ -52,7 +81,7 @@ export function useUpdatePassword() {
   return {
     error,
     loading,
-    success,
-    updatePassword,
+    linkGoogleAccount,
+    unlinkGoogleAccount,
   }
 }

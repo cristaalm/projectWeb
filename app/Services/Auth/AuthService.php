@@ -92,6 +92,21 @@ class AuthService
     }
 
     /**
+     * Verifica el idToken contra el proveedor correspondiente y devuelve sus
+     * claims — reusado por el login social y por ProfileService al vincular
+     * una cuenta social desde una sesión ya autenticada.
+     *
+     * @return array{sub: string, email: string, given_name: string, family_name: string}
+     */
+    public function verifySocialClaims(string $provider, string $idToken): array
+    {
+        return match ($provider) {
+            'google' => $this->googleVerifier->verify($idToken),
+            default => throw new AuthException('Proveedor de inicio de sesión no soportado.', 422),
+        };
+    }
+
+    /**
      * Verifica el idToken del proveedor y resuelve el usuario correspondiente:
      * si ya está vinculado por provider_id, o por email (y lo vincula), o si es
      * la primera vez y viene de móvil, crea una cuenta incompleta (phone null).
@@ -99,10 +114,7 @@ class AuthService
      */
     public function resolveSocialUser(string $provider, string $idToken, bool $isWebSession): User
     {
-        $claims = match ($provider) {
-            'google' => $this->googleVerifier->verify($idToken),
-            default => throw new AuthException('Proveedor de inicio de sesión no soportado.', 422),
-        };
+        $claims = $this->verifySocialClaims($provider, $idToken);
 
         $user = $this->users->findBySocialProvider($provider, $claims['sub']);
 
@@ -143,6 +155,7 @@ class AuthService
             'email' => $claims['email'],
             'phone' => null,
             'password' => Hash::make(User::generatePassword()),
+            'has_usable_password' => false,
             'code_identity' => $digits12 . $checkDigit,
             'role_id' => $role?->id,
             'google2fa_secret' => (new Google2FA())->generateSecretKey(),
@@ -208,6 +221,7 @@ class AuthService
             'email' => $data['email'],
             'phone' => $data['phone'],
             'password' => Hash::make($data['password']),
+            'has_usable_password' => true,
             'code_identity' => $digits12 . $checkDigit,
             'role_id' => $role?->id,
             'google2fa_secret' => (new Google2FA())->generateSecretKey(),
@@ -233,6 +247,7 @@ class AuthService
             $data,
             function (User $user, string $password) {
                 $user->password = Hash::make($password);
+                $user->has_usable_password = true;
                 $user->save();
 
                 $user->notify(new ResetPasswordNotification());
@@ -250,7 +265,7 @@ class AuthService
     public function validateSession(Request $request): array
     {
         $user = $request->user();
-        $user->load('role');
+        $user->load(['role', 'socialAccounts']);
 
         if ($user->trashed()) {
             throw new AuthException('Tu cuenta no está activa.', 403);
