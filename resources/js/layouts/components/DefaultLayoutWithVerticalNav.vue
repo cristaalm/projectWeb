@@ -33,9 +33,16 @@ const greeting = computed(() => {
   const hour = getHours(new Date())
   if (hour >= 5 && hour < 12) return 'Buenos días'
   if (hour >= 12 && hour < 19) return 'Buenas tardes'
-  
+
   return 'Buenas noches'
 })
+
+// La barra superior (bienvenida + avatar) solo tiene sentido en el panel
+// principal — en el resto de vistas ocupaba espacio de sobra (ver
+// VerticalNavLayout.vue, que la colapsa a 0 en desktop cuando no es esta
+// ruta). Esas acciones se replican en el pie del menú lateral vía
+// UserProfile variant="sidebar" (#after-vertical-nav-items más abajo).
+const isPanelRoute = computed(() => router.currentRoute.value.name === 'panel')
 
 const goToHome = () => {
   router.push({ name: 'panel' })
@@ -55,17 +62,19 @@ const goToHome = () => {
           <VIcon icon="bx-menu" />
         </IconBtn>
 
-        <!-- texto decorativo de bienvenida junto con el nombre -->
-        <span class="text-xl font-bold">
-          {{ greeting }} {{ authStore.user?.name ?? '' }}
-          <span class="hidden md:inline">
-            {{ authStore.user?.last_name ?? '' }}
+        <template v-if="isPanelRoute">
+          <!-- texto decorativo de bienvenida junto con el nombre -->
+          <span class="text-xl font-bold">
+            {{ greeting }} {{ authStore.user?.name ?? '' }}
+            <span class="hidden md:inline">
+              {{ authStore.user?.last_name ?? '' }}
+            </span>
           </span>
-        </span>
 
-        <VSpacer />
+          <VSpacer />
 
-        <UserProfile />
+          <UserProfile />
+        </template>
       </div>
     </template>
 
@@ -97,6 +106,16 @@ const goToHome = () => {
 
     <template #vertical-nav-content>
       <NavItems />
+    </template>
+
+    <template #after-vertical-nav-items>
+      <template v-if="!isPanelRoute">
+        <VDivider class="mx-3" />
+        <UserProfile
+          variant="sidebar"
+          class="my-2"
+        />
+      </template>
     </template>
 
     <!-- 👉 Pages -->

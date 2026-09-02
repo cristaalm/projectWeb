@@ -10,11 +10,19 @@ export default defineComponent({
     const route = useRoute()
     const { mdAndDown } = useDisplay()
 
+    // La barra superior (bienvenida + avatar) solo tiene contenido en el
+    // panel principal — ver DefaultLayoutWithVerticalNav.vue, que mueve esas
+    // acciones al pie del menú lateral (UserProfile variant="sidebar") para
+    // el resto de las vistas. En desktop, donde el botón hamburguesa ya no
+    // vive aquí, no queda nada que mostrar, así que se colapsa a 0 para
+    // recuperar el espacio; en mobile se deja la altura normal porque el
+    // botón hamburguesa sigue siendo necesario ahí.
+    const isPanelRoute = computed(() => route.name === 'panel')
 
     // ℹ️ This is alternative to below two commented watcher
     // We want to show overlay if overlay nav is visible and want to hide overlay if overlay is hidden and vice versa.
     syncRef(isOverlayNavActive, isLayoutOverlayVisible)
-    
+
     return () => {
       // 👉 Vertical nav
       const verticalNav = h(VerticalNav, { isOverlayNavActive: isOverlayNavActive.value, toggleIsOverlayNavActive }, {
@@ -24,10 +32,25 @@ export default defineComponent({
         'after-nav-items': () => slots['after-vertical-nav-items']?.(),
       })
 
+      const collapseNavbar = !isPanelRoute.value && !mdAndDown.value
 
       // 👉 Navbar
-      const navbar = h('header', { class: ['layout-navbar navbar-blur'] }, [
-        h('div', { class: 'navbar-content-container' }, slots.navbar?.({
+      const navbar = h('header', {
+        class: [
+          'layout-navbar navbar-blur',
+
+          // pointer-events-none se hereda a los pseudo-elementos del header
+          // (p. ej. algún ::after de blur), evitando que un header colapsado
+          // a 0 pero con overlays propios intercepte clicks igual.
+          collapseNavbar ? 'pointer-events-none' : '',
+        ],
+      }, [
+        h('div', {
+          class: [
+            'navbar-content-container',
+            collapseNavbar ? 'navbar-collapsed' : '',
+          ],
+        }, slots.navbar?.({
           toggleVerticalOverlayNavActive: toggleIsOverlayNavActive,
         })),
       ])
@@ -51,6 +74,7 @@ export default defineComponent({
         class: [
           'layout-wrapper layout-nav-type-vertical layout-navbar-sticky layout-footer-static layout-content-width-fluid',
           mdAndDown.value && 'layout-overlay-nav',
+          collapseNavbar ? 'layout-navbar-collapsed' : '',
           route.meta.layoutWrapperClasses,
         ],
       }, [
@@ -94,6 +118,14 @@ export default defineComponent({
 
     .navbar-content-container {
       block-size: variables.$layout-vertical-nav-navbar-height;
+
+      // Mayor especificidad que la regla de arriba a propósito: sin esto,
+      // .navbar-collapsed (clase plana, agregada en VerticalNavLayout.vue)
+      // pierde el conflicto de especificidad y la barra no colapsa.
+      &.navbar-collapsed {
+        block-size: 0;
+        overflow: hidden;
+      }
     }
 
     @at-root {
@@ -120,6 +152,15 @@ export default defineComponent({
 
   &.layout-navbar-hidden .layout-navbar {
     @extend %layout-navbar-hidden;
+  }
+
+  // .layout-page-content trae un padding-block-start fijo de 1.5rem (ver
+  // _default-layout.scss), pensado como separación visual respecto al header
+  // con altura normal. Con el header colapsado a 0 (ver VerticalNavLayout.vue
+  // arriba) ese padding queda como el único espacio visible sobre el
+  // contenido — se reduce aquí para que no se sienta como un hueco suelto.
+  &.layout-navbar-collapsed .layout-page-content {
+    padding-block-start: 0.75rem;
   }
 
   // 👉 Footer
