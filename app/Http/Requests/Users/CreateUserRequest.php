@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Users;
 
+use App\Models\Alliance;
 use App\Models\Role;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -27,6 +28,15 @@ class CreateUserRequest extends FormRequest
             'alliance_id' => [
                 Rule::requiredIf(fn () => in_array($this->resolveRoleName(), ['admin_merchant', 'merchant'], true)),
                 'nullable', 'integer', 'exists:alliances,id',
+                function ($attribute, $value, $fail) {
+                    if ($this->resolveRoleName() !== 'member' || ! $value) {
+                        return;
+                    }
+
+                    if (! Alliance::where('id', $value)->value('has_exclusive_rewards')) {
+                        $fail('Esta alianza no acepta enlazar usuarios miembro.');
+                    }
+                },
             ],
         ];
     }
