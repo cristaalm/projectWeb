@@ -1,4 +1,5 @@
 <script setup>
+import LocationPickerDialog from '@/components/LocationPickerDialog.vue'
 import { useAllianceManagement } from '@/hooks/Alliances/useAllianceManagement'
 import { useTypeShopCatalog } from '@/hooks/TypeShop/useTypeShopCatalog'
 import { computed, ref, watch } from 'vue'
@@ -26,10 +27,15 @@ const form = ref({
   contact_email: '',
   phone: '',
   address: '',
+  latitude: null,
+  longitude: null,
   type_shop_id: null,
   has_exclusive_rewards: false,
   status: true,
 })
+
+const locationDialog = ref(false)
+const hasCoordinates = computed(() => form.value.latitude !== null && form.value.longitude !== null)
 
 // Guarda una copia local de la alianza en edición para poder refrescar el
 // logo apenas se sube/quita sin esperar a que se recargue la tabla completa.
@@ -55,6 +61,8 @@ function resetForm() {
       contact_email: props.alliance.contact_email,
       phone: props.alliance.phone,
       address: props.alliance.address,
+      latitude: props.alliance.latitude,
+      longitude: props.alliance.longitude,
       type_shop_id: props.alliance.type_shop_id,
       has_exclusive_rewards: Boolean(props.alliance.has_exclusive_rewards),
       status: Boolean(props.alliance.status),
@@ -63,9 +71,19 @@ function resetForm() {
   } else {
     form.value = {
       name: '', contact_name: '', contact_email: '', phone: '', address: '',
+      latitude: null, longitude: null,
       type_shop_id: null, has_exclusive_rewards: false, status: true,
     }
     editedAlliance.value = null
+  }
+}
+
+function applyLocation({ latitude, longitude, locationName }) {
+  form.value.latitude = latitude
+  form.value.longitude = longitude
+
+  if (locationName) {
+    form.value.address = locationName
   }
 }
 
@@ -88,6 +106,8 @@ async function submit() {
     contact_email: form.value.contact_email,
     phone: form.value.phone,
     address: form.value.address,
+    latitude: form.value.latitude,
+    longitude: form.value.longitude,
     type_shop_id: form.value.type_shop_id,
     has_exclusive_rewards: form.value.has_exclusive_rewards,
     status: form.value.status,
@@ -181,6 +201,40 @@ async function submit() {
               />
             </VCol>
             <VCol cols="12">
+              <div class="location-summary pa-3 rounded-lg border border-gray-200 d-flex align-center justify-space-between dark:border-gray-700">
+                <div class="d-flex align-center gap-3">
+                  <VIcon
+                    icon="bx-map-pin"
+                    :color="hasCoordinates ? 'primary' : 'default'"
+                    size="24"
+                  />
+                  <div>
+                    <div class="text-body-2 font-weight-medium">
+                      {{ hasCoordinates ? 'Ubicación en el mapa' : 'Sin ubicación asignada' }}
+                    </div>
+                    <div
+                      v-if="hasCoordinates"
+                      class="text-caption text-medium-emphasis"
+                    >
+                      {{ form.latitude }}, {{ form.longitude }}
+                    </div>
+                  </div>
+                </div>
+                <VBtn
+                  variant="tonal"
+                  color="primary"
+                  size="small"
+                  @click="locationDialog = true"
+                >
+                  <VIcon
+                    icon="bx-map"
+                    class="me-2"
+                  />
+                  {{ hasCoordinates ? 'Cambiar' : 'Elegir en el mapa' }}
+                </VBtn>
+              </div>
+            </VCol>
+            <VCol cols="12">
               <VSwitch
                 v-model="form.status"
                 label="Activa"
@@ -221,4 +275,12 @@ async function submit() {
       </VCardActions>
     </VCard>
   </VDialog>
+
+  <LocationPickerDialog
+    v-model="locationDialog"
+    title="Ubicación de la alianza"
+    :latitude="form.latitude"
+    :longitude="form.longitude"
+    @confirm="applyLocation"
+  />
 </template>
