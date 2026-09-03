@@ -45,6 +45,8 @@ declare module 'vue' {
     List: typeof import('./resources/js/components/Base/Headless/Tab/List.vue')['default']
     Litepicker: typeof import('./resources/js/components/Base/Litepicker/Litepicker.vue')['default']
     LoadingIcon: typeof import('./resources/js/components/Base/LoadingIcon/LoadingIcon.vue')['default']
+    LocationPickerDialog: typeof import('./resources/js/components/LocationPickerDialog.vue')['default']
+    LocationPickerMap: typeof import('./resources/js/components/LocationPickerMap.vue')['default']
     Lucide: typeof import('./resources/js/components/Base/Lucide/Lucide.vue')['default']
     Menu: typeof import('./resources/js/components/Base/Headless/Menu/Menu.vue')['default']
     MoreBtn: typeof import('./resources/js/@core/components/MoreBtn.vue')['default']

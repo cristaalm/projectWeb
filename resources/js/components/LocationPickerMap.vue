@@ -16,7 +16,7 @@ const emit = defineEmits(['change'])
 // Pin propio en el verde de marca (primary) en vez del marcador azul por
 // defecto de Leaflet — más coherente con el resto de la interfaz.
 const MARKER_ICON = new L.DivIcon({
-  className: 'container-location-marker',
+  className: 'location-picker-marker',
   html: `
     <svg width="34" height="44" viewBox="0 0 34 44" xmlns="http://www.w3.org/2000/svg">
       <path d="M17 0C7.6 0 0 7.6 0 17c0 12.4 17 27 17 27s17-14.6 17-27C34 7.6 26.4 0 17 0Z" fill="#05D16E" stroke="#0B3B2E" stroke-width="1.5" />

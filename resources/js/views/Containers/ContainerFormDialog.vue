@@ -1,7 +1,7 @@
 <script setup>
+import LocationPickerDialog from '@/components/LocationPickerDialog.vue'
 import { useContainerManagement } from '@/hooks/Containers/useContainerManagement'
 import { computed, ref, watch } from 'vue'
-import LocationPickerDialog from './components/LocationPickerDialog.vue'
 
 const props = defineProps({
   modelValue: { type: Boolean, required: true },
@@ -183,6 +183,7 @@ async function submit() {
 
   <LocationPickerDialog
     v-model="locationDialog"
+    title="Ubicación del contenedor"
     :latitude="form.latitude"
     :longitude="form.longitude"
     @confirm="applyLocation"

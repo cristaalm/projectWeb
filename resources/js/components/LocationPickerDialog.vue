@@ -8,6 +8,7 @@ const props = defineProps({
   modelValue: { type: Boolean, required: true },
   latitude: { type: Number, default: null },
   longitude: { type: Number, default: null },
+  title: { type: String, default: 'Selecciona una ubicación' },
 })
 
 const emit = defineEmits(['update:modelValue', 'confirm'])
@@ -166,7 +167,7 @@ function confirm() {
     persistent
     @update:model-value="emit('update:modelValue', $event)"
   >
-    <VCard title="Ubicación del contenedor">
+    <VCard :title="title">
       <VCardText>
         <div class="position-relative mb-4">
           <VTextField
