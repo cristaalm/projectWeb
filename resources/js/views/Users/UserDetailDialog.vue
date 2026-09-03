@@ -96,22 +96,24 @@ function historyIcon(entry) {
     @update:model-value="emit('update:modelValue', $event)"
   >
     <VCard title="Detalle de usuario">
-      <VCardText v-if="initialLoading">
+      <VCardText
+        v-if="initialLoading"
+        class="skeleton-detail"
+      >
         <div class="gap-4 d-flex align-center mb-4">
-          <VSkeletonLoader
-            type="avatar"
-            width="56"
-            height="56"
-          />
+          <div class="skeleton-avatar-lg">
+            <VSkeletonLoader type="avatar" />
+          </div>
           <div class="flex-grow-1">
             <VSkeletonLoader
               type="text"
               width="55%"
-              class="mb-2"
+              class="skeleton-line-lg mb-1"
             />
             <VSkeletonLoader
               type="text"
               width="35%"
+              class="skeleton-line-sm"
             />
           </div>
         </div>
@@ -125,11 +127,12 @@ function historyIcon(entry) {
             <VSkeletonLoader
               type="text"
               width="30%"
-              class="mb-1"
+              class="skeleton-line-xs mb-1"
             />
             <VSkeletonLoader
               type="text"
               width="65%"
+              class="skeleton-line-sm"
             />
           </VCol>
         </VRow>
@@ -138,29 +141,28 @@ function historyIcon(entry) {
 
         <VSkeletonLoader
           type="text"
-          width="160"
-          class="mb-3"
+          width="140"
+          class="skeleton-line-md mb-3"
         />
 
         <div
-          v-for="n in 4"
+          v-for="n in 2"
           :key="n"
           class="gap-3 d-flex py-2"
         >
-          <VSkeletonLoader
-            type="avatar"
-            width="32"
-            height="32"
-          />
+          <div class="skeleton-avatar-sm">
+            <VSkeletonLoader type="avatar" />
+          </div>
           <div class="flex-grow-1">
             <VSkeletonLoader
               type="text"
               width="60%"
-              class="mb-1"
+              class="skeleton-line-sm mb-1"
             />
             <VSkeletonLoader
               type="text"
               width="40%"
+              class="skeleton-line-xs"
             />
           </div>
         </div>
@@ -349,5 +351,55 @@ function historyIcon(entry) {
 .history-list {
   max-block-size: 320px;
   overflow-y: auto;
+}
+
+/*
+ * Vuetify le da a cada "hueso" del skeleton un margin fijo (16px en texto,
+ * 8px/16px en avatar) que no depende del width/height del componente — esas
+ * props solo dimensionan el contenedor externo, no el hueso interno. Sin
+ * anular ese margin acá, el skeleton se ve mucho más alto/ancho que el
+ * contenido real que reemplaza.
+ */
+.skeleton-detail :deep(.v-skeleton-loader__text) {
+  margin: 0;
+  border-radius: 4px;
+}
+
+.skeleton-detail :deep(.v-skeleton-loader__avatar) {
+  margin: 0;
+}
+
+.skeleton-detail .skeleton-line-lg :deep(.v-skeleton-loader__text) {
+  block-size: 20px;
+}
+
+.skeleton-detail .skeleton-line-md :deep(.v-skeleton-loader__text) {
+  block-size: 16px;
+}
+
+.skeleton-detail .skeleton-line-sm :deep(.v-skeleton-loader__text) {
+  block-size: 14px;
+}
+
+.skeleton-detail .skeleton-line-xs :deep(.v-skeleton-loader__text) {
+  block-size: 11px;
+}
+
+.skeleton-detail .skeleton-avatar-lg :deep(.v-skeleton-loader__avatar) {
+  inline-size: 56px;
+  block-size: 56px;
+  min-inline-size: 56px;
+  min-block-size: 56px;
+  max-inline-size: 56px;
+  max-block-size: 56px;
+}
+
+.skeleton-detail .skeleton-avatar-sm :deep(.v-skeleton-loader__avatar) {
+  inline-size: 32px;
+  block-size: 32px;
+  min-inline-size: 32px;
+  min-block-size: 32px;
+  max-inline-size: 32px;
+  max-block-size: 32px;
 }
 </style>
