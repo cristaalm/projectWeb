@@ -29,6 +29,12 @@ export const routes = [
         meta: { title: 'Contenedores', roles: ['superadmin', 'moderador'] },
         component: () => import('@/pages/Dashboard/Containers/'),
       },
+      {
+        path: 'alianzas',
+        name: 'alliances',
+        meta: { title: 'Alianzas', roles: ['superadmin', 'moderador'] },
+        component: () => import('@/pages/Dashboard/Alliances/'),
+      },
     ],
   },
   {

@@ -22,6 +22,7 @@ const useMenuStore = defineStore('menu', {
         { title: 'Panel', icon: 'bx-bxs-dashboard', to: '/panel' },
         { title: 'Usuarios', icon: 'bx-user', to: '/usuarios', roles: ['superadmin', 'moderador'] },
         { title: 'Contenedores', icon: 'bx-trash', to: '/contenedores', roles: ['superadmin', 'moderador'] },
+        { title: 'Alianzas', icon: 'bx-store', to: '/alianzas', roles: ['superadmin', 'moderador'] },
       ]
     },
   },
