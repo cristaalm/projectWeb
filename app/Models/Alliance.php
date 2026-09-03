@@ -18,17 +18,15 @@ class Alliance extends Model
         'contact_email',
         'phone',
         'address',
-        'total_points',
-        'logo',
+        'logo_url',
+        'has_exclusive_rewards',
         'type_shop_id',
-        'ext',
         'status',
     ];
 
     protected $casts = [
         'status' => AllianceStatus::class,
-        'logo' => 'boolean',
-        'total_points' => 'integer',
+        'has_exclusive_rewards' => 'boolean',
     ];
 
     public function rewards(): HasMany
