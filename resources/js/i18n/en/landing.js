@@ -29,7 +29,7 @@ export default {
     },
 
     description:
-      'Turn your plastic bottles and aluminum cans into redeemable points. EcoSort makes recycling easy, fun, and rewarding.',
+      'Turn your plastic bottles, aluminum cans, glass, and cardboard into redeemable points. EcoSort makes recycling easy, fun, and rewarding.',
 
     actions: {
       download: 'Download App',
@@ -66,7 +66,7 @@ export default {
         icon: 'mdi mdi-camera',
         title: 'Deposit your materials',
         description:
-          'Place your plastic bottles or aluminum cans. Our smart container will identify them automatically.',
+          'Place your plastic, aluminum, glass, or cardboard waste. Our smart container will identify it automatically.',
       },
       {
         icon: 'mdi mdi-gift',

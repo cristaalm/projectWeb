@@ -29,7 +29,7 @@ export default {
     },
 
     description:
-      'Convierte tus botellas de plástico y latas de aluminio en puntos canjeables. EcoSort hace que reciclar sea fácil, divertido y gratificante.',
+      'Convierte tus botellas de plástico, latas de aluminio, vidrio y cartón en puntos canjeables. EcoSort hace que reciclar sea fácil, divertido y gratificante.',
 
     actions: {
       download: 'Descargar App',
@@ -66,7 +66,7 @@ export default {
         icon: 'mdi mdi-camera',
         title: 'Deposita tus materiales',
         description:
-          'Coloca tus botellas de plástico o latas de aluminio. Nuestro contenedor inteligente las identificará automáticamente.',
+          'Coloca tus residuos de plástico, aluminio, vidrio o cartón. Nuestro contenedor inteligente los identificará automáticamente.',
       },
       {
         icon: 'mdi mdi-gift',

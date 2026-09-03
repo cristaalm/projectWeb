@@ -14,11 +14,15 @@ const props = withDefaults(
     text?: string
     disabled?: boolean
     loading?: boolean
+    size?: string
+    pill?: boolean
   }>(),
   {
     text: 'Continuar con Google',
     disabled: false,
     loading: false,
+    size: undefined,
+    pill: false,
   }
 )
 
@@ -77,7 +81,9 @@ onBeforeUnmount(() => {
       block
       variant="outlined"
       color="secondary"
+      :size="size"
       class="google-signin-visual"
+      :class="{ '!rounded-full': pill }"
       :disabled="disabled || loading"
     >
       <VProgressCircular

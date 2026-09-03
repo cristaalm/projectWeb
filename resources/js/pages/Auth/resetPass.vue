@@ -1,10 +1,10 @@
 <script setup>
-import useResetPassword from '@/hooks/Auth/useResetPassword'
 import LoadingIcon from '@/components/Base/LoadingIcon/'
-import authV1BottomShape from '@images/svg/auth-v1-bottom-shape.svg?url'
-import authV1TopShape from '@images/svg/auth-v1-top-shape.svg?url'
-import { useRouter } from 'vue-router'
+import Lucide from '@/components/Base/Lucide/'
+import useResetPassword from '@/hooks/Auth/useResetPassword'
 import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import AuthLayout from './components/AuthLayout.vue'
 
 const props = defineProps({
   token: {
@@ -13,20 +13,17 @@ const props = defineProps({
   },
   email: {
     type: String,
-    required: true, 
+    required: true,
   },
 })
 
-onMounted(() => {
-  console.log('Token:', props.token)
-  console.log('Email:', props.email)
+const router = useRouter()
 
+onMounted(() => {
   if (!props.token || !props.email) {
     router.push('/')
   }
 })
-
-const router = useRouter()
 
 const form = ref({
   newPassword: '',
@@ -44,220 +41,117 @@ const {
 const isPasswordVisible = ref(false)
 const isConfirmPasswordVisible = ref(false)
 
-const goToHome = () => {
-  router.push({ name: 'panel' })
+const submitReset = () => {
+  if (loading.value || !form.value.newPassword || !form.value.confirmPassword || success.value) return
+  resetPassword(form.value)
 }
 </script>
 
 <template>
-  <div class="justify-center lg:bg-gradient-to-b bg-gradient-to-r  from-[#CFFFE0] to-[#8BE6AE] auth-wrapper d-flex align-center pa-4">
-    <div class="position-relative my-sm-16">
-      <!-- 👉 Top shape -->
-      <VImg
-        :src="authV1TopShape"
-        class="text-primary auth-v1-top-shape !absolute d-none d-sm-block"
-        :class="{ 'shapes-hidden': success }"
-      />
+  <AuthLayout
+    title="Crea una nueva contraseña"
+    description="Elige una contraseña segura para proteger tu cuenta y los puntos que ya has ganado."
+  >
+    <Transition
+      name="auth-fade"
+      mode="out-in"
+    >
+      <div
+        v-if="!success"
+        key="form"
+      >
+        <h2 class="auth-heading">
+          Restablecer contraseña
+        </h2>
+        <p class="auth-subheading">
+          Ingresa tu nueva contraseña para recuperar el acceso a tu cuenta.
+        </p>
 
-      <!-- 👉 Bottom shape -->
-      <VImg
-        :src="authV1BottomShape"
-        class="text-primary auth-v1-bottom-shape !absolute d-none d-sm-block"
-        :class="{ 'shapes-hidden': success }"
-      />
-
-      <!-- 👉 Cards wrapper -->
-      <div class="auth-cards-wrapper">
-        <!-- Card principal: Formulario -->
-        <VCard
-          class="auth-card auth-card--primary !bg-white/30 !shadow-2xl"
-          :class="[success ? 'card-exit' : 'card-enter', $vuetify.display.smAndUp ? 'pa-6' : 'pa-0']"
-          max-width="480"
+        <VForm
+          class="mt-8"
+          @submit.prevent="submitReset"
         >
-          <VCardItem class="justify-center">
-            <span
-              class="app-logo d-flex align-center gap-2 cursor-pointer"
-              @click="goToHome"
-            >
-              <VSheet class="w-12 h-12 !bg-transparent rounded-lg d-flex align-center justify-center">
-                <img
-                  src="/images/logo.png"
-                  alt="Logo"
-                  class="w-full h-full object-contain bg-transparent"
-                >
-              </VSheet>
-              <span class="text-5xl font-weight-bold tracking-wider mt-1 font-stella text-[#13b868]">EcoSort</span>
+          <VTextField
+            v-model="form.newPassword"
+            label="Nueva contraseña"
+            placeholder="**********"
+            variant="underlined"
+            class="font-poppins mb-3"
+            :type="isPasswordVisible ? 'text' : 'password'"
+            autocomplete="password"
+            :append-inner-icon="isPasswordVisible ? 'bx-hide' : 'bx-show'"
+            @keyup.enter="submitReset"
+            @click:append-inner="isPasswordVisible = !isPasswordVisible"
+          />
+
+          <VTextField
+            v-model="form.confirmPassword"
+            label="Confirmar contraseña"
+            placeholder="**********"
+            variant="underlined"
+            class="font-poppins"
+            :type="isConfirmPasswordVisible ? 'text' : 'password'"
+            autocomplete="password"
+            :append-inner-icon="isConfirmPasswordVisible ? 'bx-hide' : 'bx-show'"
+            @keyup.enter="submitReset"
+            @click:append-inner="isConfirmPasswordVisible = !isConfirmPasswordVisible"
+          />
+
+          <VBtn
+            block
+            size="large"
+            type="submit"
+            class="mt-6 font-poppins !rounded-full hover:!bg-[#08b662]"
+            :disabled="loading || !form.newPassword || !form.confirmPassword || success"
+          >
+            <span v-if="loading">
+              <LoadingIcon icon="three-dots" />
             </span>
-          </VCardItem>
+            <span v-else>
+              Restablecer contraseña
+            </span>
+          </VBtn>
 
-          <VCardText>
-            <h4 class="font-poppins relative mb-1 text-h4">
-              Restablecer Contraseña <span class="absolute -top-2 ml-2 text-4xl transition-all duration-200 transform animate-wave">🔐</span>
-            </h4>
-            <p class="mb-0 font-poppins">
-              Ingresa tu nueva contraseña para restablecer el acceso a tu cuenta.
-            </p>
-          </VCardText>
-
-          <VCardText>
-            <VForm @submit.prevent="">
-              <VRow>
-                <!-- new password -->
-                <VCol cols="12">
-                  <VTextField
-                    v-model="form.newPassword"
-                    label="Nueva Contraseña"
-                    placeholder="**********"
-                    class="font-poppins"
-                    :type="isPasswordVisible ? 'text' : 'password'"
-                    autocomplete="password"
-                    :append-inner-icon="isPasswordVisible ? 'bx-hide' : 'bx-show'"
-                    @click:append-inner="isPasswordVisible = !isPasswordVisible"
-                  />
-                </VCol>
-
-                <!-- confirm password -->
-                <VCol cols="12">
-                  <VTextField
-                    v-model="form.confirmPassword"
-                    label="Confirmar Contraseña"
-                    placeholder="**********"
-                    class="font-poppins"
-                    :type="isConfirmPasswordVisible ? 'text' : 'password'"
-                    autocomplete="password"
-                    :append-inner-icon="isConfirmPasswordVisible ? 'bx-hide' : 'bx-show'"
-                    @click:append-inner="isConfirmPasswordVisible = !isConfirmPasswordVisible"
-                  />
-                </VCol>
-
-                <!-- submit button -->
-                <VCol cols="12">
-                  <VBtn
-                    block
-                    type="submit"
-                    :disabled="loading || !form.newPassword || !form.confirmPassword || success"
-                    class="font-poppins"
-                    @click="resetPassword(form)"
-                  >
-                    <span v-if="loading">
-                      <LoadingIcon icon="three-dots" />
-                    </span>
-                    <span v-else>
-                      Restablecer Contraseña
-                    </span>
-                  </VBtn>
-                  <VBtn
-                    block
-                    type="button"
-                    variant="text"
-                    :disabled="loading"
-                    class="mt-4 font-poppins"
-                    @click="router.push({ name: 'login' })"
-                  >
-                    Regresar
-                  </VBtn>
-                </VCol>
-              </VRow>
-            </VForm>
-          </VCardText>
-        </VCard>
-
-        <!-- Card secundaria: Confirmación -->
-        <VCard
-          class="auth-card auth-card--secondary !bg-white/30 !shadow-2xl"
-          :class="[success ? 'card-enter' : 'card-exit', $vuetify.display.smAndUp ? 'pa-6' : 'pa-0']"
-          max-width="480"
-        >
-          <div class="text-center pa-6">
-            <VAvatar
-              size="80"
-              color="primary"
-              class="p-3 mb-4"
-            >
-              <Lucide
-                icon="CircleCheckBig"
-                class="w-full h-full"
-              />
-            </VAvatar>
-
-            <h2 class="mb-2 !text-3xl !font-bold text-h5 font-poppins">
-              ¡Contraseña Restablecida!
-            </h2>
-
-            <p class="mb-6 text-body-1 !text-xl font-poppins">
-              Tu contraseña ha sido restablecida con éxito.
-              <br>
-              Ahora puedes iniciar sesión con tu nueva contraseña.
-            </p>
-
-            <VBtn
-              block
-              color="primary"
-              class="font-poppins"
-              @click="router.push({ name: 'login' })"
-            >
-              Ir al Inicio
-            </VBtn>
-          </div>
-        </VCard>
+          <VBtn
+            block
+            type="button"
+            variant="text"
+            :disabled="loading"
+            class="mt-2 font-poppins !rounded-full"
+            @click="router.push({ name: 'login' })"
+          >
+            Regresar
+          </VBtn>
+        </VForm>
       </div>
-    </div>
-  </div>
+
+      <div
+        v-else
+        key="success"
+      >
+        <div class="auth-success-icon">
+          <Lucide
+            icon="CircleCheckBig"
+            class="w-7 h-7"
+          />
+        </div>
+        <h2 class="auth-heading">
+          ¡Contraseña restablecida!
+        </h2>
+        <p class="auth-subheading">
+          Tu contraseña se actualizó con éxito. Ya puedes iniciar sesión con tu nueva contraseña.
+        </p>
+
+        <VBtn
+          block
+          size="large"
+          type="button"
+          class="mt-6 font-poppins !rounded-full hover:!bg-[#08b662]"
+          @click="router.push({ name: 'login' })"
+        >
+          Ir al inicio
+        </VBtn>
+      </div>
+    </Transition>
+  </AuthLayout>
 </template>
-
-<style lang="scss">
-@use "@core-scss/template/pages/page-auth";
-</style>
-
-<style scoped>
-/* Contenedor que define el espacio ocupado (evita colapso de altura) */
-.auth-cards-wrapper {
-  position: relative;
-  width: 480px;
-  /* La altura se toma de la card primary en su estado normal */
-}
-
-/* Ambas cards se apilan en el mismo espacio */
-.auth-card--primary,
-.auth-card--secondary {
-  width: 100%;
-  transition:
-    opacity 0.4s ease,
-    transform 0.4s ease,
-    visibility 0.4s;
-}
-
-.auth-card--secondary {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Estado visible */
-.card-enter {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-  visibility: visible;
-  pointer-events: auto;
-}
-
-/* Estado oculto: se contrae hacia arriba y desaparece */
-.card-exit {
-  opacity: 0;
-  transform: scale(0.85) translateY(-24px);
-  visibility: hidden;
-  pointer-events: none;
-}
-
-/* Shapes: fade out suave en lugar de display:none abrupto */
-.auth-v1-top-shape,
-.auth-v1-bottom-shape {
-  transition: opacity 0.3s ease;
-}
-.shapes-hidden {
-  opacity: 0 !important;
-  pointer-events: none;
-}
-</style>

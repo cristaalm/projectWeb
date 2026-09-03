@@ -20,6 +20,7 @@
    | Import CSS components.
    |
    */
+@import "./components/_auth.css";
 @import "./components/_box.css";
 @import "./components/_global.css";
 @import "./components/_image-fit.css";
