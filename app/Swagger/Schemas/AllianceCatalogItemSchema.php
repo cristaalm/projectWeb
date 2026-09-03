@@ -10,6 +10,7 @@ use OpenApi\Attributes as OA;
     properties: [
         new OA\Property(property: 'id', type: 'integer', example: 1),
         new OA\Property(property: 'name', type: 'string', example: 'Alianza EcoSort Centro'),
+        new OA\Property(property: 'has_exclusive_rewards', type: 'boolean', description: 'Si es true, esta alianza acepta enlazar usuarios con rol member.', example: false),
     ]
 )]
 class AllianceCatalogItemSchema
