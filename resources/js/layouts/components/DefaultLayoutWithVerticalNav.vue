@@ -39,9 +39,10 @@ const greeting = computed(() => {
 
 // La barra superior (bienvenida + avatar) solo tiene sentido en el panel
 // principal — en el resto de vistas ocupaba espacio de sobra (ver
-// VerticalNavLayout.vue, que la colapsa a 0 en desktop cuando no es esta
-// ruta). Esas acciones se replican en el pie del menú lateral vía
-// UserProfile variant="sidebar" (#after-vertical-nav-items más abajo).
+// VerticalNavLayout.vue, que la colapsa a 0 siempre, desktop y mobile,
+// cuando no es esta ruta). Esas acciones se replican en el pie del menú
+// lateral vía UserProfile variant="sidebar" (#after-vertical-nav-items
+// más abajo).
 const isPanelRoute = computed(() => router.currentRoute.value.name === 'panel')
 
 const goToHome = () => {
@@ -54,9 +55,17 @@ const goToHome = () => {
     <!-- 👉 navbar -->
     <template #navbar="{ toggleVerticalOverlayNavActive }">
       <div class="d-flex h-100 align-center">
-        <!-- 👉 Vertical nav toggle in overlay mode -->
+        <!--
+          👉 Vertical nav toggle in overlay mode. Fuera del panel principal la
+          barra superior está colapsada a 0 (ver VerticalNavLayout.vue) incluso
+          en mobile, así que este botón no puede vivir dentro de ella — queda
+          fijo/flotante sobre el contenido, con pointer-events-auto explícito
+          porque el header colapsado tiene pointer-events-none.
+        -->
         <IconBtn
-          class="ms-n3 d-lg-none"
+          :class="isPanelRoute
+            ? 'ms-n3 d-lg-none'
+            : 'd-lg-none fixed top-4 start-4 z-[60] pointer-events-auto rounded-full bg-white dark:bg-[#2B2C40] shadow-lg'"
           @click="toggleVerticalOverlayNavActive(true)"
         >
           <VIcon icon="bx-menu" />

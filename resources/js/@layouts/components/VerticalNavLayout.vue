@@ -13,10 +13,11 @@ export default defineComponent({
     // La barra superior (bienvenida + avatar) solo tiene contenido en el
     // panel principal — ver DefaultLayoutWithVerticalNav.vue, que mueve esas
     // acciones al pie del menú lateral (UserProfile variant="sidebar") para
-    // el resto de las vistas. En desktop, donde el botón hamburguesa ya no
-    // vive aquí, no queda nada que mostrar, así que se colapsa a 0 para
-    // recuperar el espacio; en mobile se deja la altura normal porque el
-    // botón hamburguesa sigue siendo necesario ahí.
+    // el resto de las vistas. Fuera del panel se colapsa a 0 siempre
+    // (desktop y mobile) para recuperar el espacio; en mobile el botón
+    // hamburguesa que vivía aquí se reubica como botón flotante independiente
+    // (ver DefaultLayoutWithVerticalNav.vue), ya que la barra colapsada deja
+    // de ser un contenedor visible donde tenga sentido mostrarlo.
     const isPanelRoute = computed(() => route.name === 'panel')
 
     // ℹ️ This is alternative to below two commented watcher
@@ -32,12 +33,21 @@ export default defineComponent({
         'after-nav-items': () => slots['after-vertical-nav-items']?.(),
       })
 
-      const collapseNavbar = !isPanelRoute.value && !mdAndDown.value
+      const collapseNavbar = !isPanelRoute.value
 
       // 👉 Navbar
       const navbar = h('header', {
         class: [
-          'layout-navbar navbar-blur',
+          'layout-navbar',
+
+          // navbar-blur aplica backdrop-filter (%blurry-bg, ver
+          // _default-layout-w-vertical-nav.scss), que por spec crea un
+          // containing block para descendientes position:fixed — el botón
+          // flotante de menú (ver DefaultLayoutWithVerticalNav.vue) quedaba
+          // posicionado relativo a este header colapsado (fuera de pantalla)
+          // en vez de al viewport. Colapsado no hay nada que difuminar, así
+          // que se omite la clase en ese caso.
+          collapseNavbar ? '' : 'navbar-blur',
 
           // pointer-events-none se hereda a los pseudo-elementos del header
           // (p. ej. algún ::after de blur), evitando que un header colapsado
