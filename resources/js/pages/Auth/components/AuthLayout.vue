@@ -59,7 +59,7 @@ const goToLanding = () => {
         <h1 class="font-poppins auth-panel__title">
           {{ title }}
         </h1>
-        <p class="font-poppins auth-panel__desc">
+        <p class="font-poppins auth-panel__desc !text-xl">
           {{ description }}
         </p>
       </div>
@@ -75,9 +75,9 @@ const goToLanding = () => {
         >
           <Lucide
             :icon="feature.icon"
-            class="auth-panel__feature-icon"
+            class="auth-panel__feature-icon !w-8 !h-8 stroke-[2]"
           />
-          <span class="font-poppins">{{ feature.text }}</span>
+          <span class="font-poppins text-lg">{{ feature.text }}</span>
         </li>
       </ul>
     </aside>
