@@ -19,6 +19,8 @@ class UpdateAllianceRequest extends FormRequest
             'contact_email' => ['required', 'email', 'max:100'],
             'phone' => ['required', 'string', 'max:20'],
             'address' => ['required', 'string', 'max:255'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'type_shop_id' => ['required', 'integer', 'exists:type_shop,id'],
             'has_exclusive_rewards' => ['required', 'boolean'],
             'status' => ['required', 'boolean'],

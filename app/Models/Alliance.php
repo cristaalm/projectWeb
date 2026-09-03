@@ -18,6 +18,8 @@ class Alliance extends Model
         'contact_email',
         'phone',
         'address',
+        'latitude',
+        'longitude',
         'logo_url',
         'has_exclusive_rewards',
         'type_shop_id',
@@ -27,6 +29,8 @@ class Alliance extends Model
     protected $casts = [
         'status' => AllianceStatus::class,
         'has_exclusive_rewards' => 'boolean',
+        'latitude' => 'float',
+        'longitude' => 'float',
     ];
 
     public function rewards(): HasMany
