@@ -207,21 +207,25 @@ export function useUserManagement() {
     return null
   }
 
-  const getUserHistory = async userId => {
+  const getUserHistory = async (userId, { page = 1, perPage = 15 } = {}) => {
     resetState()
     loading.value = true
 
     try {
-      const response = await requestGet({ url: `users/${userId}/history` })
+      const response = await requestGet({ url: `users/${userId}/history`, params: { page, per_page: perPage } })
 
       if (!response.success) {
         error.value = true
         toast.showToast({ message: response.message ?? messageError, tipo: 'error', duration: 8000 })
 
-        return []
+        return { history: [], lastPage: 1, total: 0 }
       }
 
-      return response.data.history
+      return {
+        history: response.data.history,
+        lastPage: response.data.last_page ?? 1,
+        total: response.data.total ?? response.data.history.length,
+      }
     } catch (err) {
       error.value = true
       console.error(err)
@@ -230,7 +234,7 @@ export function useUserManagement() {
       loading.value = false
     }
 
-    return []
+    return { history: [], lastPage: 1, total: 0 }
   }
 
   return {

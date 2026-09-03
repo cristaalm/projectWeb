@@ -13,10 +13,16 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
-const { loading, getUserDetail, getUserHistory } = useUserManagement()
+const { getUserDetail, getUserHistory } = useUserManagement()
+
+const HISTORY_PAGE_SIZE = 15
 
 const user = ref(null)
 const history = ref([])
+const initialLoading = ref(false)
+const loadingMoreHistory = ref(false)
+const historyPage = ref(1)
+const historyLastPage = ref(1)
 
 const HISTORY_ICONS = {
   user_created: { icon: 'bx-user-plus', color: 'success' },
@@ -32,15 +38,41 @@ watch(() => props.modelValue, async open => {
 
   user.value = null
   history.value = []
+  historyPage.value = 1
+  historyLastPage.value = 1
+  initialLoading.value = true
 
-  const [detail, userHistory] = await Promise.all([
+  const [detail, historyResult] = await Promise.all([
     getUserDetail(props.userId),
-    getUserHistory(props.userId),
+    getUserHistory(props.userId, { page: 1, perPage: HISTORY_PAGE_SIZE }),
   ])
 
   user.value = detail
-  history.value = userHistory ?? []
+  history.value = historyResult.history ?? []
+  historyLastPage.value = historyResult.lastPage ?? 1
+  initialLoading.value = false
 })
+
+async function loadMoreHistory() {
+  if (loadingMoreHistory.value || historyPage.value >= historyLastPage.value) return
+
+  loadingMoreHistory.value = true
+
+  const nextPage = historyPage.value + 1
+  const result = await getUserHistory(props.userId, { page: nextPage, perPage: HISTORY_PAGE_SIZE })
+
+  history.value = [...history.value, ...(result.history ?? [])]
+  historyPage.value = nextPage
+  historyLastPage.value = result.lastPage ?? historyLastPage.value
+  loadingMoreHistory.value = false
+}
+
+function onHistoryScroll(event) {
+  const el = event.target
+  const scrollThreshold = 48
+
+  if (el.scrollTop + el.clientHeight >= el.scrollHeight - scrollThreshold) loadMoreHistory()
+}
 
 function avatarUrl(target) {
   return target?.avatar ? storageURL + target.avatar : null
@@ -64,12 +96,73 @@ function historyIcon(entry) {
     @update:model-value="emit('update:modelValue', $event)"
   >
     <VCard title="Detalle de usuario">
-      <VCardText v-if="loading && !user">
-        <div class="d-flex justify-center py-8">
-          <VProgressCircular
-            indeterminate
-            color="primary"
+      <VCardText v-if="initialLoading">
+        <div class="gap-4 d-flex align-center mb-4">
+          <VSkeletonLoader
+            type="avatar"
+            width="56"
+            height="56"
           />
+          <div class="flex-grow-1">
+            <VSkeletonLoader
+              type="text"
+              width="55%"
+              class="mb-2"
+            />
+            <VSkeletonLoader
+              type="text"
+              width="35%"
+            />
+          </div>
+        </div>
+
+        <VRow dense>
+          <VCol
+            v-for="n in 6"
+            :key="n"
+            cols="6"
+          >
+            <VSkeletonLoader
+              type="text"
+              width="30%"
+              class="mb-1"
+            />
+            <VSkeletonLoader
+              type="text"
+              width="65%"
+            />
+          </VCol>
+        </VRow>
+
+        <VDivider class="my-4" />
+
+        <VSkeletonLoader
+          type="text"
+          width="160"
+          class="mb-3"
+        />
+
+        <div
+          v-for="n in 4"
+          :key="n"
+          class="gap-3 d-flex py-2"
+        >
+          <VSkeletonLoader
+            type="avatar"
+            width="32"
+            height="32"
+          />
+          <div class="flex-grow-1">
+            <VSkeletonLoader
+              type="text"
+              width="60%"
+              class="mb-1"
+            />
+            <VSkeletonLoader
+              type="text"
+              width="40%"
+            />
+          </div>
         </div>
       </VCardText>
 
@@ -174,6 +267,7 @@ function historyIcon(entry) {
         <div
           v-if="history.length"
           class="history-list"
+          @scroll="onHistoryScroll"
         >
           <div
             v-for="entry in history"
@@ -210,6 +304,18 @@ function historyIcon(entry) {
                 {{ entry.actor ? `${entry.actor.name} ${entry.actor.last_name}` : 'Sistema' }} · {{ formatDate(entry.created_at) }}
               </div>
             </div>
+          </div>
+
+          <div
+            v-if="loadingMoreHistory"
+            class="d-flex justify-center py-2"
+          >
+            <VProgressCircular
+              indeterminate
+              size="20"
+              width="2"
+              color="primary"
+            />
           </div>
         </div>
         <div

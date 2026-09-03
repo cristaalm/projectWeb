@@ -7,6 +7,7 @@ use App\Http\Controllers\OldControllers\Controller;
 use App\Http\Requests\Users\CreateUserRequest;
 use App\Http\Requests\Users\DeactivateUserRequest;
 use App\Http\Requests\Users\DisableTwoFactorRequest;
+use App\Http\Requests\Users\ListUserHistoryRequest;
 use App\Http\Requests\Users\ListUsersRequest;
 use App\Http\Requests\Users\ModifyPointsRequest;
 use App\Http\Requests\Users\ResetCredentialsRequest;
@@ -56,7 +57,7 @@ class UserController extends Controller
         ], null, 200);
     }
 
-    public function history(int $userId)
+    public function history(ListUserHistoryRequest $request, int $userId)
     {
         $user = $this->users->findById($userId, withTrashed: true);
 
@@ -64,11 +65,17 @@ class UserController extends Controller
             return $this->apiResponse(false, 'Usuario no encontrado.', null, null, 404);
         }
 
-        $history = $this->users->history($userId);
+        $history = $this->users->history(
+            $userId,
+            (int) ($request->validated('page') ?? 1),
+            (int) ($request->validated('per_page') ?? 15),
+        );
 
-        return $this->apiResponse(true, 'Historial obtenido correctamente.', [
-            'history' => UserAccountActionResource::collection($history),
-        ], null, 200);
+        $data = $this->unsetDataPagination($history);
+        unset($data['data']);
+        $data['history'] = UserAccountActionResource::collection($history->items());
+
+        return $this->apiResponse(true, 'Historial obtenido correctamente.', $data, null, 200);
     }
 
     public function modifyPoints(ModifyPointsRequest $request, int $userId)

@@ -8,7 +8,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\UserAccountAction;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -137,10 +137,11 @@ class UserRepository
      * Historial combinado de acciones administrativas sobre una cuenta:
      * user_account_actions (baja/restauración/reset/2FA/creación) y
      * point_adjustments (cambios de puntos), unificados y ordenados por fecha
-     * descendente. Sin paginar a propósito — un usuario individual no
-     * acumula un volumen que lo justifique.
+     * descendente. Paginado en memoria (no con ->paginate() de query builder)
+     * porque las dos fuentes vienen de tablas distintas y se combinan/ordenan
+     * después de traerlas — no hay un único query SQL paginable.
      */
-    public function history(int $userId): Collection
+    public function history(int $userId, int $page = 1, int $perPage = 15): LengthAwarePaginator
     {
         $accountActions = UserAccountAction::where('target_user_id', $userId)
             ->with('actorUser')
@@ -150,9 +151,16 @@ class UserRepository
             ->with('admin')
             ->get();
 
-        return $accountActions->concat($pointAdjustments)
+        $combined = $accountActions->concat($pointAdjustments)
             ->sortByDesc('created_at')
             ->values();
+
+        return new Paginator(
+            $combined->forPage($page, $perPage)->values(),
+            $combined->count(),
+            $perPage,
+            $page
+        );
     }
 
     /**
