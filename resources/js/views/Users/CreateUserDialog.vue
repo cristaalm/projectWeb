@@ -27,6 +27,15 @@ const selectedRole = computed(() => CREATABLE_ROLES.find(role => role.id === for
 const needsAllianceField = computed(() => selectedRole.value?.name !== 'moderador' && selectedRole.value !== null)
 const allianceRequired = computed(() => ALLIANCE_REQUIRED_ROLES.includes(selectedRole.value?.name))
 
+// Un `member` solo puede enlazarse a alianzas que aceptan miembros
+// (has_exclusive_rewards) — admin_merchant/merchant no tienen esa
+// restricción, se enlazan a cualquier alianza existente como antes.
+const filteredAlliances = computed(() => (
+  selectedRole.value?.name === 'member'
+    ? alliances.value.filter(a => a.has_exclusive_rewards)
+    : alliances.value
+))
+
 const isValid = computed(() => (
   Boolean(form.value.name.trim())
   && Boolean(form.value.last_name.trim())
@@ -126,7 +135,7 @@ async function submit() {
             >
               <VSelect
                 v-model="form.alliance_id"
-                :items="alliances"
+                :items="filteredAlliances"
                 :loading="alliancesLoading"
                 item-title="name"
                 item-value="id"
