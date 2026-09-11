@@ -27,6 +27,11 @@ class ContainerRepository
             ->exists();
     }
 
+    public function findBySerialNumber(string $serialNumber): ?Container
+    {
+        return Container::where('serial_number', $serialNumber)->first();
+    }
+
     public function paginate(array $filters): LengthAwarePaginator
     {
         $query = Container::query();
@@ -36,7 +41,7 @@ class ContainerRepository
         }
 
         if (! empty($filters['query'])) {
-            $term = '%' . $filters['query'] . '%';
+            $term = '%'.$filters['query'].'%';
             $query->where(function ($q) use ($term) {
                 $q->where('name', 'ilike', $term)
                     ->orWhere('serial_number', 'ilike', $term)

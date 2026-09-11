@@ -51,4 +51,8 @@ return [
         'credentials_json' => env('FIREBASE_CREDENTIALS_JSON'),
     ],
 
+    'evi' => [
+        'api_key' => env('EVI_API_KEY'),
+    ],
+
 ];

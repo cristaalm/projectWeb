@@ -80,6 +80,11 @@ class UserRepository
         return User::withTrashed()->where('code_identity', $codeIdentity)->exists();
     }
 
+    public function findByCodeIdentity(string $codeIdentity): ?User
+    {
+        return User::where('code_identity', $codeIdentity)->first();
+    }
+
     public function create(array $attributes): User
     {
         return User::create($attributes);

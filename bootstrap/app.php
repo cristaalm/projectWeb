@@ -1,18 +1,18 @@
 <?php
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__ . '/../routes/web.php',
-        commands: __DIR__ . '/../routes/console.php',
+        web: __DIR__.'/../routes/web.php',
+        commands: __DIR__.'/../routes/console.php',
         health: '/up',
-        api: __DIR__ . '/../routes/api.php',
+        api: __DIR__.'/../routes/api.php',
     )
     ->withMiddleware(function (Middleware $middleware) {
         // Middleware de autenticación
@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth' => \App\Http\Middleware\ApiAuthenticate::class,
             'ensureUserIsActive' => \App\Http\Middleware\EnsureUserIsActive::class,
             'role' => \App\Http\Middleware\EnsureUserHasRole::class,
+            'service.apiKey' => \App\Http\Middleware\EnsureValidServiceApiKey::class,
         ]);
 
         // Middleware global para el grupo 'api': arranca la sesión/cookie para
@@ -47,7 +48,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return response()->json([
                     'message' => 'No autenticado',
                     'status' => 401,
-                    'authenticated' => false
+                    'authenticated' => false,
                 ], 401);
             }
         });
@@ -71,7 +72,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->is('api/*') || $request->expectsJson()) {
                 return response()->json([
                     'message' => 'Ruta no encontrada',
-                    'status' => 404
+                    'status' => 404,
                 ], 404);
             }
         });
