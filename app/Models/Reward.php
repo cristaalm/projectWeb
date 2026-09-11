@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use App\Enums\RewardStatus;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Reward extends Model
@@ -13,8 +14,11 @@ class Reward extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'rewards';
+
     protected $primaryKey = 'id';
+
     protected $keyType = 'integer';
+
     public $incrementing = true;
 
     protected $fillable = [
@@ -24,15 +28,24 @@ class Reward extends Model
         'points_required',
         'stock',
         'code',
-        'is_active',
+        'is_exclusive',
+        'status',
+        'rejection_reason',
+        'approved_by',
+        'approved_at',
+        'rejected_by',
+        'rejected_at',
         'expires_at',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
+        'status' => RewardStatus::class,
+        'is_exclusive' => 'boolean',
         'points_required' => 'integer',
         'stock' => 'integer',
         'code' => 'string',
+        'approved_at' => 'datetime',
+        'rejected_at' => 'datetime',
         'expires_at' => 'datetime',
     ];
 
@@ -40,10 +53,25 @@ class Reward extends Model
     {
         return $this->belongsTo(Alliance::class);
     }
-    
+
+    public function approvedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function rejectedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'rejected_by');
+    }
+
+    public function redemptions(): HasMany
+    {
+        return $this->hasMany(PointRedemption::class);
+    }
+
     public static function calculateEan13CheckDigit(string $digits12): string
     {
-        if (strlen($digits12) !== 12 || !ctype_digit($digits12)) {
+        if (strlen($digits12) !== 12 || ! ctype_digit($digits12)) {
             throw new \InvalidArgumentException('Se requieren 12 dígitos numéricos.');
         }
 
@@ -60,6 +88,7 @@ class Reward extends Model
         }
 
         $checksum = (10 - ($sum % 10)) % 10;
+
         return (string) $checksum;
     }
 }

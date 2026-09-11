@@ -34,8 +34,7 @@ class AuthService
     public function __construct(
         private readonly UserRepository $users,
         private readonly GoogleIdTokenVerifier $googleVerifier,
-    ) {
-    }
+    ) {}
 
     /**
      * Validates credentials + account/role/alliance state. Shared by both the
@@ -135,7 +134,7 @@ class AuthService
     }
 
     /**
-     * @param array{sub: string, email: string, given_name: string, family_name: string} $claims
+     * @param  array{sub: string, email: string, given_name: string, family_name: string}  $claims
      */
     private function resolveOrCreateSocialUser(array $claims, string $provider, bool $isWebSession): User
     {
@@ -164,7 +163,7 @@ class AuthService
     }
 
     /**
-     * @param array{sub: string, email: string, given_name: string, family_name: string} $claims
+     * @param  array{sub: string, email: string, given_name: string, family_name: string}  $claims
      */
     private function createSocialUser(array $claims, string $provider): User
     {
@@ -179,9 +178,9 @@ class AuthService
             'phone' => null,
             'password' => Hash::make(User::generatePassword()),
             'has_usable_password' => false,
-            'code_identity' => $digits12 . $checkDigit,
+            'code_identity' => $digits12.$checkDigit,
             'role_id' => $role?->id,
-            'google2fa_secret' => (new Google2FA())->generateSecretKey(),
+            'google2fa_secret' => (new Google2FA)->generateSecretKey(),
         ]);
 
         $this->users->linkSocialAccount($user, $provider, $claims['sub']);
@@ -245,9 +244,9 @@ class AuthService
             'phone' => $data['phone'],
             'password' => Hash::make($data['password']),
             'has_usable_password' => true,
-            'code_identity' => $digits12 . $checkDigit,
+            'code_identity' => $digits12.$checkDigit,
             'role_id' => $role?->id,
-            'google2fa_secret' => (new Google2FA())->generateSecretKey(),
+            'google2fa_secret' => (new Google2FA)->generateSecretKey(),
         ]);
     }
 
@@ -273,7 +272,7 @@ class AuthService
                 $user->has_usable_password = true;
                 $user->save();
 
-                $user->notify(new ResetPasswordNotification());
+                $user->notify(new ResetPasswordNotification);
             }
         );
 
@@ -288,7 +287,7 @@ class AuthService
     public function validateSession(Request $request): array
     {
         $user = $request->user();
-        $user->load(['role', 'socialAccounts']);
+        $user->load(['role', 'socialAccounts', 'merchant.alliance.typeShop', 'organizationMember.alliance.typeShop']);
 
         if ($user->trashed()) {
             throw new AuthException('Tu cuenta no está activa.', 403);
@@ -356,7 +355,7 @@ class AuthService
         $codes = [];
 
         for ($i = 0; $i < self::RECOVERY_CODES_COUNT; $i++) {
-            $codes[] = strtoupper(Str::random(5)) . '-' . strtoupper(Str::random(5));
+            $codes[] = strtoupper(Str::random(5)).'-'.strtoupper(Str::random(5));
         }
 
         foreach ($codes as $code) {

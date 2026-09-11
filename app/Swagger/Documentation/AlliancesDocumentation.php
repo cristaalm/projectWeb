@@ -30,9 +30,7 @@ class AlliancesDocumentation
             new OA\Response(response: 403, description: 'La cuenta del usuario ya no está activa.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
         ]
     )]
-    public function catalog()
-    {
-    }
+    public function catalog() {}
 
     #[OA\Get(
         path: '/alliances',
@@ -58,9 +56,7 @@ class AlliancesDocumentation
             new OA\Response(response: 403, description: 'El rol del usuario autenticado no es superadmin ni moderador.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
         ]
     )]
-    public function index()
-    {
-    }
+    public function index() {}
 
     #[OA\Post(
         path: '/alliances',
@@ -96,9 +92,7 @@ class AlliancesDocumentation
             new OA\Response(response: 422, description: 'Error de validación: campos requeridos o type_shop_id inexistente.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
         ]
     )]
-    public function store()
-    {
-    }
+    public function store() {}
 
     #[OA\Put(
         path: '/alliances/{id}',
@@ -138,15 +132,13 @@ class AlliancesDocumentation
             new OA\Response(response: 422, description: 'Error de validación: campos requeridos o type_shop_id inexistente.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
         ]
     )]
-    public function update()
-    {
-    }
+    public function update() {}
 
     #[OA\Delete(
         path: '/alliances/{id}',
         tags: ['Alliances'],
         summary: 'Eliminar alianza',
-        description: 'Eliminación permanente. merchants.alliance_id y organization_members.alliance_id son FK ON DELETE RESTRICT — si la alianza tiene comercios o miembros vinculados, la eliminación falla con 422. rewards.alliance_id sí es ON DELETE CASCADE: si la alianza tiene recompensas creadas, se eliminan en cascada sin aviso adicional (riesgo documentado, sin guarda extra en esta versión — el módulo de Rewards todavía no está reconstruido).',
+        description: 'Eliminación permanente. merchants.alliance_id y organization_members.alliance_id son FK ON DELETE RESTRICT — si la alianza tiene comercios o miembros vinculados, la eliminación falla con 422. rewards.alliance_id sí es ON DELETE CASCADE: si la alianza tiene recompensas creadas, se eliminan en cascada (borrado físico, sin pasar por el soft-delete de App\Models\Reward) sin aviso adicional — riesgo documentado, sin guarda extra en esta versión.',
         security: [['sessionCookie' => []], ['bearerToken' => []]],
         parameters: [
             new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
@@ -163,9 +155,7 @@ class AlliancesDocumentation
             new OA\Response(response: 422, description: 'La alianza tiene comercios o miembros vinculados (merchants/organization_members).', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
         ]
     )]
-    public function destroy()
-    {
-    }
+    public function destroy() {}
 
     #[OA\Post(
         path: '/alliances/{id}/logo',
@@ -200,9 +190,7 @@ class AlliancesDocumentation
             new OA\Response(response: 422, description: 'Archivo inválido (formato o tamaño).', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
         ]
     )]
-    public function uploadLogo()
-    {
-    }
+    public function uploadLogo() {}
 
     #[OA\Delete(
         path: '/alliances/{id}/logo',
@@ -224,7 +212,5 @@ class AlliancesDocumentation
             new OA\Response(response: 404, description: 'Alianza no encontrada.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
         ]
     )]
-    public function deleteLogo()
-    {
-    }
+    public function deleteLogo() {}
 }

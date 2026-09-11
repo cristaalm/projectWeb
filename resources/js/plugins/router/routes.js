@@ -35,6 +35,18 @@ export const routes = [
         meta: { title: 'Alianzas', roles: ['superadmin', 'moderador'] },
         component: () => import('@/pages/Dashboard/Alliances/'),
       },
+      {
+        path: 'recompensas',
+        name: 'rewards',
+        meta: { title: 'Recompensas', roles: ['superadmin', 'moderador', 'admin_merchant'] },
+        component: () => import('@/pages/Dashboard/Rewards/'),
+      },
+      {
+        path: 'insignias',
+        name: 'badges',
+        meta: { title: 'Insignias', roles: ['superadmin', 'moderador'] },
+        component: () => import('@/pages/Dashboard/Badges/'),
+      },
     ],
   },
   {

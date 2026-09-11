@@ -1,7 +1,7 @@
 <script setup>
+import ReasonActionDialog from '@/components/ReasonActionDialog.vue'
 import CreateUserDialog from './CreateUserDialog.vue'
 import ModifyPointsDialog from './ModifyPointsDialog.vue'
-import ReasonActionDialog from './ReasonActionDialog.vue'
 import UserDetailDialog from './UserDetailDialog.vue'
 import UsersDataTable from './components/UsersDataTable.vue'
 import UsersFiltersPanel from './components/UsersFiltersPanel.vue'

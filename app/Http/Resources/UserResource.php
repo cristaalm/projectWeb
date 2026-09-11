@@ -34,14 +34,14 @@ class UserResource extends JsonResource
                         'id' => $alliance->id,
                         'name' => $alliance->name,
                         'phone' => $alliance->phone,
-                        'logo' => $alliance->logo,
                         'address' => $alliance->address,
-                        'type_shop' => $alliance->type_shop_id ? $alliance->whenLoaded('typeShop', [
+                        'logo_url' => $alliance->logo_url,
+                        'has_exclusive_rewards' => $alliance->has_exclusive_rewards,
+                        'type_shop' => $alliance->relationLoaded('typeShop') && $alliance->typeShop ? [
                             'id' => $alliance->typeShop->id,
                             'name' => $alliance->typeShop->name,
-                        ]) : null,
-                        'total_points' => $alliance->total_points,
-                        'ext' => $alliance->ext,
+                        ] : null,
+                        'status' => $alliance->status,
                         'created_at' => $alliance->created_at,
                         'updated_at' => $alliance->updated_at,
                     ] : null;

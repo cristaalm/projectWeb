@@ -98,20 +98,22 @@ class UserRepository
     }
 
     /**
-     * Saldo de puntos de un usuario: point_earnings + point_adjustments -
-     * redenciones (canjes REDEEMED/DELIVERED). No es una columna real.
+     * Saldo de puntos de un usuario: point_earnings + point_adjustments +
+     * badge_earnings - redenciones (canjes REDEEMED/DELIVERED). No es una
+     * columna real.
      */
     public function pointsBalance(int $userId): int
     {
         $earnings = (int) DB::table('point_earnings')->where('user_id', $userId)->sum('points');
         $adjustments = (int) DB::table('point_adjustments')->where('user_id', $userId)->sum('points');
+        $badgeEarnings = (int) DB::table('badge_earnings')->where('user_id', $userId)->sum('points');
         $redeemed = (int) DB::table('point_redemptions')
             ->where('user_id', $userId)
             ->whereIn('status', [RewardRedemptionStatus::REDEEMED->value, RewardRedemptionStatus::DELIVERED->value])
             ->selectRaw('COALESCE(SUM(points_spent * quantity), 0) as total')
             ->value('total');
 
-        return $earnings + $adjustments - $redeemed;
+        return $earnings + $adjustments + $badgeEarnings - $redeemed;
     }
 
     /**
@@ -170,11 +172,12 @@ class UserRepository
      */
     public function paginate(array $filters): LengthAwarePaginator
     {
-        // MAX(...) es seguro aquí: pe/pa/pr ya están agregados por user_id en sus
-        // propias subconsultas, así que cada join aporta a lo más una fila por
-        // usuario — MAX() no cambia el valor, pero hace la expresión válida bajo
-        // GROUP BY (Postgres exige que toda columna no agrupada sea una agregación).
-        $balanceExpr = 'MAX(COALESCE(pe.total, 0)) + MAX(COALESCE(pa.total, 0)) - MAX(COALESCE(pr.total, 0))';
+        // MAX(...) es seguro aquí: pe/pa/be/pr ya están agregados por user_id en
+        // sus propias subconsultas, así que cada join aporta a lo más una fila
+        // por usuario — MAX() no cambia el valor, pero hace la expresión válida
+        // bajo GROUP BY (Postgres exige que toda columna no agrupada sea una
+        // agregación).
+        $balanceExpr = 'MAX(COALESCE(pe.total, 0)) + MAX(COALESCE(pa.total, 0)) + MAX(COALESCE(be.total, 0)) - MAX(COALESCE(pr.total, 0))';
 
         $query = User::query()
             ->select('users.*')
@@ -190,6 +193,13 @@ class UserRepository
                 DB::table('point_adjustments')->selectRaw('user_id, SUM(points) as total')->groupBy('user_id'),
                 'pa',
                 'pa.user_id',
+                '=',
+                'users.id'
+            )
+            ->leftJoinSub(
+                DB::table('badge_earnings')->selectRaw('user_id, SUM(points) as total')->groupBy('user_id'),
+                'be',
+                'be.user_id',
                 '=',
                 'users.id'
             )
@@ -231,7 +241,7 @@ class UserRepository
         }
 
         if (! empty($filters['query'])) {
-            $term = '%' . $filters['query'] . '%';
+            $term = '%'.$filters['query'].'%';
             $query->where(function ($q) use ($term) {
                 $q->where('users.name', 'ilike', $term)
                     ->orWhere('users.last_name', 'ilike', $term)

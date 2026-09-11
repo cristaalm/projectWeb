@@ -494,7 +494,7 @@
                     "Alliances"
                 ],
                 "summary": "Eliminar alianza",
-                "description": "Eliminación permanente. merchants.alliance_id y organization_members.alliance_id son FK ON DELETE RESTRICT — si la alianza tiene comercios o miembros vinculados, la eliminación falla con 422. rewards.alliance_id sí es ON DELETE CASCADE: si la alianza tiene recompensas creadas, se eliminan en cascada sin aviso adicional (riesgo documentado, sin guarda extra en esta versión — el módulo de Rewards todavía no está reconstruido).",
+                "description": "Eliminación permanente. merchants.alliance_id y organization_members.alliance_id son FK ON DELETE RESTRICT — si la alianza tiene comercios o miembros vinculados, la eliminación falla con 422. rewards.alliance_id sí es ON DELETE CASCADE: si la alianza tiene recompensas creadas, se eliminan en cascada (borrado físico, sin pasar por el soft-delete de App\\Models\\Reward) sin aviso adicional — riesgo documentado, sin guarda extra en esta versión.",
                 "operationId": "ef0463517c8248aaa4c405899f9bf003",
                 "parameters": [
                     {
@@ -1814,6 +1814,763 @@
                 }
             }
         },
+        "/badges": {
+            "get": {
+                "tags": [
+                    "Badges"
+                ],
+                "summary": "Listar insignias (administración)",
+                "description": "Listado paginado/filtrable/ordenable sobre App\\Repositories\\BadgeRepository::paginate().",
+                "operationId": "b0b3077eccb3611dd98ac196841f76b7",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
+                        }
+                    },
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "description": "Búsqueda libre por nombre (ilike).",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "key",
+                        "in": "query",
+                        "description": "Columna de orden — allowlist explícita.",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "id",
+                                "name",
+                                "recycles_required",
+                                "points_awarded",
+                                "status",
+                                "created_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 15,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Página de insignias.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El rol del usuario autenticado no es superadmin ni moderador.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Badges"
+                ],
+                "summary": "Crear insignia",
+                "operationId": "11cd1c7525c4ef62fd78b65d53e88806",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "recycles_required",
+                                    "points_awarded",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 100,
+                                        "example": "Reciclador del mes"
+                                    },
+                                    "icon": {
+                                        "type": "string",
+                                        "enum": [
+                                            "bx-recycle",
+                                            "bx-leaf",
+                                            "bx-bxs-tree",
+                                            "bx-water",
+                                            "bx-world",
+                                            "bx-medal",
+                                            "bx-trophy",
+                                            "bx-award",
+                                            "bx-badge-check",
+                                            "bx-sun"
+                                        ],
+                                        "nullable": true
+                                    },
+                                    "recycles_required": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "example": 10
+                                    },
+                                    "points_awarded": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "example": 50
+                                    },
+                                    "status": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Insignia creada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El rol del usuario autenticado no es superadmin ni moderador.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación: campos requeridos o nombre duplicado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/badges/{id}": {
+            "put": {
+                "tags": [
+                    "Badges"
+                ],
+                "summary": "Actualizar insignia",
+                "operationId": "801c8ce6722b90121077e672fbc4bf0c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "recycles_required",
+                                    "points_awarded",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "icon": {
+                                        "type": "string",
+                                        "enum": [
+                                            "bx-recycle",
+                                            "bx-leaf",
+                                            "bx-bxs-tree",
+                                            "bx-water",
+                                            "bx-world",
+                                            "bx-medal",
+                                            "bx-trophy",
+                                            "bx-award",
+                                            "bx-badge-check",
+                                            "bx-sun"
+                                        ],
+                                        "nullable": true
+                                    },
+                                    "recycles_required": {
+                                        "type": "integer",
+                                        "minimum": 1
+                                    },
+                                    "points_awarded": {
+                                        "type": "integer",
+                                        "minimum": 0
+                                    },
+                                    "status": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Insignia actualizada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El rol del usuario autenticado no es superadmin ni moderador.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Insignia no encontrada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación: campos requeridos o nombre duplicado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Badges"
+                ],
+                "summary": "Eliminar insignia",
+                "description": "Eliminación permanente. Bloqueada con 422 si la insignia ya tiene progreso o historial de usuarios vinculado (App\\Models\\BadgeProgress / App\\Models\\BadgeUser) — hay que desactivarla en vez de eliminarla para preservar la auditoría y los puntos ya acreditados.",
+                "operationId": "a7fb47e6f78b7e4cba5b6394dd3e714a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Insignia eliminada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El rol del usuario autenticado no es superadmin ni moderador.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Insignia no encontrada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Tiene progreso o historial de usuarios vinculado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/badges/catalog": {
+            "get": {
+                "tags": [
+                    "Badges"
+                ],
+                "summary": "Catálogo de insignias activas",
+                "description": "Solo insignias con status=true, ordenadas por recycles_required — pensado para el catálogo de la futura app móvil.",
+                "operationId": "bf23f32c7203d80f5fde3d89e0d8d73e",
+                "responses": {
+                    "200": {
+                        "description": "Catálogo de insignias.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/badges/my-progress": {
+            "get": {
+                "tags": [
+                    "Badges"
+                ],
+                "summary": "Mi progreso del mes actual",
+                "description": "Progreso del usuario autenticado sobre todas las insignias activas en el mes calendario actual (App\\Services\\BadgeService::myProgress()).",
+                "operationId": "0c194f514335d8f743351b2bbbeed335",
+                "responses": {
+                    "200": {
+                        "description": "Progreso del mes actual.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "progress": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/BadgeProgress"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/badges/my-history": {
+            "get": {
+                "tags": [
+                    "Badges"
+                ],
+                "summary": "Mi historial de insignias reclamadas",
+                "description": "Todas las insignias reclamadas por el usuario autenticado, de cualquier mes, orden descendente por fecha de otorgamiento (App\\Services\\BadgeService::myHistory()).",
+                "operationId": "d45dc7c605943662fda5dabaf2e9fed8",
+                "responses": {
+                    "200": {
+                        "description": "Historial de insignias.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "history": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/BadgeUser"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/badges/pending-claims": {
+            "get": {
+                "tags": [
+                    "Badges"
+                ],
+                "summary": "Mis insignias listas para reclamar",
+                "description": "Progreso con completed=true (de cualquier mes, no expira) sin su fila correspondiente en App\\Models\\BadgeUser todavía — lo que puede reclamarse ahora mismo vía /badges/claim.",
+                "operationId": "82ab959fe0db0a7ef760c44fc1762998",
+                "responses": {
+                    "200": {
+                        "description": "Reclamos pendientes.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "pending": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/BadgeProgress"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/badges/claim": {
+            "post": {
+                "tags": [
+                    "Badges"
+                ],
+                "summary": "Reclamar una insignia completada",
+                "description": "Otorgamiento manual: crea la fila en App\\Models\\BadgeUser y acredita los puntos (App\\Models\\BadgeEarning). Solo funciona sobre un (usuario, insignia, mes) con progreso completed=true y todavía no reclamado — protegido además por un índice único a nivel de base de datos contra doble-reclamo por condición de carrera.",
+                "operationId": "2fe032ecfd62bdcb09da84a8fb02bbf4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "badge_id",
+                                    "month"
+                                ],
+                                "properties": {
+                                    "badge_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "month": {
+                                        "description": "Cualquier día del mes calendario a reclamar; el backend lo normaliza al primer día.",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-09-01"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Insignia reclamada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Insignia no encontrada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Aún no se completó esta insignia en el mes indicado, o ya fue reclamada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
         "/containers": {
             "get": {
                 "tags": [
@@ -2257,6 +3014,1012 @@
                     },
                     "404": {
                         "description": "Contenedor no encontrado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/redemptions": {
+            "get": {
+                "tags": [
+                    "Redemptions"
+                ],
+                "summary": "Listar canjes",
+                "description": "Listado paginado/filtrable/ordenable. Si quien pide el listado es admin_merchant, alliance_id se fuerza a su propia alianza (App\\Services\\RedemptionService::scopeAllianceFilter()).",
+                "operationId": "b32e1fc86f64b9a1b8fddbe026905c90",
+                "parameters": [
+                    {
+                        "name": "alliance_id",
+                        "in": "query",
+                        "description": "Ignorado si quien pide el listado es admin_merchant.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "reward_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                1,
+                                2,
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "description": "Búsqueda libre por nombre/correo del usuario o nombre/código de la recompensa.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "key",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "id",
+                                "points_spent",
+                                "quantity",
+                                "status",
+                                "created_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 15,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Página de canjes.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El rol del usuario autenticado no es superadmin, moderador ni admin_merchant.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/redemptions/{id}/deliver": {
+            "post": {
+                "tags": [
+                    "Redemptions"
+                ],
+                "summary": "Marcar un canje como entregado",
+                "description": "Canjeado → Entregado. Solo aplica sobre canjes en status Canjeado (1). Cuando lo marca admin_merchant (no staff) y el canje todavía no tenía merchant_user_id asignado, queda registrado como quien lo entregó.",
+                "operationId": "f4ea20e26354fa11fe95ba6db2b39126",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Canje marcado como entregado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Rol no permitido, o admin_merchant intentando confirmar un canje de otra alianza.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Canje no encontrado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "El canje no está en status Canjeado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/rewards": {
+            "get": {
+                "tags": [
+                    "Rewards"
+                ],
+                "summary": "Listar recompensas",
+                "description": "Listado paginado/filtrable/ordenable. Si quien pide el listado es admin_merchant, alliance_id se fuerza a su propia alianza sin importar qué mande el query string (App\\Services\\RewardService::scopeAllianceFilter()).",
+                "operationId": "b7a87589ac9f67305b71b91a218b82d2",
+                "parameters": [
+                    {
+                        "name": "alliance_id",
+                        "in": "query",
+                        "description": "Ignorado si quien pide el listado es admin_merchant.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1,
+                                2,
+                                3
+                            ]
+                        }
+                    },
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "description": "Búsqueda libre por nombre, descripción o código (ilike).",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "key",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "id",
+                                "name",
+                                "points_required",
+                                "stock",
+                                "status",
+                                "is_exclusive",
+                                "expires_at",
+                                "created_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 15,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Página de recompensas.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El rol del usuario autenticado no es superadmin, moderador ni admin_merchant.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Rewards"
+                ],
+                "summary": "Crear recompensa",
+                "description": "admin_merchant: alliance_id se ignora, se fuerza a su propia alianza y queda en status PENDING. staff (superadmin/moderador): alliance_id es obligatorio y la recompensa se crea ya APPROVED (aprobada por quien la crea). is_exclusive=true solo se acepta si la alianza tiene has_exclusive_rewards=true.",
+                "operationId": "8cfce9dc84a1db58ac58fa32b72bcfd7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "points_required"
+                                ],
+                                "properties": {
+                                    "alliance_id": {
+                                        "description": "Obligatorio para staff; ignorado para admin_merchant.",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 150,
+                                        "example": "Café gratis"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "nullable": true
+                                    },
+                                    "points_required": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "example": 100
+                                    },
+                                    "stock": {
+                                        "description": "null = ilimitado.",
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "nullable": true
+                                    },
+                                    "is_exclusive": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "expires_at": {
+                                        "description": "Debe ser una fecha futura.",
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Recompensa creada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El rol del usuario autenticado no es superadmin, moderador ni admin_merchant.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación, o is_exclusive=true sobre una alianza sin has_exclusive_rewards, o la cuenta admin_merchant no está enlazada a ninguna alianza.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/rewards/{id}": {
+            "put": {
+                "tags": [
+                    "Rewards"
+                ],
+                "summary": "Actualizar recompensa",
+                "description": "admin_merchant solo puede editar recompensas de su propia alianza (403 si no); si la recompensa editada no estaba PENDING, vuelve a PENDING y se limpia el resultado de la revisión anterior — necesita aprobarse de nuevo. staff puede editar cualquiera, sin resetear el estado, y es el único que puede reasignar alliance_id.",
+                "operationId": "45a0814cdebff6d0b91f8cc3d12b62fc",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "points_required"
+                                ],
+                                "properties": {
+                                    "alliance_id": {
+                                        "description": "Solo staff puede reasignar; se ignora si lo manda admin_merchant.",
+                                        "type": "integer"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 150
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "nullable": true
+                                    },
+                                    "points_required": {
+                                        "type": "integer",
+                                        "minimum": 1
+                                    },
+                                    "stock": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "nullable": true
+                                    },
+                                    "is_exclusive": {
+                                        "type": "boolean"
+                                    },
+                                    "expires_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Recompensa actualizada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Rol no permitido, o admin_merchant intentando editar una recompensa de otra alianza.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Recompensa no encontrada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación, o is_exclusive=true sobre una alianza sin has_exclusive_rewards.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Rewards"
+                ],
+                "summary": "Eliminar recompensa",
+                "description": "Soft-delete. admin_merchant solo sobre las de su propia alianza.",
+                "operationId": "af93109381c6520e8596661bf509e574",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Recompensa eliminada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Rol no permitido, o admin_merchant intentando eliminar una recompensa de otra alianza.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Recompensa no encontrada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/rewards/{id}/approve": {
+            "post": {
+                "tags": [
+                    "Rewards"
+                ],
+                "summary": "Aprobar recompensa pendiente",
+                "description": "Exclusivo de superadmin/moderador. Solo aplica sobre recompensas en status PENDING.",
+                "operationId": "24691ca25c3a00a5dd894fc262d92537",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Recompensa aprobada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El rol del usuario autenticado no es superadmin ni moderador.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Recompensa no encontrada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "La recompensa no está en status PENDING.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/rewards/{id}/reject": {
+            "post": {
+                "tags": [
+                    "Rewards"
+                ],
+                "summary": "Rechazar recompensa pendiente",
+                "description": "Exclusivo de superadmin/moderador. Solo aplica sobre recompensas en status PENDING. El motivo queda guardado en rejection_reason.",
+                "operationId": "c5dac9fd79e7792931e7920f59aaaa7d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "reason"
+                                ],
+                                "properties": {
+                                    "reason": {
+                                        "type": "string",
+                                        "maxLength": 1000,
+                                        "example": "El costo en puntos no corresponde al valor real del producto."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Recompensa rechazada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El rol del usuario autenticado no es superadmin ni moderador.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Recompensa no encontrada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Falta el motivo, o la recompensa no está en status PENDING.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/rewards/{id}/pause": {
+            "post": {
+                "tags": [
+                    "Rewards"
+                ],
+                "summary": "Pausar recompensa aprobada",
+                "description": "Solo aplica sobre recompensas en status APPROVED — no pierde su historial de aprobación (a diferencia de un rechazo). admin_merchant solo sobre las de su propia alianza.",
+                "operationId": "f0c1e886c583fc0b9866cb78bc2b4958",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Recompensa pausada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Rol no permitido, o admin_merchant intentando pausar una recompensa de otra alianza.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Recompensa no encontrada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "La recompensa no está en status APPROVED.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/rewards/{id}/reactivate": {
+            "post": {
+                "tags": [
+                    "Rewards"
+                ],
+                "summary": "Reactivar recompensa pausada",
+                "description": "Solo aplica sobre recompensas en status PAUSED. admin_merchant solo sobre las de su propia alianza.",
+                "operationId": "22f71a0da71496466ce93a0e551a65b3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Recompensa reactivada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Rol no permitido, o admin_merchant intentando reactivar una recompensa de otra alianza.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Recompensa no encontrada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "La recompensa no está en status PAUSED.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3830,6 +5593,100 @@
                 },
                 "type": "object"
             },
+            "BadgeProgress": {
+                "description": "Progreso mensual de un usuario hacia una insignia (App\\Models\\BadgeProgress). Cada mes calendario tiene su propia fila — el reinicio mensual es implícito, no requiere un job.",
+                "properties": {
+                    "badge": {
+                        "$ref": "#/components/schemas/Badge"
+                    },
+                    "recycles_count": {
+                        "description": "Reciclajes válidos acumulados en el mes actual.",
+                        "type": "integer",
+                        "example": 7
+                    },
+                    "completed": {
+                        "description": "true cuando recycles_count alcanzó recycles_required — todavía no implica que se haya reclamado.",
+                        "type": "boolean",
+                        "example": false
+                    }
+                },
+                "type": "object"
+            },
+            "Badge": {
+                "description": "Insignia del catálogo de reciclaje (App\\Models\\Badge).",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Reciclador del mes"
+                    },
+                    "icon": {
+                        "type": "string",
+                        "enum": [
+                            "bx-recycle",
+                            "bx-leaf",
+                            "bx-bxs-tree",
+                            "bx-water",
+                            "bx-world",
+                            "bx-medal",
+                            "bx-trophy",
+                            "bx-award",
+                            "bx-badge-check",
+                            "bx-sun"
+                        ],
+                        "example": "bx-recycle",
+                        "nullable": true
+                    },
+                    "recycles_required": {
+                        "description": "Reciclajes válidos requeridos en un mes calendario para completar la insignia.",
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "points_awarded": {
+                        "description": "Puntos acreditados al reclamar la insignia.",
+                        "type": "integer",
+                        "example": 50
+                    },
+                    "status": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "BadgeUser": {
+                "description": "Insignia reclamada por un usuario en un mes específico (App\\Models\\BadgeUser). La misma insignia puede volver a reclamarse en un mes distinto.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "badge": {
+                        "$ref": "#/components/schemas/Badge"
+                    },
+                    "month": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2026-09-01"
+                    },
+                    "awarded_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "ErrorResponse": {
                 "description": "Forma estándar de una respuesta de error, tal como la produce Controller::apiResponse(). En producción (APP_DEBUG=false), \"errors\" se reemplaza por un mensaje genérico salvo que sea un arreglo de errores de validación.",
                 "properties": {
@@ -3935,6 +5792,197 @@
                             1
                         ],
                         "example": 1
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "PointRedemption": {
+                "description": "Canje de una recompensa por un usuario (App\\Models\\PointRedemption, tabla point_redemptions).",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "user": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/User"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "reward_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "reward": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/Reward"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "alliance_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "alliance": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/Alliance"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "merchant_user_id": {
+                        "description": "Usuario del comercio que confirmó la entrega en persona — se asigna solo cuando quien marca \"entregado\" es admin_merchant.",
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "merchant_user": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/User"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "points_spent": {
+                        "description": "Puntos por unidad (multiplicar por quantity para el total gastado).",
+                        "type": "integer",
+                        "example": 100
+                    },
+                    "quantity": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "status": {
+                        "description": "1 = Canjeado, 2 = Entregado, 3 = Cancelado, 4 = Expirado (App\\Enums\\RewardRedemptionStatus). Solo Canjeado/Entregado restan del saldo de puntos del usuario (App\\Repositories\\UserRepository::pointsBalance()).",
+                        "type": "integer",
+                        "enum": [
+                            1,
+                            2,
+                            3,
+                            4
+                        ],
+                        "example": 1
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Reward": {
+                "description": "Recompensa canjeable por puntos, propiedad de una alianza (App\\Models\\Reward).",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "alliance_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "alliance": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/Alliance"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Presente cuando el endpoint hace eager-load de la relación (ej. el listado)."
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Café gratis"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Un café americano o espresso, tamaño chico.",
+                        "nullable": true
+                    },
+                    "points_required": {
+                        "type": "integer",
+                        "example": 100
+                    },
+                    "stock": {
+                        "description": "null = ilimitado.",
+                        "type": "integer",
+                        "example": 50,
+                        "nullable": true
+                    },
+                    "code": {
+                        "description": "Código de 13 dígitos (12 aleatorios + dígito verificador EAN-13) generado por el backend al crear — no editable.",
+                        "type": "string",
+                        "example": "123456789012 5"
+                    },
+                    "is_exclusive": {
+                        "description": "Solo puede ser true si la alianza tiene has_exclusive_rewards=true (App\\Models\\Alliance).",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "status": {
+                        "description": "0 = pendiente de revisión, 1 = aprobada, 2 = rechazada, 3 = pausada (App\\Enums\\RewardStatus).",
+                        "type": "integer",
+                        "enum": [
+                            0,
+                            1,
+                            2,
+                            3
+                        ],
+                        "example": 1
+                    },
+                    "rejection_reason": {
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "approved_by": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "approved_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "rejected_by": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "rejected_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "expires_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "deleted_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
                     },
                     "created_at": {
                         "type": "string",
@@ -4141,8 +6189,20 @@
             "description": "Autenticación dual (sesión por cookie para la SPA web, token Bearer para clientes móviles) con 2FA basado en un challenge temporal. Ver App\\Services\\Auth\\AuthService."
         },
         {
+            "name": "Badges",
+            "description": "Insignias de reciclaje (App\\Models\\Badge). El CRUD administrativo del catálogo está bajo /badges, protegido por auth:sanctum + ensureUserIsActive + role:superadmin,moderador. Las rutas de lectura/reclamo (/badges/catalog, /badges/my-progress, /badges/my-history, /badges/pending-claims, /badges/claim) solo exigen sesión/token activa, sin gate de rol — pensadas para la futura app móvil. El otorgamiento es un reclamo manual: al completar el progreso mensual solo se marca completed=true en App\\Models\\BadgeProgress, el usuario debe llamar a /badges/claim para recibir la insignia (App\\Models\\BadgeUser) y sus puntos (App\\Models\\BadgeEarning)."
+        },
+        {
             "name": "Containers",
             "description": "CRUD administrativo de contenedores de reciclaje. Todas las rutas están bajo /containers, protegidas por auth:sanctum + ensureUserIsActive + role:superadmin,moderador (middleware App\\Http\\Middleware\\EnsureUserHasRole). Alcance de este módulo: solo administración básica (nombre, número de serie, ubicación, coordenadas, estado activo/inactivo) — el tracking de sensores/nivel de llenado (tabla container_sensors) y el endpoint IoT de actualización de capacidad quedan fuera de alcance a propósito."
+        },
+        {
+            "name": "Redemptions",
+            "description": "Consulta de canjes de recompensas (point_redemptions) y confirmación de entrega en persona. Bajo /redemptions, protegidas por auth:sanctum + ensureUserIsActive + role:superadmin,moderador,admin_merchant. admin_merchant solo ve/gestiona los canjes de su propia alianza. El canje en sí (el cliente gastando sus puntos) no se hace desde este panel — se asume que ocurre desde una app móvil, fuera de alcance de este módulo."
+        },
+        {
+            "name": "Rewards",
+            "description": "Catálogo de recompensas canjeables por puntos. Bajo /rewards, protegidas por auth:sanctum + ensureUserIsActive + role:superadmin,moderador,admin_merchant (primer módulo del dashboard con acceso no-staff). admin_merchant solo ve/gestiona las recompensas de su propia alianza (App\\Models\\User::currentAlliance()) y sus creaciones quedan pendientes de revisión (App\\Enums\\RewardStatus::PENDING); superadmin/moderador gestionan cualquier alianza y sus creaciones se aprueban de una vez. Aprobar/rechazar es exclusivo de superadmin/moderador."
         },
         {
             "name": "TypeShop",

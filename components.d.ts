@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    BadgeEmblem: typeof import('./resources/js/components/BadgeEmblem.vue')['default']
     BalloonBlockEditor: typeof import('./resources/js/components/Base/Ckeditor/BalloonBlockEditor.vue')['default']
     BalloonEditor: typeof import('./resources/js/components/Base/Ckeditor/BalloonEditor.vue')['default']
     Button: typeof import('./resources/js/components/Base/Button/Button.vue')['default']
@@ -55,6 +56,7 @@ declare module 'vue' {
     Panels: typeof import('./resources/js/components/Base/Headless/Tab/Panels.vue')['default']
     Popover: typeof import('./resources/js/components/Base/Headless/Popover/Popover.vue')['default']
     Provider: typeof import('./resources/js/components/Base/Headless/Disclosure/Disclosure/Provider.vue')['default']
+    ReasonActionDialog: typeof import('./resources/js/components/ReasonActionDialog.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Slideover: typeof import('./resources/js/components/Base/Headless/Slideover/Slideover.vue')['default']
