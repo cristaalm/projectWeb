@@ -1814,6 +1814,451 @@
                 }
             }
         },
+        "/avatar/identify": {
+            "post": {
+                "tags": [
+                    "Avatar"
+                ],
+                "summary": "Identificar usuario en un contenedor (snapshot completo para Evi)",
+                "description": "Resuelve el contenedor por serial_number y el usuario por code_identity (QR/NFC), y arma un snapshot completo sobre App\\Services\\AvatarService::identify(). Evi calcula el nivel pedagógico internamente a partir de valid_scans — este endpoint nunca devuelve un \"nivel\".",
+                "operationId": "f56bed3738fe6fa17630c52eac2f8726",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "code_identity",
+                                    "container_serial_number"
+                                ],
+                                "properties": {
+                                    "code_identity": {
+                                        "type": "string",
+                                        "maxLength": 30,
+                                        "example": "ABC123"
+                                    },
+                                    "container_serial_number": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "SN-0001"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Identificación exitosa.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/AvatarIdentifySnapshot"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "API key ausente o inválida.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "El contenedor (container_serial_number) o el usuario (code_identity) no existen.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación: campos requeridos.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "eviApiKey": []
+                    }
+                ]
+            }
+        },
+        "/avatar/{user}/memories": {
+            "post": {
+                "tags": [
+                    "Avatar"
+                ],
+                "summary": "Guardar un resumen de la sesión (memoria entre visitas)",
+                "description": "Fase 2, opcional — pensado para llamarse al cerrar sesión con Evi. Escribe en App\\Models\\AgentMemory; no afecta scans ni puntos.",
+                "operationId": "d9c7e890227db16b7798535beaca3fbc",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "ID del usuario (users.id).",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "content"
+                                ],
+                                "properties": {
+                                    "content": {
+                                        "type": "string",
+                                        "example": "El usuario recicló 3 botellas y estuvo motivado."
+                                    },
+                                    "metadata": {
+                                        "type": "object",
+                                        "example": {
+                                            "mood": "happy"
+                                        },
+                                        "nullable": true,
+                                        "additionalProperties": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Memoria guardada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "creada": {
+                                        "summary": "Memoria guardada",
+                                        "value": {
+                                            "success": true,
+                                            "message": "Memoria guardada correctamente.",
+                                            "data": {
+                                                "memory": {
+                                                    "id": 1,
+                                                    "user_id": 42,
+                                                    "content": "El usuario recicló 3 botellas y estuvo motivado.",
+                                                    "metadata": {
+                                                        "mood": "happy"
+                                                    },
+                                                    "created_at": "2026-09-11T23:06:47.000000Z"
+                                                }
+                                            },
+                                            "errors": null,
+                                            "code": 201
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "API key ausente o inválida.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación: content requerido.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "eviApiKey": []
+                    }
+                ]
+            }
+        },
+        "/avatar/{user}/feedback": {
+            "post": {
+                "tags": [
+                    "Avatar"
+                ],
+                "summary": "Guardar una valoración del usuario sobre Evi",
+                "description": "Fase 2, opcional — solo si el usuario da feedback durante la sesión. Escribe en App\\Models\\AgentFeedback.",
+                "operationId": "8c82640c90d5e48d32eb48b0858bbc2f",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "ID del usuario (users.id).",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "thread_id",
+                                    "rating"
+                                ],
+                                "properties": {
+                                    "thread_id": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "abc-123"
+                                    },
+                                    "rating": {
+                                        "type": "integer",
+                                        "maximum": 5,
+                                        "minimum": 1,
+                                        "example": 5
+                                    },
+                                    "comment": {
+                                        "type": "string",
+                                        "example": "Muy buena experiencia",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Valoración registrada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "feedback": {
+                                                            "$ref": "#/components/schemas/AgentFeedback"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "API key ausente o inválida.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación: thread_id/rating requeridos, rating fuera de 1-5.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "eviApiKey": []
+                    }
+                ]
+            }
+        },
+        "/avatar/{user}/state": {
+            "patch": {
+                "tags": [
+                    "Avatar"
+                ],
+                "summary": "Actualizar el mood/estado del avatar durante la sesión",
+                "description": "Fase 2, opcional — solo si la app de Evi muestra el estado del avatar. Actualiza (o crea, si el usuario todavía no tenía fila) App\\Models\\Avatar. Al menos uno de current_mood/state es requerido.",
+                "operationId": "9f6313e48c6e83cedca5e885c94d6f0d",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "ID del usuario (users.id).",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "current_mood": {
+                                        "type": "string",
+                                        "maxLength": 50,
+                                        "example": "feliz",
+                                        "nullable": true
+                                    },
+                                    "state": {
+                                        "type": "string",
+                                        "maxLength": 50,
+                                        "example": "escuchando",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Estado del avatar actualizado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "avatar": {
+                                                            "$ref": "#/components/schemas/Avatar"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "API key ausente o inválida.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "No se envió current_mood ni state.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "eviApiKey": []
+                    }
+                ]
+            }
+        },
         "/badges": {
             "get": {
                 "tags": [
@@ -5490,6 +5935,69 @@
     },
     "components": {
         "schemas": {
+            "AgentFeedback": {
+                "description": "Valoración del usuario sobre una sesión con Evi (App\\Models\\AgentFeedback).",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 42
+                    },
+                    "thread_id": {
+                        "type": "string",
+                        "example": "abc-123"
+                    },
+                    "rating": {
+                        "type": "integer",
+                        "maximum": 5,
+                        "minimum": 1,
+                        "example": 5
+                    },
+                    "comment": {
+                        "type": "string",
+                        "example": "Muy buena experiencia",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "AgentMemory": {
+                "description": "Resumen de una interacción que Evi guarda para recordar entre visitas (App\\Models\\AgentMemory). Evi solo escribe content/metadata — embedding queda sin usar por ahora.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 42
+                    },
+                    "content": {
+                        "type": "string",
+                        "example": "El usuario recicló 3 botellas y estuvo motivado."
+                    },
+                    "metadata": {
+                        "type": "object",
+                        "example": {
+                            "mood": "happy"
+                        },
+                        "nullable": true,
+                        "additionalProperties": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "AllianceCatalogItem": {
                 "description": "Entrada del catálogo de alianzas activas (App\\Http\\Controllers\\AllianceController::catalog) — solo id y nombre, pensado para poblar selects (filtro/formulario de crear usuario). No es el recurso completo de Alliance.",
                 "properties": {
@@ -5589,6 +6097,220 @@
                     "updated_at": {
                         "type": "string",
                         "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "AvatarIdentifySnapshot": {
+                "description": "Snapshot completo que Evi carga una sola vez al identificarse en el contenedor (App\\Services\\AvatarService::identify()) y cachea en RAM durante toda la sesión — no vuelve a consultar por turno. Evi calcula el nivel pedagógico internamente a partir de valid_scans (umbrales 0-10/11-25/>25); esta API nunca devuelve un \"nivel\".",
+                "properties": {
+                    "container": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "serial_number": {
+                                "type": "string",
+                                "example": "SN-0001"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 42
+                    },
+                    "code_identity": {
+                        "type": "string",
+                        "example": "ABC123"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Juan"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "example": "Pérez"
+                    },
+                    "total_points": {
+                        "description": "Saldo calculado (App\\Repositories\\UserRepository::pointsBalance()), no una columna real.",
+                        "type": "integer",
+                        "example": 350
+                    },
+                    "valid_scans": {
+                        "description": "Reciclajes válidos de por vida (COUNT(scans WHERE scan_status = SUCCESS)).",
+                        "type": "integer",
+                        "example": 18
+                    },
+                    "streak": {
+                        "properties": {
+                            "current_streak": {
+                                "type": "integer",
+                                "example": 4
+                            },
+                            "best_streak": {
+                                "type": "integer",
+                                "example": 9
+                            },
+                            "streak_status": {
+                                "type": "boolean",
+                                "example": true
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "prefs": {
+                        "description": "Preferencias del avatar (App\\Models\\Avatar), creado con defaults neutros la primera vez si el usuario no tenía fila todavía.",
+                        "properties": {
+                            "tone": {
+                                "type": "string",
+                                "example": "amigable"
+                            },
+                            "socratic_mode": {
+                                "type": "boolean",
+                                "example": false
+                            },
+                            "lang": {
+                                "type": "string",
+                                "example": "es"
+                            },
+                            "voice": {
+                                "type": "string",
+                                "example": "default"
+                            },
+                            "feedback": {
+                                "type": "boolean",
+                                "example": true
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "tour": {
+                        "description": "true si el usuario ya vio el onboarding (users.tour).",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "points_month": {
+                        "description": "Puntos ganados (point_earnings) en el mes calendario actual.",
+                        "type": "integer",
+                        "example": 40
+                    },
+                    "badge": {
+                        "description": "Insignia de mayor nivel ya completada este mes. null si no hay ninguna.",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "example": "Reciclador Bronce"
+                            },
+                            "recycles_remaining": {
+                                "type": "integer",
+                                "example": 0
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "next_badge": {
+                        "description": "Siguiente insignia no completada este mes. null si no queda ninguna pendiente.",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "example": "Reciclador Plata"
+                            },
+                            "recycles_required": {
+                                "type": "integer",
+                                "example": 25
+                            },
+                            "recycles_remaining": {
+                                "type": "integer",
+                                "example": 7
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "recent_memories": {
+                        "description": "Hasta 3 resúmenes más recientes de App\\Models\\AgentMemory.content, más nuevo primero.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "El usuario recicló 3 botellas y estuvo motivado."
+                        ]
+                    },
+                    "alliance_id": {
+                        "description": "Alianza actual del usuario (User::currentAlliance()), vía merchant u organization_member.",
+                        "type": "integer",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "role_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "verification_status": {
+                        "description": "Nombre del case de App\\Enums\\VerificationStatus. Siempre null por ahora — la tabla identity_verifications no tiene migración en este esquema.",
+                        "type": "string",
+                        "enum": [
+                            "PENDING",
+                            "APPROVED",
+                            "REJECTED",
+                            "EMPTY",
+                            null
+                        ],
+                        "example": null,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "Avatar": {
+                "description": "Configuración/estado del avatar de Evi para un usuario (App\\Models\\Avatar). Se crea con defaults neutros en el primer acceso si el usuario todavía no tiene fila (App\\Repositories\\AvatarRepository::findOrCreateAvatar()).",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 42
+                    },
+                    "preferred_language": {
+                        "type": "string",
+                        "example": "es"
+                    },
+                    "selected_tone": {
+                        "type": "string",
+                        "example": "amigable"
+                    },
+                    "socratic_mode": {
+                        "type": "boolean",
+                        "example": false,
+                        "nullable": true
+                    },
+                    "feedback_enabled": {
+                        "type": "boolean",
+                        "example": true,
+                        "nullable": true
+                    },
+                    "voice_model": {
+                        "type": "string",
+                        "example": "default"
+                    },
+                    "current_mood": {
+                        "type": "string",
+                        "example": "neutral"
+                    },
+                    "state": {
+                        "type": "string",
+                        "example": "idle"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -6176,6 +6898,12 @@
                 "description": "Autenticación por token para clientes no-navegador (apps móviles). Token emitido por POST /api/auth/login o /api/auth/register cuando la petición no trae sesión de Sanctum activa. Enviar como header Authorization: Bearer {token}.",
                 "bearerFormat": "Personal Access Token",
                 "scheme": "bearer"
+            },
+            "eviApiKey": {
+                "type": "apiKey",
+                "description": "Autenticación máquina-a-máquina para el backend del asistente Evi (App\\Http\\Middleware\\EnsureValidServiceApiKey) — no es un usuario de Sanctum. Clave estática compartida, configurada en services.evi.api_key (env EVI_API_KEY).",
+                "name": "X-Api-Key",
+                "in": "header"
             }
         }
     },
@@ -6187,6 +6915,10 @@
         {
             "name": "Auth",
             "description": "Autenticación dual (sesión por cookie para la SPA web, token Bearer para clientes móviles) con 2FA basado en un challenge temporal. Ver App\\Services\\Auth\\AuthService."
+        },
+        {
+            "name": "Avatar",
+            "description": "Contrato de datos para el asistente conversacional Evi (proyecto RenovaAvatar). Quien llama a estas rutas es el backend de Evi/el software del contenedor, no un usuario logueado ni la SPA de este proyecto — por eso van autenticadas por API key compartida (App\\Http\\Middleware\\EnsureValidServiceApiKey), no por Sanctum. /avatar/identify es la llamada principal (1 sola vez por sesión, Evi cachea el resultado en RAM); las otras tres son de fase 2 (Evi escribe de vuelta memoria/feedback/estado del avatar) y son opcionales."
         },
         {
             "name": "Badges",

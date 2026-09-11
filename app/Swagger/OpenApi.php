@@ -18,7 +18,7 @@ use OpenApi\Attributes as OA;
     type: 'apiKey',
     in: 'cookie',
     name: 'laravel_session',
-    description: "Autenticación por sesión para la SPA web. Requiere primero pedir GET /sanctum/csrf-cookie y luego enviar el header X-XSRF-TOKEN (tomado de la cookie XSRF-TOKEN) en cada petición mutante. Sanctum activa este modo automáticamente para dominios listados en SANCTUM_STATEFUL_DOMAINS."
+    description: 'Autenticación por sesión para la SPA web. Requiere primero pedir GET /sanctum/csrf-cookie y luego enviar el header X-XSRF-TOKEN (tomado de la cookie XSRF-TOKEN) en cada petición mutante. Sanctum activa este modo automáticamente para dominios listados en SANCTUM_STATEFUL_DOMAINS.'
 )]
 #[OA\SecurityScheme(
     securityScheme: 'bearerToken',
@@ -26,6 +26,13 @@ use OpenApi\Attributes as OA;
     scheme: 'bearer',
     bearerFormat: 'Personal Access Token',
     description: 'Autenticación por token para clientes no-navegador (apps móviles). Token emitido por POST /api/auth/login o /api/auth/register cuando la petición no trae sesión de Sanctum activa. Enviar como header Authorization: Bearer {token}.'
+)]
+#[OA\SecurityScheme(
+    securityScheme: 'eviApiKey',
+    type: 'apiKey',
+    in: 'header',
+    name: 'X-Api-Key',
+    description: 'Autenticación máquina-a-máquina para el backend del asistente Evi (App\Http\Middleware\EnsureValidServiceApiKey) — no es un usuario de Sanctum. Clave estática compartida, configurada en services.evi.api_key (env EVI_API_KEY).'
 )]
 class OpenApi
 {
