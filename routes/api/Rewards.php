@@ -10,6 +10,8 @@ Route::prefix('rewards')
         Route::post('/', [RewardController::class, 'store']);
         Route::put('{id}', [RewardController::class, 'update']);
         Route::delete('{id}', [RewardController::class, 'destroy']);
+        Route::post('{id}/image', [RewardController::class, 'uploadImage']);
+        Route::delete('{id}/image', [RewardController::class, 'deleteImage']);
         Route::post('{id}/approve', [RewardController::class, 'approve'])->middleware('role:superadmin,moderador');
         Route::post('{id}/reject', [RewardController::class, 'reject'])->middleware('role:superadmin,moderador');
         Route::post('{id}/pause', [RewardController::class, 'pause']);

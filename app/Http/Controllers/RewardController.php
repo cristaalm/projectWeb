@@ -7,6 +7,7 @@ use App\Http\Controllers\OldControllers\Controller;
 use App\Http\Requests\Rewards\CreateRewardRequest;
 use App\Http\Requests\Rewards\ListRewardsRequest;
 use App\Http\Requests\Rewards\RejectRewardRequest;
+use App\Http\Requests\Rewards\UpdateRewardImageRequest;
 use App\Http\Requests\Rewards\UpdateRewardRequest;
 use App\Repositories\RewardRepository;
 use App\Services\RewardService;
@@ -79,6 +80,44 @@ class RewardController extends Controller
             $this->rewardService->delete($reward, $request->user());
 
             return $this->apiResponse(true, 'Recompensa eliminada correctamente.', null, null, 200);
+        } catch (RewardException $e) {
+            return $this->apiResponse(false, $e->getMessage(), null, $e->details, $e->status);
+        }
+    }
+
+    public function uploadImage(UpdateRewardImageRequest $request, int $id)
+    {
+        $reward = $this->rewards->findById($id);
+
+        if (! $reward) {
+            return $this->apiResponse(false, 'Recompensa no encontrada.', null, null, 404);
+        }
+
+        try {
+            $updated = $this->rewardService->updateImage($reward, $request->user(), $request->file('image'));
+
+            return $this->apiResponse(true, 'Imagen actualizada correctamente.', [
+                'reward' => $updated,
+            ], null, 200);
+        } catch (RewardException $e) {
+            return $this->apiResponse(false, $e->getMessage(), null, $e->details, $e->status);
+        }
+    }
+
+    public function deleteImage(Request $request, int $id)
+    {
+        $reward = $this->rewards->findById($id);
+
+        if (! $reward) {
+            return $this->apiResponse(false, 'Recompensa no encontrada.', null, null, 404);
+        }
+
+        try {
+            $updated = $this->rewardService->deleteImage($reward, $request->user());
+
+            return $this->apiResponse(true, 'Imagen eliminada correctamente.', [
+                'reward' => $updated,
+            ], null, 200);
         } catch (RewardException $e) {
             return $this->apiResponse(false, $e->getMessage(), null, $e->details, $e->status);
         }

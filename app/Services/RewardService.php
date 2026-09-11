@@ -7,6 +7,8 @@ use App\Exceptions\RewardException;
 use App\Models\Alliance;
 use App\Models\Reward;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class RewardService
 {
@@ -107,15 +109,49 @@ class RewardService
             'expires_at' => $data['expires_at'] ?? null,
         ]);
 
-        if (! $isStaff && $reward->status !== RewardStatus::PENDING) {
-            $reward->status = RewardStatus::PENDING;
-            $reward->approved_by = null;
-            $reward->approved_at = null;
-            $reward->rejected_by = null;
-            $reward->rejected_at = null;
-            $reward->rejection_reason = null;
+        $this->resetToPendingIfEdited($reward, $isStaff);
+
+        $reward->save();
+
+        return $reward;
+    }
+
+    /**
+     * Reemplaza la imagen del producto. Igual que editar el resto del
+     * contenido: si lo hace un admin_merchant sobre una recompensa ya
+     * revisada, la regresa a PENDING (misma regla que update()).
+     */
+    public function updateImage(Reward $reward, User $actor, UploadedFile $file): Reward
+    {
+        $isStaff = $this->isStaff($actor);
+        $this->assertOwnership($actor, $reward, $isStaff);
+
+        if ($reward->image_url) {
+            Storage::disk('public')->delete($reward->image_url);
         }
 
+        $path = "rewards/reward_{$reward->id}";
+        $filename = 'image.'.$file->getClientOriginalExtension();
+        $file->storeAs($path, $filename, 'public');
+
+        $reward->image_url = "$path/$filename";
+        $this->resetToPendingIfEdited($reward, $isStaff);
+        $reward->save();
+
+        return $reward;
+    }
+
+    public function deleteImage(Reward $reward, User $actor): Reward
+    {
+        $isStaff = $this->isStaff($actor);
+        $this->assertOwnership($actor, $reward, $isStaff);
+
+        if ($reward->image_url) {
+            Storage::disk('public')->delete($reward->image_url);
+        }
+
+        $reward->image_url = null;
+        $this->resetToPendingIfEdited($reward, $isStaff);
         $reward->save();
 
         return $reward;
@@ -187,7 +223,13 @@ class RewardService
     {
         $this->assertOwnership($actor, $reward);
 
+        $imagePath = $reward->image_url;
+
         $reward->delete();
+
+        if ($imagePath) {
+            Storage::disk('public')->delete($imagePath);
+        }
     }
 
     private function assertExclusiveAllowed(int $allianceId, bool $isExclusive): void
@@ -212,6 +254,25 @@ class RewardService
         if (! $alliance || $alliance->id !== $reward->alliance_id) {
             throw new RewardException('No tienes permisos para gestionar esta recompensa.', 403);
         }
+    }
+
+    /**
+     * Cualquier edición de contenido (datos o imagen) hecha por un
+     * admin_merchant sobre una recompensa ya revisada la manda de nuevo a
+     * pendiente — no toca el estado si edita staff.
+     */
+    private function resetToPendingIfEdited(Reward $reward, bool $isStaff): void
+    {
+        if ($isStaff || $reward->status === RewardStatus::PENDING) {
+            return;
+        }
+
+        $reward->status = RewardStatus::PENDING;
+        $reward->approved_by = null;
+        $reward->approved_at = null;
+        $reward->rejected_by = null;
+        $reward->rejected_at = null;
+        $reward->rejection_reason = null;
     }
 
     private function isStaff(User $actor): bool

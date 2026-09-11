@@ -25,6 +25,7 @@ class Reward extends Model
         'alliance_id',
         'name',
         'description',
+        'image_url',
         'points_required',
         'stock',
         'code',

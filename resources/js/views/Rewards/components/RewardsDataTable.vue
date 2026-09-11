@@ -1,5 +1,6 @@
 <script setup>
 import { useAuthStore } from '@/store/auth'
+import { storageURL } from '@/utils/constants'
 import {
   canApproveOrReject,
   canManageReward,
@@ -54,6 +55,10 @@ const HEADERS = [
   { title: '', key: 'actions', sortable: false, align: 'end' },
 ]
 
+function imageUrl(item) {
+  return item.image_url ? storageURL + item.image_url : null
+}
+
 function formatDate(value) {
   if (!value) return 'Sin vencimiento'
 
@@ -97,12 +102,31 @@ function hasAnyAction(item) {
     @update:sort-by="emit('update:sortBy', $event)"
   >
     <template #item.name="{ item }">
-      <div>
-        <div class="font-weight-medium">
-          {{ item.name }}
-        </div>
-        <div class="text-caption text-medium-emphasis">
-          {{ item.code }}
+      <div class="gap-3 d-flex align-center">
+        <VAvatar
+          size="36"
+          rounded="lg"
+          color="primary"
+          variant="tonal"
+        >
+          <VImg
+            v-if="imageUrl(item)"
+            :src="imageUrl(item)"
+            cover
+          />
+          <VIcon
+            v-else
+            icon="bx-gift"
+            size="18"
+          />
+        </VAvatar>
+        <div>
+          <div class="font-weight-medium">
+            {{ item.name }}
+          </div>
+          <div class="text-caption text-medium-emphasis">
+            {{ item.code }}
+          </div>
         </div>
       </div>
     </template>

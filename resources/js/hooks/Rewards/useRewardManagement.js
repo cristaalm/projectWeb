@@ -97,6 +97,66 @@ export function useRewardManagement() {
     return false
   }
 
+  const uploadRewardImage = async (rewardId, file) => {
+    resetState()
+    loading.value = true
+
+    try {
+      const formData = new FormData()
+
+      formData.append('image', file)
+
+      const response = await requestPost({ url: `rewards/${rewardId}/image`, data: formData, formData: true })
+
+      if (!response.success) {
+        error.value = true
+        toast.showToast({ message: response.message ?? messageError, tipo: 'error', duration: 8000 })
+
+        return null
+      }
+
+      toast.showToast({ message: response.message, tipo: 'success' })
+
+      return response.data.reward
+    } catch (err) {
+      error.value = true
+      console.error(err)
+      toast.showToast({ message: messageError, tipo: 'error' })
+    } finally {
+      loading.value = false
+    }
+
+    return null
+  }
+
+  const deleteRewardImage = async rewardId => {
+    resetState()
+    loading.value = true
+
+    try {
+      const response = await requestDelete({ url: `rewards/${rewardId}/image` })
+
+      if (!response.success) {
+        error.value = true
+        toast.showToast({ message: response.message ?? messageError, tipo: 'error', duration: 8000 })
+
+        return null
+      }
+
+      toast.showToast({ message: response.message, tipo: 'success' })
+
+      return response.data.reward
+    } catch (err) {
+      error.value = true
+      console.error(err)
+      toast.showToast({ message: messageError, tipo: 'error' })
+    } finally {
+      loading.value = false
+    }
+
+    return null
+  }
+
   const approveReward = async rewardId => {
     resetState()
     loading.value = true
@@ -215,6 +275,8 @@ export function useRewardManagement() {
     createReward,
     updateReward,
     deleteReward,
+    uploadRewardImage,
+    deleteRewardImage,
     approveReward,
     rejectReward,
     pauseReward,

@@ -4,6 +4,7 @@ import { useAllianceCatalog } from '@/hooks/Users/useAllianceCatalog'
 import { useAuthStore } from '@/store/auth'
 import { isStaff } from '@/utils/rewardPermissions'
 import { computed, ref, watch } from 'vue'
+import RewardImageUploader from './components/RewardImageUploader.vue'
 
 const props = defineProps({
   modelValue: { type: Boolean, required: true },
@@ -16,6 +17,10 @@ const emit = defineEmits(['update:modelValue', 'saved'])
 const { loading, createReward, updateReward } = useRewardManagement()
 const { alliances, loading: alliancesLoading, fetchAlliances } = useAllianceCatalog()
 const authStore = useAuthStore()
+
+// Guarda una copia local de la recompensa en edición para poder refrescar la
+// imagen apenas se sube/quita sin esperar a que se recargue la tabla completa.
+const editedReward = ref(null)
 
 const isEdit = computed(() => props.mode === 'edit')
 const dialogTitle = computed(() => (isEdit.value ? 'Editar recompensa' : 'Crear recompensa'))
@@ -64,6 +69,7 @@ function resetForm() {
       is_exclusive: Boolean(props.reward.is_exclusive),
       expires_at: props.reward.expires_at ? props.reward.expires_at.slice(0, 10) : '',
     }
+    editedReward.value = props.reward
   } else {
     form.value = {
       alliance_id: null,
@@ -74,6 +80,7 @@ function resetForm() {
       is_exclusive: false,
       expires_at: '',
     }
+    editedReward.value = null
   }
 }
 
@@ -83,6 +90,11 @@ watch(() => props.modelValue, open => {
     if (staffUser.value) fetchAlliances()
   }
 })
+
+function onImageUpdated(reward) {
+  editedReward.value = reward
+  emit('saved')
+}
 
 async function submit() {
   const payload = {
@@ -118,6 +130,23 @@ async function submit() {
   >
     <VCard :title="dialogTitle">
       <VCardText>
+        <div
+          v-if="isEdit && editedReward"
+          class="mb-4"
+        >
+          <RewardImageUploader
+            :reward-id="editedReward.id"
+            :image-url="editedReward.image_url"
+            @updated="onImageUpdated"
+          />
+        </div>
+        <p
+          v-else
+          class="mb-4 text-caption text-medium-emphasis"
+        >
+          Podrás subir la imagen del producto después de crear la recompensa.
+        </p>
+
         <VForm @submit.prevent="submit">
           <VRow>
             <VCol
