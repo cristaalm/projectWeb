@@ -28,6 +28,13 @@ class TypeShopController extends Controller
         ], null, 200);
     }
 
+    public function activeCatalog()
+    {
+        return $this->apiResponse(true, 'Categorías obtenidas correctamente.', [
+            'type_shops' => $this->typeShops->activeCatalog(),
+        ], null, 200);
+    }
+
     public function index(ListTypeShopRequest $request)
     {
         $paginated = $this->typeShops->paginate($request->validated());

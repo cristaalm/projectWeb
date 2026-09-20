@@ -6,6 +6,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth:sanctum', 'ensureUserIsActive'])
     ->get('type-shop/catalog', [TypeShopController::class, 'catalog']);
 
+// Solo categorías activas, para la app móvil (el `catalog` de arriba también lista las inactivas).
+Route::middleware(['auth:sanctum', 'ensureUserIsActive'])
+    ->get('type-shop/active', [TypeShopController::class, 'activeCatalog']);
+
 Route::prefix('type-shop')
     ->middleware(['auth:sanctum', 'ensureUserIsActive', 'role:superadmin,moderador'])
     ->group(function () {

@@ -6,6 +6,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth:sanctum', 'ensureUserIsActive'])
     ->get('alliances/catalog', [AllianceController::class, 'catalog']);
 
+// Listado público de comercios activos para la app móvil (paginado, con filtro por categoría).
+Route::middleware(['auth:sanctum', 'ensureUserIsActive'])
+    ->get('alliances/shops', [AllianceController::class, 'shops']);
+
 Route::prefix('alliances')
     ->middleware(['auth:sanctum', 'ensureUserIsActive', 'role:superadmin,moderador'])
     ->group(function () {

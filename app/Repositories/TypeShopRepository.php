@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\TypeShop;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 
 class TypeShopRepository
@@ -24,6 +25,15 @@ class TypeShopRepository
         return TypeShop::whereRaw('LOWER(name) = ?', [Str::lower($name)])
             ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
             ->exists();
+    }
+
+    /**
+     * Categorías activas para la app móvil — a diferencia del `catalog` del admin,
+     * que también lista las inactivas.
+     */
+    public function activeCatalog(): Collection
+    {
+        return TypeShop::where('is_active', true)->orderBy('name')->get(['id', 'name']);
     }
 
     public function paginate(array $filters): LengthAwarePaginator

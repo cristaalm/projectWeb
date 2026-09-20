@@ -7,8 +7,10 @@ use App\Exceptions\AllianceException;
 use App\Http\Controllers\OldControllers\Controller;
 use App\Http\Requests\Alliances\CreateAllianceRequest;
 use App\Http\Requests\Alliances\ListAlliancesRequest;
+use App\Http\Requests\Alliances\ListShopsRequest;
 use App\Http\Requests\Alliances\UpdateAllianceLogoRequest;
 use App\Http\Requests\Alliances\UpdateAllianceRequest;
+use App\Http\Resources\ShopResource;
 use App\Models\Alliance;
 use App\Repositories\AllianceRepository;
 use App\Services\AllianceService;
@@ -30,6 +32,16 @@ class AllianceController extends Controller
         return $this->apiResponse(true, 'Alianzas obtenidas correctamente.', [
             'alliances' => $alliances,
         ], null, 200);
+    }
+
+    public function shops(ListShopsRequest $request)
+    {
+        $paginated = $this->alliances->paginateShops($request->validated());
+
+        $data = $this->unsetDataPagination($paginated);
+        $data['data'] = ShopResource::collection($paginated->items())->resolve($request);
+
+        return $this->apiResponse(true, 'Comercios obtenidos correctamente.', $data, null, 200);
     }
 
     public function index(ListAlliancesRequest $request)
