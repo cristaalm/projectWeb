@@ -16,6 +16,7 @@ require __DIR__.'/api/Dash.php';
 require __DIR__.'/api/Notifications.php';
 require __DIR__.'/api/Badge.php';
 require __DIR__.'/api/Avatar.php';
+require __DIR__.'/api/Points.php';
 
 Route::get('/health', function () {
     return response()->json(['status' => 'ok', 'time' => now()]);
