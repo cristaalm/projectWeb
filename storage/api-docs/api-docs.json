@@ -91,6 +91,153 @@
                 ]
             }
         },
+        "/alliances/shops": {
+            "get": {
+                "tags": [
+                    "Alliances"
+                ],
+                "summary": "Comercios activos (app móvil)",
+                "description": "Listado paginado de comercios con status activo, ordenado por nombre, con filtro opcional por categoría en el mismo endpoint (App\\Repositories\\AllianceRepository::paginateShops()). A diferencia del listado admin, no expone datos de contacto (contact_name, contact_email, phone) y la búsqueda solo mira nombre y dirección. logo_url ya viene como URL absoluta. Un comercio activo se lista aunque su categoría esté inactiva. Solo exige sesión/token activa, sin gate de rol.",
+                "operationId": "27b3b5b78aab6d90c9c4a6b5c0bf05e7",
+                "parameters": [
+                    {
+                        "name": "type_shop_id",
+                        "in": "query",
+                        "description": "Solo comercios de esta categoría (ver /type-shop/active).",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "description": "Búsqueda libre por nombre o dirección (ilike).",
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 100
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 15,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Página de comercios.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/Shop"
+                                                            }
+                                                        },
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "last_page": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "pagina": {
+                                        "summary": "Página de comercios",
+                                        "value": {
+                                            "success": true,
+                                            "message": "Comercios obtenidos correctamente.",
+                                            "data": {
+                                                "data": [
+                                                    {
+                                                        "id": 1,
+                                                        "name": "Café Central",
+                                                        "logo_url": "https://api.ejemplo.com/storage/alliances/alliance_1/logo.png",
+                                                        "address": "Calle Uno 10, Centro",
+                                                        "latitude": 19.4326,
+                                                        "longitude": -99.1332,
+                                                        "has_exclusive_rewards": false,
+                                                        "type_shop": {
+                                                            "id": 3,
+                                                            "name": "Cafetería"
+                                                        }
+                                                    }
+                                                ],
+                                                "last_page": 1,
+                                                "total": 1
+                                            },
+                                            "errors": null,
+                                            "code": 200
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado, o la cuenta fue dada de baja.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Parámetros inválidos (ej. type_shop_id de una categoría que no existe).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
         "/alliances": {
             "get": {
                 "tags": [
@@ -3478,6 +3625,282 @@
                 ]
             }
         },
+        "/points/balance": {
+            "get": {
+                "tags": [
+                    "Points"
+                ],
+                "summary": "Total de puntos y última vez que cambiaron",
+                "description": "total_points es el saldo actual. last_changed_at es la fecha del movimiento más reciente entre las mismas fuentes que componen el saldo (reciclaje, insignias, ajustes y canjes REDEEMED/DELIVERED); null si el usuario nunca ha tenido movimientos.",
+                "operationId": "be0cce8fb3369e1002fc00dce63394bd",
+                "responses": {
+                    "200": {
+                        "description": "Saldo del usuario.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "con_movimientos": {
+                                        "summary": "Usuario con movimientos",
+                                        "value": {
+                                            "success": true,
+                                            "message": "Saldo de puntos obtenido correctamente.",
+                                            "data": {
+                                                "total_points": 18,
+                                                "last_changed_at": "2026-09-20T19:21:28.000000Z"
+                                            },
+                                            "errors": null,
+                                            "code": 200
+                                        }
+                                    },
+                                    "sin_movimientos": {
+                                        "summary": "Usuario sin movimientos",
+                                        "value": {
+                                            "success": true,
+                                            "message": "Saldo de puntos obtenido correctamente.",
+                                            "data": {
+                                                "total_points": 0,
+                                                "last_changed_at": null
+                                            },
+                                            "errors": null,
+                                            "code": 200
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado, o la cuenta fue dada de baja.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/points/movements": {
+            "get": {
+                "tags": [
+                    "Points"
+                ],
+                "summary": "Últimos movimientos de puntos",
+                "description": "Historial paginado del saldo, más reciente primero. Cada movimiento trae points con signo. Los canjes cancelados o expirados no aparecen (no afectan el saldo). La respuesta usa el mismo formato de paginación que el resto de listados: data.data, data.total y data.last_page.",
+                "operationId": "77b63dc398c13f8726bc256479c9efc7",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 15,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Página de movimientos.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/PointMovement"
+                                                            }
+                                                        },
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 4
+                                                        },
+                                                        "last_page": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "pagina": {
+                                        "summary": "Página de movimientos",
+                                        "value": {
+                                            "success": true,
+                                            "message": "Movimientos de puntos obtenidos correctamente.",
+                                            "data": {
+                                                "data": [
+                                                    {
+                                                        "type": "redemption",
+                                                        "label": "Canje",
+                                                        "description": "Café gratis",
+                                                        "points": -20,
+                                                        "created_at": "2026-09-20T19:21:28.000000Z"
+                                                    },
+                                                    {
+                                                        "type": "adjustment",
+                                                        "label": "Ajuste",
+                                                        "description": "Corrección de puntos",
+                                                        "points": -4,
+                                                        "created_at": "2026-09-20T19:01:28.000000Z"
+                                                    },
+                                                    {
+                                                        "type": "badge",
+                                                        "label": "Insignia",
+                                                        "description": "Reciclador del mes",
+                                                        "points": 20,
+                                                        "created_at": "2026-09-20T17:31:28.000000Z"
+                                                    },
+                                                    {
+                                                        "type": "earning",
+                                                        "label": "Reciclaje",
+                                                        "description": "PET",
+                                                        "points": 5,
+                                                        "created_at": "2026-09-20T16:31:28.000000Z"
+                                                    }
+                                                ],
+                                                "last_page": 1,
+                                                "total": 4
+                                            },
+                                            "errors": null,
+                                            "code": 200
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado, o la cuenta fue dada de baja.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Parámetros de paginación inválidos.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/points/month": {
+            "get": {
+                "tags": [
+                    "Points"
+                ],
+                "summary": "Puntos ganados en el mes",
+                "description": "Puntos ganados por actividad en el mes calendario en curso (zona horaria de la aplicación): reciclaje (point_earnings) más insignias reclamadas (badge_earnings). No incluye ajustes de admin ni descuenta canjes. Es el mismo cálculo que el points_month que devuelve /avatar/identify (Evi), por lo que ambos números siempre coinciden.",
+                "operationId": "38821e04969fcefe8d38f5ffd5031b8f",
+                "responses": {
+                    "200": {
+                        "description": "Puntos del mes.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "mes": {
+                                        "summary": "Mes en curso",
+                                        "value": {
+                                            "success": true,
+                                            "message": "Puntos del mes obtenidos correctamente.",
+                                            "data": {
+                                                "month": "2026-09",
+                                                "points_month": 35
+                                            },
+                                            "errors": null,
+                                            "code": 200
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado, o la cuenta fue dada de baja.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
         "/redemptions": {
             "get": {
                 "tags": [
@@ -4539,6 +4962,73 @@
                     },
                     "403": {
                         "description": "La cuenta del usuario ya no está activa.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/type-shop/active": {
+            "get": {
+                "tags": [
+                    "TypeShop"
+                ],
+                "summary": "Categorías activas (app móvil)",
+                "description": "Solo las categorías con is_active = true, ordenadas por nombre y con la forma mínima (id + name) — pensada para pintar los filtros de la app móvil. A diferencia de /type-shop/catalog (uso admin), no lista las inactivas. El id sirve como type_shop_id en /alliances/shops.",
+                "operationId": "84ea3e1b0c3e0fc37ab05ebad5a0c6ad",
+                "responses": {
+                    "200": {
+                        "description": "Categorías activas.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "activas": {
+                                        "summary": "Categorías activas",
+                                        "value": {
+                                            "success": true,
+                                            "message": "Categorías obtenidas correctamente.",
+                                            "data": {
+                                                "type_shops": [
+                                                    {
+                                                        "id": 1,
+                                                        "name": "Cafetería"
+                                                    },
+                                                    {
+                                                        "id": 2,
+                                                        "name": "Supermercado"
+                                                    }
+                                                ]
+                                            },
+                                            "errors": null,
+                                            "code": 200
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado, o la cuenta fue dada de baja.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -6192,7 +6682,7 @@
                         "example": false
                     },
                     "points_month": {
-                        "description": "Puntos ganados (point_earnings) en el mes calendario actual.",
+                        "description": "Puntos ganados por actividad en el mes calendario actual: reciclaje (point_earnings) más insignias reclamadas (badge_earnings). No incluye ajustes de admin ni canjes. Mismo cálculo que GET /points/month (App\\Repositories\\PointRepository::earnedInMonth()).",
                         "type": "integer",
                         "example": 40
                     },
@@ -6526,6 +7016,45 @@
                 },
                 "type": "object"
             },
+            "PointMovement": {
+                "description": "Movimiento del saldo de puntos del usuario autenticado (App\\Http\\Resources\\PointMovementResource sobre App\\Repositories\\PointRepository::movements()). Une 4 fuentes: reciclaje (point_earnings), insignias (badge_earnings), ajustes de admin (point_adjustments) y canjes (point_redemptions, solo REDEEMED/DELIVERED). La suma de todos los points coincide con total_points de /points/balance.",
+                "properties": {
+                    "type": {
+                        "description": "Fuente del movimiento (App\\Enums\\PointMovementType).",
+                        "type": "string",
+                        "enum": [
+                            "earning",
+                            "badge",
+                            "adjustment",
+                            "redemption"
+                        ],
+                        "example": "earning"
+                    },
+                    "label": {
+                        "description": "Etiqueta en español del tipo: Reciclaje, Insignia, Ajuste o Canje.",
+                        "type": "string",
+                        "example": "Reciclaje"
+                    },
+                    "description": {
+                        "description": "Reciclaje: nombre del material. Insignia: nombre de la insignia. Ajuste: motivo. Canje: nombre de la recompensa.",
+                        "type": "string",
+                        "example": "PET",
+                        "nullable": true
+                    },
+                    "points": {
+                        "description": "Puntos con signo: positivo suma al saldo, negativo lo descuenta (ajustes negativos y canjes = puntos × cantidad).",
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-09-20T16:31:28.000000Z",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
             "PointRedemption": {
                 "description": "Canje de una recompensa por un usuario (App\\Models\\PointRedemption, tabla point_redemptions).",
                 "properties": {
@@ -6713,6 +7242,61 @@
                     "updated_at": {
                         "type": "string",
                         "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Shop": {
+                "description": "Comercio activo en su forma pública para la app móvil (App\\Http\\Resources\\ShopResource sobre App\\Models\\Alliance). No incluye datos de contacto administrativo (contact_name, contact_email, phone) ni status/timestamps.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Café Central"
+                    },
+                    "logo_url": {
+                        "description": "URL absoluta del logo (disco public, Storage::url). null si el comercio no tiene logo. Requiere APP_URL correcto en el entorno.",
+                        "type": "string",
+                        "example": "https://api.ejemplo.com/storage/alliances/alliance_1/logo.png",
+                        "nullable": true
+                    },
+                    "address": {
+                        "type": "string",
+                        "example": "Calle Uno 10, Centro"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 19.4326,
+                        "nullable": true
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": -99.1332,
+                        "nullable": true
+                    },
+                    "has_exclusive_rewards": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "type_shop": {
+                        "description": "Categoría del comercio.",
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 3
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Cafetería"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -6910,7 +7494,7 @@
     "tags": [
         {
             "name": "Alliances",
-            "description": "CRUD administrativo de alianzas (comercios). Las rutas de administración están bajo /alliances, protegidas por auth:sanctum + ensureUserIsActive + role:superadmin,moderador (App\\Http\\Middleware\\EnsureUserHasRole); el catálogo (/alliances/catalog) solo exige sesión/token activa. El campo has_exclusive_rewards controla si la alianza acepta enlazar usuarios con rol member — ver App\\Http\\Requests\\Users\\CreateUserRequest."
+            "description": "CRUD administrativo de alianzas (comercios). Las rutas de administración están bajo /alliances, protegidas por auth:sanctum + ensureUserIsActive + role:superadmin,moderador (App\\Http\\Middleware\\EnsureUserHasRole); el catálogo (/alliances/catalog) y el listado público para la app móvil (/alliances/shops) solo exigen sesión/token activa. El campo has_exclusive_rewards controla si la alianza acepta enlazar usuarios con rol member — ver App\\Http\\Requests\\Users\\CreateUserRequest."
         },
         {
             "name": "Auth",
@@ -6929,6 +7513,10 @@
             "description": "CRUD administrativo de contenedores de reciclaje. Todas las rutas están bajo /containers, protegidas por auth:sanctum + ensureUserIsActive + role:superadmin,moderador (middleware App\\Http\\Middleware\\EnsureUserHasRole). Alcance de este módulo: solo administración básica (nombre, número de serie, ubicación, coordenadas, estado activo/inactivo) — el tracking de sensores/nivel de llenado (tabla container_sensors) y el endpoint IoT de actualización de capacidad quedan fuera de alcance a propósito."
         },
         {
+            "name": "Points",
+            "description": "Puntos del usuario autenticado, pensados para la app móvil. Todas las rutas están bajo /points y solo exigen sesión/token activa (auth:sanctum + ensureUserIsActive), sin gate de rol: siempre responden sobre el propio usuario del token. El saldo no es una columna real: se calcula como point_earnings + point_adjustments + badge_earnings − canjes REDEEMED/DELIVERED (App\\Repositories\\UserRepository::pointsBalance()). No existe endpoint de escritura: los puntos los generan el flujo de scan, las insignias, los ajustes de admin y los canjes."
+        },
+        {
             "name": "Redemptions",
             "description": "Consulta de canjes de recompensas (point_redemptions) y confirmación de entrega en persona. Bajo /redemptions, protegidas por auth:sanctum + ensureUserIsActive + role:superadmin,moderador,admin_merchant. admin_merchant solo ve/gestiona los canjes de su propia alianza. El canje en sí (el cliente gastando sus puntos) no se hace desde este panel — se asume que ocurre desde una app móvil, fuera de alcance de este módulo."
         },
@@ -6938,7 +7526,7 @@
         },
         {
             "name": "TypeShop",
-            "description": "CRUD administrativo de categorías de comercio (App\\Models\\TypeShop) — clasifican a las alianzas (ej. Supermercado, Farmacia). Las rutas de administración están bajo /type-shop, protegidas por auth:sanctum + ensureUserIsActive + role:superadmin,moderador; el catálogo (/type-shop/catalog) solo exige sesión/token activa."
+            "description": "CRUD administrativo de categorías de comercio (App\\Models\\TypeShop) — clasifican a las alianzas (ej. Supermercado, Farmacia). Las rutas de administración están bajo /type-shop, protegidas por auth:sanctum + ensureUserIsActive + role:superadmin,moderador; el catálogo (/type-shop/catalog) y el listado de activas para la app móvil (/type-shop/active) solo exigen sesión/token activa."
         },
         {
             "name": "Users",

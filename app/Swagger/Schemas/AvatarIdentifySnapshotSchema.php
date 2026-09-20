@@ -44,7 +44,7 @@ use OpenApi\Attributes as OA;
             ]
         ),
         new OA\Property(property: 'tour', type: 'boolean', description: 'true si el usuario ya vio el onboarding (users.tour).', example: false),
-        new OA\Property(property: 'points_month', type: 'integer', description: 'Puntos ganados (point_earnings) en el mes calendario actual.', example: 40),
+        new OA\Property(property: 'points_month', type: 'integer', description: 'Puntos ganados por actividad en el mes calendario actual: reciclaje (point_earnings) más insignias reclamadas (badge_earnings). No incluye ajustes de admin ni canjes. Mismo cálculo que GET /points/month (App\Repositories\PointRepository::earnedInMonth()).', example: 40),
         new OA\Property(
             property: 'badge',
             nullable: true,

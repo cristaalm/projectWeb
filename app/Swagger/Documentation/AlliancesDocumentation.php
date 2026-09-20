@@ -4,7 +4,7 @@ namespace App\Swagger\Documentation;
 
 use OpenApi\Attributes as OA;
 
-#[OA\Tag(name: 'Alliances', description: 'CRUD administrativo de alianzas (comercios). Las rutas de administración están bajo /alliances, protegidas por auth:sanctum + ensureUserIsActive + role:superadmin,moderador (App\Http\Middleware\EnsureUserHasRole); el catálogo (/alliances/catalog) solo exige sesión/token activa. El campo has_exclusive_rewards controla si la alianza acepta enlazar usuarios con rol member — ver App\Http\Requests\Users\CreateUserRequest.')]
+#[OA\Tag(name: 'Alliances', description: 'CRUD administrativo de alianzas (comercios). Las rutas de administración están bajo /alliances, protegidas por auth:sanctum + ensureUserIsActive + role:superadmin,moderador (App\Http\Middleware\EnsureUserHasRole); el catálogo (/alliances/catalog) y el listado público para la app móvil (/alliances/shops) solo exigen sesión/token activa. El campo has_exclusive_rewards controla si la alianza acepta enlazar usuarios con rol member — ver App\Http\Requests\Users\CreateUserRequest.')]
 class AlliancesDocumentation
 {
     #[OA\Get(
@@ -31,6 +31,42 @@ class AlliancesDocumentation
         ]
     )]
     public function catalog() {}
+
+    #[OA\Get(
+        path: '/alliances/shops',
+        tags: ['Alliances'],
+        summary: 'Comercios activos (app móvil)',
+        description: 'Listado paginado de comercios con status activo, ordenado por nombre, con filtro opcional por categoría en el mismo endpoint (App\Repositories\AllianceRepository::paginateShops()). A diferencia del listado admin, no expone datos de contacto (contact_name, contact_email, phone) y la búsqueda solo mira nombre y dirección. logo_url ya viene como URL absoluta. Un comercio activo se lista aunque su categoría esté inactiva. Solo exige sesión/token activa, sin gate de rol.',
+        security: [['sessionCookie' => []], ['bearerToken' => []]],
+        parameters: [
+            new OA\Parameter(name: 'type_shop_id', in: 'query', description: 'Solo comercios de esta categoría (ver /type-shop/active).', schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'query', in: 'query', description: 'Búsqueda libre por nombre o dirección (ilike).', schema: new OA\Schema(type: 'string', maxLength: 100)),
+            new OA\Parameter(name: 'page', in: 'query', schema: new OA\Schema(type: 'integer', minimum: 1, default: 1)),
+            new OA\Parameter(name: 'per_page', in: 'query', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 100, default: 15)),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Página de comercios.',
+                content: new OA\JsonContent(
+                    allOf: [new OA\Schema(ref: '#/components/schemas/SuccessResponse')],
+                    properties: [new OA\Property(property: 'data', type: 'object', properties: [
+                        new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/Shop')),
+                        new OA\Property(property: 'total', type: 'integer', example: 1),
+                        new OA\Property(property: 'last_page', type: 'integer', example: 1),
+                    ])],
+                    examples: [new OA\Examples(
+                        example: 'pagina',
+                        summary: 'Página de comercios',
+                        value: ['success' => true, 'message' => 'Comercios obtenidos correctamente.', 'data' => ['data' => [['id' => 1, 'name' => 'Café Central', 'logo_url' => 'https://api.ejemplo.com/storage/alliances/alliance_1/logo.png', 'address' => 'Calle Uno 10, Centro', 'latitude' => 19.4326, 'longitude' => -99.1332, 'has_exclusive_rewards' => false, 'type_shop' => ['id' => 3, 'name' => 'Cafetería']]], 'last_page' => 1, 'total' => 1], 'errors' => null, 'code' => 200]
+                    )]
+                )
+            ),
+            new OA\Response(response: 401, description: 'No autenticado, o la cuenta fue dada de baja.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 422, description: 'Parámetros inválidos (ej. type_shop_id de una categoría que no existe).', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+        ]
+    )]
+    public function shops() {}
 
     #[OA\Get(
         path: '/alliances',

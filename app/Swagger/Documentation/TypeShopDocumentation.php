@@ -4,7 +4,7 @@ namespace App\Swagger\Documentation;
 
 use OpenApi\Attributes as OA;
 
-#[OA\Tag(name: 'TypeShop', description: 'CRUD administrativo de categorías de comercio (App\Models\TypeShop) — clasifican a las alianzas (ej. Supermercado, Farmacia). Las rutas de administración están bajo /type-shop, protegidas por auth:sanctum + ensureUserIsActive + role:superadmin,moderador; el catálogo (/type-shop/catalog) solo exige sesión/token activa.')]
+#[OA\Tag(name: 'TypeShop', description: 'CRUD administrativo de categorías de comercio (App\Models\TypeShop) — clasifican a las alianzas (ej. Supermercado, Farmacia). Las rutas de administración están bajo /type-shop, protegidas por auth:sanctum + ensureUserIsActive + role:superadmin,moderador; el catálogo (/type-shop/catalog) y el listado de activas para la app móvil (/type-shop/active) solo exigen sesión/token activa.')]
 class TypeShopDocumentation
 {
     #[OA\Get(
@@ -33,6 +33,30 @@ class TypeShopDocumentation
     public function catalog()
     {
     }
+
+    #[OA\Get(
+        path: '/type-shop/active',
+        tags: ['TypeShop'],
+        summary: 'Categorías activas (app móvil)',
+        description: 'Solo las categorías con is_active = true, ordenadas por nombre y con la forma mínima (id + name) — pensada para pintar los filtros de la app móvil. A diferencia de /type-shop/catalog (uso admin), no lista las inactivas. El id sirve como type_shop_id en /alliances/shops.',
+        security: [['sessionCookie' => []], ['bearerToken' => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Categorías activas.',
+                content: new OA\JsonContent(
+                    allOf: [new OA\Schema(ref: '#/components/schemas/SuccessResponse')],
+                    examples: [new OA\Examples(
+                        example: 'activas',
+                        summary: 'Categorías activas',
+                        value: ['success' => true, 'message' => 'Categorías obtenidas correctamente.', 'data' => ['type_shops' => [['id' => 1, 'name' => 'Cafetería'], ['id' => 2, 'name' => 'Supermercado']]], 'errors' => null, 'code' => 200]
+                    )]
+                )
+            ),
+            new OA\Response(response: 401, description: 'No autenticado, o la cuenta fue dada de baja.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+        ]
+    )]
+    public function activeCatalog() {}
 
     #[OA\Get(
         path: '/type-shop',
