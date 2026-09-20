@@ -12,7 +12,6 @@ use App\Models\Scan;
 use App\Models\UserStreak;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class AvatarRepository
 {
@@ -48,14 +47,6 @@ class AvatarRepository
         return Scan::where('user_id', $userId)
             ->where('scan_status', ScanStatus::SUCCESS)
             ->count();
-    }
-
-    public function pointsEarnedThisMonth(int $userId): int
-    {
-        return (int) DB::table('point_earnings')
-            ->where('user_id', $userId)
-            ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
-            ->sum('points');
     }
 
     /** @return Collection<int, Badge> */

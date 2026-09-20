@@ -9,6 +9,7 @@ use App\Models\Avatar;
 use App\Models\IdentityVerification;
 use App\Repositories\AvatarRepository;
 use App\Repositories\ContainerRepository;
+use App\Repositories\PointRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Schema;
 
@@ -18,6 +19,7 @@ class AvatarService
         private readonly UserRepository $users,
         private readonly ContainerRepository $containers,
         private readonly AvatarRepository $avatarRepo,
+        private readonly PointRepository $points,
     ) {}
 
     /**
@@ -68,7 +70,7 @@ class AvatarService
                 'feedback' => (bool) $avatar->feedback_enabled,
             ],
             'tour' => (bool) $user->tour,
-            'points_month' => $this->avatarRepo->pointsEarnedThisMonth($user->id),
+            'points_month' => $this->points->earnedInMonth($user->id, now()),
             'badge' => $badge,
             'next_badge' => $nextBadge,
             'recent_memories' => $this->avatarRepo->recentMemories($user->id)
