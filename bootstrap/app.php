@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'ensureUserIsActive' => \App\Http\Middleware\EnsureUserIsActive::class,
             'role' => \App\Http\Middleware\EnsureUserHasRole::class,
             'service.apiKey' => \App\Http\Middleware\EnsureValidServiceApiKey::class,
+            'container.token' => \App\Http\Middleware\EnsureValidContainerToken::class,
         ]);
 
         // Middleware global para el grupo 'api': arranca la sesión/cookie para

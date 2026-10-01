@@ -15,8 +15,7 @@ class ContainerController extends Controller
     public function __construct(
         private readonly ContainerService $containerService,
         private readonly ContainerRepository $containers,
-    ) {
-    }
+    ) {}
 
     public function index(ListContainersRequest $request)
     {
@@ -58,6 +57,32 @@ class ContainerController extends Controller
         } catch (ContainerException $e) {
             return $this->apiResponse(false, $e->getMessage(), null, $e->details, $e->status);
         }
+    }
+
+    public function token(int $id)
+    {
+        $container = $this->containers->findById($id);
+
+        if (! $container) {
+            return $this->apiResponse(false, 'Contenedor no encontrado.', null, null, 404);
+        }
+
+        return $this->apiResponse(true, 'Token obtenido correctamente.', [
+            'token' => $container->api_token,
+        ], null, 200);
+    }
+
+    public function regenerateToken(int $id)
+    {
+        $container = $this->containers->findById($id);
+
+        if (! $container) {
+            return $this->apiResponse(false, 'Contenedor no encontrado.', null, null, 404);
+        }
+
+        return $this->apiResponse(true, 'Token regenerado correctamente.', [
+            'token' => $this->containerService->regenerateToken($container),
+        ], null, 200);
     }
 
     public function destroy(int $id)

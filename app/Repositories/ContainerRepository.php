@@ -32,6 +32,11 @@ class ContainerRepository
         return Container::where('serial_number', $serialNumber)->first();
     }
 
+    public function findByToken(string $token): ?Container
+    {
+        return Container::where('api_token_hash', Container::hashToken($token))->first();
+    }
+
     public function paginate(array $filters): LengthAwarePaginator
     {
         $query = Container::query();

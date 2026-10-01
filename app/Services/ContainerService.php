@@ -10,8 +10,7 @@ class ContainerService
 {
     public function __construct(
         private readonly ContainerRepository $containers,
-    ) {
-    }
+    ) {}
 
     public function create(array $data): Container
     {
@@ -31,6 +30,19 @@ class ContainerService
         $container->update($data);
 
         return $container;
+    }
+
+    /**
+     * Rota el token del contenedor: el anterior deja de funcionar de
+     * inmediato, así que el equipo físico queda sin acceso hasta que se le
+     * cargue el nuevo.
+     */
+    public function regenerateToken(Container $container): string
+    {
+        $token = $container->assignNewToken();
+        $container->save();
+
+        return $token;
     }
 
     public function delete(Container $container): void
