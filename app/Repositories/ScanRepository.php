@@ -67,7 +67,9 @@ class ScanRepository
         $sortBy = in_array($filters['key'] ?? null, self::SORTABLE_COLUMNS, true) ? $filters['key'] : 'id';
         $sortDir = ($filters['order'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
 
-        $query->orderBy($sortBy, $sortDir);
+        // Desempate por id: varios escaneos pueden compartir segundo o puntos,
+        // y sin un orden total las páginas podrían repetir u omitir filas.
+        $query->orderBy($sortBy, $sortDir)->orderBy('id', $sortDir);
 
         return $query->paginate($filters['per_page'] ?? 15);
     }
