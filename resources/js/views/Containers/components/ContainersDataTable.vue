@@ -1,4 +1,5 @@
 <script setup>
+import ContainerTokenCell from './ContainerTokenCell.vue'
 import { containerStatusColor, containerStatusLabel } from '@/utils/containerStatus'
 import { format, parseISO } from 'date-fns'
 
@@ -10,6 +11,8 @@ defineProps({
   itemsPerPage: { type: Number, required: true },
   sortBy: { type: Array, required: true },
   search: { type: String, default: '' },
+  revealedTokens: { type: Object, default: () => ({}) },
+  loadingTokens: { type: Object, default: () => ({}) },
 })
 
 const emit = defineEmits([
@@ -19,6 +22,9 @@ const emit = defineEmits([
   'update:search',
   'edit',
   'delete',
+  'toggle-token',
+  'copy-token',
+  'regenerate-token',
 ])
 
 const ITEMS_PER_PAGE_OPTIONS = [
@@ -33,6 +39,7 @@ const HEADERS = [
   { title: 'Serie', key: 'serial_number' },
   { title: 'Ubicación', key: 'location', sortable: false },
   { title: 'Estado', key: 'status' },
+  { title: 'Token de API', key: 'api_token', sortable: false },
   { title: 'Creado', key: 'created_at' },
   { title: '', key: 'actions', sortable: false, align: 'end' },
 ]
@@ -85,6 +92,15 @@ function formatDate(value) {
       </VChip>
     </template>
 
+    <template #item.api_token="{ item }">
+      <ContainerTokenCell
+        :token="revealedTokens[item.id] ?? null"
+        :loading="!!loadingTokens[item.id]"
+        @toggle="emit('toggle-token', item)"
+        @copy="emit('copy-token', item)"
+      />
+    </template>
+
     <template #item.created_at="{ item }">
       <span class="text-body-2 text-medium-emphasis">{{ formatDate(item.created_at) }}</span>
     </template>
@@ -112,6 +128,15 @@ function formatDate(value) {
               />
             </template>
             <VListItemTitle>Editar</VListItemTitle>
+          </VListItem>
+          <VListItem @click="emit('regenerate-token', item)">
+            <template #prepend>
+              <VIcon
+                icon="bx-key"
+                class="me-2 text-warning"
+              />
+            </template>
+            <VListItemTitle>Regenerar token</VListItemTitle>
           </VListItem>
           <VListItem @click="emit('delete', item)">
             <template #prepend>

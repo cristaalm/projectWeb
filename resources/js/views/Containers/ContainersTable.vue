@@ -4,6 +4,7 @@ import ContainersDataTable from './components/ContainersDataTable.vue'
 import ContainersFiltersPanel from './components/ContainersFiltersPanel.vue'
 import ContainersTableHeader from './components/ContainersTableHeader.vue'
 import { useContainerRowActions } from './hooks/useContainerRowActions'
+import { useContainerTokens } from './hooks/useContainerTokens'
 import { useContainersFilters } from './hooks/useContainersFilters'
 import { useContainersList } from './hooks/useContainersList'
 import { ref } from 'vue'
@@ -36,6 +37,14 @@ const {
   openEditDialog,
   handleDelete,
 } = useContainerRowActions(loadData)
+
+const {
+  revealedTokens,
+  loadingTokens,
+  toggleToken,
+  copyToken,
+  regenerateToken,
+} = useContainerTokens()
 </script>
 
 <template>
@@ -82,8 +91,13 @@ const {
         :items="data"
         :total="total"
         :loading="loading"
+        :revealed-tokens="revealedTokens"
+        :loading-tokens="loadingTokens"
         @edit="openEditDialog"
         @delete="handleDelete"
+        @toggle-token="toggleToken"
+        @copy-token="copyToken"
+        @regenerate-token="regenerateToken"
       />
     </VCard>
   </div>
