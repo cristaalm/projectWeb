@@ -6,11 +6,8 @@ use App\Enums\ScanStatus;
 use App\Models\AgentFeedback;
 use App\Models\AgentMemory;
 use App\Models\Avatar;
-use App\Models\Badge;
-use App\Models\BadgeProgress;
 use App\Models\Scan;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Carbon;
 
 class AvatarRepository
 {
@@ -41,26 +38,6 @@ class AvatarRepository
         return Scan::where('user_id', $userId)
             ->where('scan_status', ScanStatus::SUCCESS)
             ->count();
-    }
-
-    /** @return Collection<int, Badge> */
-    public function activeBadgesOrdered(): Collection
-    {
-        return Badge::where('status', true)
-            ->orderBy('recycles_required')
-            ->get();
-    }
-
-    /** @return Collection<int, BadgeProgress> keyed by badge_id */
-    public function currentMonthProgressByBadge(int $userId): Collection
-    {
-        $now = Carbon::now();
-
-        return BadgeProgress::where('user_id', $userId)
-            ->whereYear('month', $now->year)
-            ->whereMonth('month', $now->month)
-            ->get()
-            ->keyBy('badge_id');
     }
 
     /** @return Collection<int, AgentMemory> */

@@ -106,6 +106,42 @@ class BadgeService
         });
     }
 
+    /**
+     * Resumen del mes para mostrar en un contenedor/asistente: `badge` = la
+     * insignia de mayor nivel ya completada este mes; `next_badge` = la
+     * siguiente no completada, con lo que falta para lograrla. Ambas pueden
+     * ser null.
+     *
+     * @return array{0: ?array, 1: ?array}
+     */
+    public function monthlySummary(int $userId): array
+    {
+        $progressByBadge = $this->badges->progressForMonth($userId, now()->startOfMonth());
+
+        $badge = null;
+        $nextBadge = null;
+
+        foreach ($this->badges->activeCatalog() as $candidate) {
+            $progress = $progressByBadge->get($candidate->id);
+
+            if ($progress->completed ?? false) {
+                $badge = ['name' => $candidate->name, 'recycles_remaining' => 0];
+
+                continue;
+            }
+
+            if ($nextBadge === null) {
+                $nextBadge = [
+                    'name' => $candidate->name,
+                    'recycles_required' => $candidate->recycles_required,
+                    'recycles_remaining' => max(0, $candidate->recycles_required - ($progress->recycles_count ?? 0)),
+                ];
+            }
+        }
+
+        return [$badge, $nextBadge];
+    }
+
     public function pendingClaims(User $user): Collection
     {
         return $this->badges->pendingClaims($user->id);

@@ -21,6 +21,7 @@ class AvatarService
         private readonly AvatarRepository $avatarRepo,
         private readonly PointRepository $points,
         private readonly StreakService $streaks,
+        private readonly BadgeService $badges,
     ) {}
 
     /**
@@ -43,7 +44,7 @@ class AvatarService
         }
 
         $avatar = $this->avatarRepo->findOrCreateAvatar($user->id);
-        [$badge, $nextBadge] = $this->resolveBadgeProgress($user->id);
+        [$badge, $nextBadge] = $this->badges->monthlySummary($user->id);
         $verification = $this->latestVerification($user->id);
 
         return [
@@ -77,42 +78,6 @@ class AvatarService
             'role_id' => $user->role_id,
             'verification_status' => $verification?->status?->name,
         ];
-    }
-
-    /**
-     * `badge` = la insignia de mayor nivel ya completada este mes; `next_badge`
-     * = la siguiente insignia no completada (con lo que falta para lograrla).
-     * Ambas pueden ser null si el usuario no tiene progreso registrado.
-     */
-    private function resolveBadgeProgress(int $userId): array
-    {
-        $badges = $this->avatarRepo->activeBadgesOrdered();
-        $progressByBadge = $this->avatarRepo->currentMonthProgressByBadge($userId);
-
-        $badge = null;
-        $nextBadge = null;
-
-        foreach ($badges as $candidate) {
-            $progress = $progressByBadge->get($candidate->id);
-            $completed = (bool) ($progress->completed ?? false);
-
-            if ($completed) {
-                $badge = ['name' => $candidate->name, 'recycles_remaining' => 0];
-
-                continue;
-            }
-
-            if ($nextBadge === null) {
-                $recyclesCount = $progress->recycles_count ?? 0;
-                $nextBadge = [
-                    'name' => $candidate->name,
-                    'recycles_required' => $candidate->recycles_required,
-                    'recycles_remaining' => max(0, $candidate->recycles_required - $recyclesCount),
-                ];
-            }
-        }
-
-        return [$badge, $nextBadge];
     }
 
     /**
