@@ -80,9 +80,20 @@ class UserRepository
         return User::withTrashed()->where('code_identity', $codeIdentity)->exists();
     }
 
-    public function findByCodeIdentity(string $codeIdentity): ?User
+    public function findByCodeIdentity(string $codeIdentity, bool $withTrashed = false): ?User
     {
-        return User::where('code_identity', $codeIdentity)->first();
+        $query = $withTrashed ? User::withTrashed() : User::query();
+
+        return $query->where('code_identity', $codeIdentity)->first();
+    }
+
+    /**
+     * Bloquea la fila del usuario dentro de la transacción en curso, para
+     * serializar operaciones concurrentes sobre su progreso (insignias, racha).
+     */
+    public function lockForUpdate(int $id): ?User
+    {
+        return User::whereKey($id)->lockForUpdate()->first();
     }
 
     public function create(array $attributes): User

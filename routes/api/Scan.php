@@ -1,12 +1,15 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MaterialTypeController;
 use App\Http\Controllers\ScanController;
+use Illuminate\Support\Facades\Route;
 
-Route::prefix('scans')->group(function () {
-    Route::post('scan', [ScanController::class, 'scan']);
+// Registro de un reciclaje: lo llama el software del contenedor (que ya
+// clasificó el material), autenticado por API key — no un usuario logueado.
+Route::post('scans', [ScanController::class, 'store'])->middleware('service.apiKey');
 
-    Route::middleware(['auth:sanctum', 'ensureUserIsActive'])->group(function () {
-        Route::get('total-type-scans', [ScanController::class, 'totalTypeScans']);
-    });
+// Consulta administrativa de escaneos.
+Route::middleware(['auth:sanctum', 'ensureUserIsActive', 'role:superadmin,moderador'])->group(function () {
+    Route::get('scans', [ScanController::class, 'index']);
+    Route::get('material-types/catalog', [MaterialTypeController::class, 'catalog']);
 });
