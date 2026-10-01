@@ -9,7 +9,6 @@ use App\Models\Avatar;
 use App\Models\Badge;
 use App\Models\BadgeProgress;
 use App\Models\Scan;
-use App\Models\UserStreak;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 
@@ -35,11 +34,6 @@ class AvatarRepository
                 'updated_at' => now(),
             ]
         );
-    }
-
-    public function findStreakByUser(int $userId): ?UserStreak
-    {
-        return UserStreak::where('user_id', $userId)->first();
     }
 
     public function countValidScans(int $userId): int

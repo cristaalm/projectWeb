@@ -20,6 +20,7 @@ class AvatarService
         private readonly ContainerRepository $containers,
         private readonly AvatarRepository $avatarRepo,
         private readonly PointRepository $points,
+        private readonly StreakService $streaks,
     ) {}
 
     /**
@@ -42,7 +43,6 @@ class AvatarService
         }
 
         $avatar = $this->avatarRepo->findOrCreateAvatar($user->id);
-        $streak = $this->avatarRepo->findStreakByUser($user->id);
         [$badge, $nextBadge] = $this->resolveBadgeProgress($user->id);
         $verification = $this->latestVerification($user->id);
 
@@ -57,11 +57,7 @@ class AvatarService
             'last_name' => $user->last_name,
             'total_points' => $this->users->pointsBalance($user->id),
             'valid_scans' => $this->avatarRepo->countValidScans($user->id),
-            'streak' => [
-                'current_streak' => $streak->current_streak ?? 0,
-                'best_streak' => $streak->best_streak ?? 0,
-                'streak_status' => $streak->streak_status ?? false,
-            ],
+            'streak' => $this->streaks->snapshot($user->id),
             'prefs' => [
                 'tone' => $avatar->selected_tone,
                 'socratic_mode' => (bool) $avatar->socratic_mode,
