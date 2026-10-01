@@ -4907,6 +4907,412 @@
                 ]
             }
         },
+        "/scans": {
+            "get": {
+                "tags": [
+                    "Scans"
+                ],
+                "summary": "Listar escaneos (administración)",
+                "description": "Listado paginado/filtrable/ordenable sobre App\\Repositories\\ScanRepository::paginate(). Por defecto, los más recientes primero.",
+                "operationId": "936751c44809881e85ee0b7ab03031d9",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "1 = éxito, 0 = fallo.",
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
+                        }
+                    },
+                    {
+                        "name": "container_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "material_type_id",
+                        "in": "query",
+                        "description": "Sale de GET /material-types/catalog.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "description": "Búsqueda libre por nombre, apellido, correo o code_identity del usuario, o por nombre/número de serie del contenedor (ilike).",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "key",
+                        "in": "query",
+                        "description": "Columna de orden — allowlist explícita.",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "id",
+                                "points_awarded",
+                                "scan_status",
+                                "scanned_at",
+                                "created_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 15,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Página de escaneos.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/Scan"
+                                                            }
+                                                        },
+                                                        "last_page": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El rol del usuario autenticado no es superadmin ni moderador.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Parámetro de filtro u orden inválido.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Scans"
+                ],
+                "summary": "Registrar un escaneo reportado por un contenedor",
+                "description": "Resuelve el contenedor por serial_number y el usuario por code_identity, y registra el reciclaje sobre App\\Services\\ScanService::register(). Los puntos son siempre los del material (material_types.points). Si el material está inactivo o vale 0 puntos (ej. \"other\"), el escaneo se guarda igualmente con status 0 y sin acreditar nada. `event_id` hace la llamada idempotente: reintentar con el mismo valor devuelve el escaneo original (HTTP 200, duplicate=true) sin volver a dar puntos. Se puede enviar como JSON (sin imagen) o como multipart/form-data (con imagen).",
+                "operationId": "041950504b7cd6214059ab98d3527c6a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "event_id",
+                                    "code_identity",
+                                    "container_serial_number",
+                                    "material"
+                                ],
+                                "properties": {
+                                    "event_id": {
+                                        "description": "UUID generado por el contenedor, uno por escaneo.",
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "example": "ad62c108-7c63-451d-af7e-59be2b426346"
+                                    },
+                                    "code_identity": {
+                                        "type": "string",
+                                        "maxLength": 30,
+                                        "example": "5760307480459"
+                                    },
+                                    "container_serial_number": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "SN-0001"
+                                    },
+                                    "material": {
+                                        "description": "Slug del material clasificado (material_types.slug).",
+                                        "type": "string",
+                                        "example": "plastic"
+                                    },
+                                    "image": {
+                                        "description": "Opcional. JPEG o PNG, máximo 5 MB.",
+                                        "type": "string",
+                                        "format": "binary",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Escaneo registrado (válido o rechazado — ver data.scan.status).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "scan": {
+                                                            "$ref": "#/components/schemas/Scan"
+                                                        },
+                                                        "total_points": {
+                                                            "description": "Saldo del usuario después del escaneo.",
+                                                            "type": "integer",
+                                                            "example": 365
+                                                        },
+                                                        "points_month": {
+                                                            "description": "Puntos ganados en el mes calendario en curso (reciclaje + insignias).",
+                                                            "type": "integer",
+                                                            "example": 55
+                                                        },
+                                                        "streak": {
+                                                            "description": "Racha de días consecutivos con al menos un reciclaje válido.",
+                                                            "properties": {
+                                                                "current_streak": {
+                                                                    "type": "integer",
+                                                                    "example": 5
+                                                                },
+                                                                "best_streak": {
+                                                                    "type": "integer",
+                                                                    "example": 9
+                                                                },
+                                                                "streak_status": {
+                                                                    "description": "true si la racha sigue viva (recicló hoy o ayer).",
+                                                                    "type": "boolean",
+                                                                    "example": true
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "duplicate": {
+                                                            "type": "boolean",
+                                                            "example": false
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "El event_id ya había sido procesado: devuelve el escaneo original con duplicate=true, sin acreditar nada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "API key ausente o inválida.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "El contenedor (container_serial_number) o el usuario (code_identity) no existen.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación (campos requeridos, event_id no es UUID, material fuera del catálogo, imagen inválida), contenedor inactivo o cuenta del usuario desactivada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "eviApiKey": []
+                    }
+                ]
+            }
+        },
+        "/material-types/catalog": {
+            "get": {
+                "tags": [
+                    "Scans"
+                ],
+                "summary": "Catálogo de tipos de material",
+                "description": "Todos los tipos de material (incluidos los inactivos), ordenados por nombre — pensado para el selector de filtros del listado de escaneos.",
+                "operationId": "120fd021b91a9040f99995803d79aeae",
+                "responses": {
+                    "200": {
+                        "description": "Catálogo de materiales.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "catalogo": {
+                                        "summary": "Catálogo",
+                                        "value": {
+                                            "success": true,
+                                            "message": "Tipos de material obtenidos correctamente.",
+                                            "data": {
+                                                "material_types": [
+                                                    {
+                                                        "id": 2,
+                                                        "name": "Aluminio",
+                                                        "slug": "aluminum",
+                                                        "points": 35,
+                                                        "is_active": true
+                                                    },
+                                                    {
+                                                        "id": 1,
+                                                        "name": "Plástico",
+                                                        "slug": "plastic",
+                                                        "points": 15,
+                                                        "is_active": true
+                                                    }
+                                                ]
+                                            },
+                                            "errors": null,
+                                            "code": 200
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El rol del usuario autenticado no es superadmin ni moderador.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
         "/type-shop/catalog": {
             "get": {
                 "tags": [
@@ -7246,6 +7652,127 @@
                 },
                 "type": "object"
             },
+            "Scan": {
+                "description": "Escaneo de reciclaje (App\\Models\\Scan) con la forma de App\\Http\\Resources\\ScanResource. `user` y `container` solo vienen en el listado administrativo (GET /scans), no en la respuesta al contenedor (POST /scans).",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "event_id": {
+                        "description": "Identificador único generado por el contenedor para este escaneo.",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "ad62c108-7c63-451d-af7e-59be2b426346",
+                        "nullable": true
+                    },
+                    "status": {
+                        "description": "1 = éxito (otorgó puntos), 0 = fallo (material rechazado) — App\\Enums\\ScanStatus.",
+                        "type": "integer",
+                        "enum": [
+                            0,
+                            1
+                        ],
+                        "example": 1
+                    },
+                    "status_label": {
+                        "type": "string",
+                        "example": "Éxito"
+                    },
+                    "material": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "slug": {
+                                "type": "string",
+                                "example": "plastic"
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Plástico"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "points_awarded": {
+                        "description": "Copia de los puntos del material al momento del escaneo; 0 si fue rechazado.",
+                        "type": "integer",
+                        "example": 15
+                    },
+                    "description": {
+                        "description": "Motivo del rechazo cuando status = 0; null en un escaneo válido.",
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "image_url": {
+                        "description": "URL absoluta de la imagen, o null si el contenedor no la envió.",
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "scanned_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-10-01T23:34:07.000000Z"
+                    },
+                    "user": {
+                        "description": "Solo en el listado administrativo. Incluye usuarios dados de baja.",
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 42
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Juan"
+                            },
+                            "last_name": {
+                                "type": "string",
+                                "example": "Pérez"
+                            },
+                            "email": {
+                                "type": "string",
+                                "example": "juan@example.com"
+                            },
+                            "code_identity": {
+                                "type": "string",
+                                "example": "5760307480459"
+                            },
+                            "avatar": {
+                                "type": "string",
+                                "example": null,
+                                "nullable": true
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "container": {
+                        "description": "Solo en el listado administrativo.",
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Contenedor Parque Central"
+                            },
+                            "serial_number": {
+                                "type": "string",
+                                "example": "SN-0001"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
             "Shop": {
                 "description": "Comercio activo en su forma pública para la app móvil (App\\Http\\Resources\\ShopResource sobre App\\Models\\Alliance). No incluye datos de contacto administrativo (contact_name, contact_email, phone) ni status/timestamps.",
                 "properties": {
@@ -7523,6 +8050,10 @@
         {
             "name": "Rewards",
             "description": "Catálogo de recompensas canjeables por puntos. Bajo /rewards, protegidas por auth:sanctum + ensureUserIsActive + role:superadmin,moderador,admin_merchant (primer módulo del dashboard con acceso no-staff). admin_merchant solo ve/gestiona las recompensas de su propia alianza (App\\Models\\User::currentAlliance()) y sus creaciones quedan pendientes de revisión (App\\Enums\\RewardStatus::PENDING); superadmin/moderador gestionan cualquier alianza y sus creaciones se aprueban de una vez. Aprobar/rechazar es exclusivo de superadmin/moderador."
+        },
+        {
+            "name": "Scans",
+            "description": "Flujo de escaneo/reciclaje. POST /scans lo llama el software del contenedor (que ya clasificó el material con su modelo de visión en el borde), autenticado por API key compartida (App\\Http\\Middleware\\EnsureValidServiceApiKey) — no un usuario logueado. Un escaneo válido acredita puntos (point_earnings), avanza el progreso mensual de insignias y la racha diaria del usuario. GET /scans y GET /material-types/catalog son de consulta administrativa (auth:sanctum + ensureUserIsActive + role:superadmin,moderador)."
         },
         {
             "name": "TypeShop",
