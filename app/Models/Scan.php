@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 // ENUMS
@@ -14,12 +15,11 @@ class Scan extends Model
     use HasFactory;
 
     protected $fillable = [
+        'event_id',
         'user_id',
         'container_id',
         'material_type_id',
         'image',
-        'is_valid',
-        'is_crushed',
         'points_awarded', // copia de material_type.points, para evitar problemas de integridad
         'scan_status',
         'description',
@@ -27,7 +27,6 @@ class Scan extends Model
     ];
 
     protected $casts = [
-        'is_valid' => 'boolean',
         'is_crushed' => 'boolean',
         'scan_status' => ScanStatus::class,
         'points_awarded' => 'integer',
@@ -47,5 +46,10 @@ class Scan extends Model
     public function materialType(): BelongsTo
     {
         return $this->belongsTo(MaterialTypes::class);
+    }
+
+    public function pointEarning(): HasOne
+    {
+        return $this->hasOne(PointEarning::class);
     }
 }
