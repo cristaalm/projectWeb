@@ -34,6 +34,13 @@ use OpenApi\Attributes as OA;
     name: 'X-Api-Key',
     description: 'Autenticación máquina-a-máquina para el backend del asistente Evi (App\Http\Middleware\EnsureValidServiceApiKey) — no es un usuario de Sanctum. Clave estática compartida, configurada en services.evi.api_key (env EVI_API_KEY).'
 )]
+#[OA\SecurityScheme(
+    securityScheme: 'containerToken',
+    type: 'apiKey',
+    in: 'header',
+    name: 'X-Container-Token',
+    description: 'Autenticación de un contenedor físico por su token propio (App\Http\Middleware\EnsureValidContainerToken). Cada contenedor tiene un token distinto, visible y regenerable desde el panel administrativo (Contenedores). El token solo abre POST /scans/identify y POST /scans, y el contenedor siempre opera a su propio nombre.'
+)]
 class OpenApi
 {
     // Contenedor de anotaciones globales de OpenAPI (Info, Servers, SecuritySchemes).

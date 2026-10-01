@@ -3625,6 +3625,182 @@
                 ]
             }
         },
+        "/containers/{id}/token": {
+            "get": {
+                "tags": [
+                    "Containers"
+                ],
+                "summary": "Ver el token de API de un contenedor",
+                "description": "Devuelve en claro el token con el que el contenedor físico se autentica (header X-Container-Token) en POST /scans/identify y POST /scans. El token nunca viaja en el listado ni en las respuestas de crear/editar: solo en este endpoint y en el de regenerar, bajo demanda.",
+                "operationId": "44a1b36a993c7fb640c02c9450774613",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Token del contenedor.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "token": {
+                                        "summary": "Token",
+                                        "value": {
+                                            "success": true,
+                                            "message": "Token obtenido correctamente.",
+                                            "data": {
+                                                "token": "ect_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                                            },
+                                            "errors": null,
+                                            "code": 200
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El rol del usuario autenticado no es superadmin ni moderador.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Contenedor no encontrado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/containers/{id}/token/regenerate": {
+            "post": {
+                "tags": [
+                    "Containers"
+                ],
+                "summary": "Regenerar el token de API de un contenedor",
+                "description": "Genera un token nuevo y lo devuelve. El anterior deja de funcionar de inmediato: el contenedor físico responderá 401 hasta que se le cargue el nuevo.",
+                "operationId": "99d4dec2a9fd12f9984c7fe6876f652a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Token nuevo.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "token": {
+                                        "summary": "Token regenerado",
+                                        "value": {
+                                            "success": true,
+                                            "message": "Token regenerado correctamente.",
+                                            "data": {
+                                                "token": "ect_yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+                                            },
+                                            "errors": null,
+                                            "code": 200
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El rol del usuario autenticado no es superadmin ni moderador.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Contenedor no encontrado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
         "/points/balance": {
             "get": {
                 "tags": [
@@ -4907,6 +5083,196 @@
                 ]
             }
         },
+        "/scans/identify": {
+            "post": {
+                "tags": [
+                    "Scans"
+                ],
+                "summary": "Identificar al usuario que se acercó al contenedor",
+                "description": "Resuelve al usuario por su code_identity (leído de su QR/NFC) y devuelve sus datos para que el contenedor pueda saludarlo y mostrarle su avance, sobre App\\Services\\ScanService::identify(). No registra nada. El contenedor es el dueño del token.",
+                "operationId": "e4de18dd2cf942cbb44997785b6a766f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "code_identity"
+                                ],
+                                "properties": {
+                                    "code_identity": {
+                                        "type": "string",
+                                        "maxLength": 30,
+                                        "example": "7501000000012"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Usuario identificado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "user": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 39
+                                                                },
+                                                                "code_identity": {
+                                                                    "type": "string",
+                                                                    "example": "7501000000012"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string",
+                                                                    "example": "Ana"
+                                                                },
+                                                                "last_name": {
+                                                                    "type": "string",
+                                                                    "example": "López"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "total_points": {
+                                                            "description": "Saldo actual de puntos.",
+                                                            "type": "integer",
+                                                            "example": 100
+                                                        },
+                                                        "points_month": {
+                                                            "description": "Puntos ganados en el mes calendario en curso (reciclaje + insignias).",
+                                                            "type": "integer",
+                                                            "example": 100
+                                                        },
+                                                        "valid_scans": {
+                                                            "description": "Reciclajes válidos de por vida.",
+                                                            "type": "integer",
+                                                            "example": 4
+                                                        },
+                                                        "streak": {
+                                                            "properties": {
+                                                                "current_streak": {
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
+                                                                "best_streak": {
+                                                                    "type": "integer",
+                                                                    "example": 3
+                                                                },
+                                                                "streak_status": {
+                                                                    "description": "true si la racha sigue viva (recicló hoy o ayer).",
+                                                                    "type": "boolean",
+                                                                    "example": true
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "badge": {
+                                                            "description": "Insignia de mayor nivel ya completada este mes, o null.",
+                                                            "properties": {
+                                                                "name": {
+                                                                    "type": "string",
+                                                                    "example": "Reciclador Bronce"
+                                                                },
+                                                                "recycles_remaining": {
+                                                                    "type": "integer",
+                                                                    "example": 0
+                                                                }
+                                                            },
+                                                            "type": "object",
+                                                            "nullable": true
+                                                        },
+                                                        "next_badge": {
+                                                            "description": "Siguiente insignia sin completar, o null si ya completó todas.",
+                                                            "properties": {
+                                                                "name": {
+                                                                    "type": "string",
+                                                                    "example": "Reciclador Plata"
+                                                                },
+                                                                "recycles_required": {
+                                                                    "type": "integer",
+                                                                    "example": 25
+                                                                },
+                                                                "recycles_remaining": {
+                                                                    "type": "integer",
+                                                                    "example": 21
+                                                                }
+                                                            },
+                                                            "type": "object",
+                                                            "nullable": true
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token de contenedor ausente o inválido.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El contenedor dueño del token está inactivo.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "El code_identity no pertenece a ningún usuario.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Falta code_identity, o la cuenta del usuario está desactivada.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "containerToken": []
+                    }
+                ]
+            }
+        },
         "/scans": {
             "get": {
                 "tags": [
@@ -5073,7 +5439,7 @@
                     "Scans"
                 ],
                 "summary": "Registrar un escaneo reportado por un contenedor",
-                "description": "Resuelve el contenedor por serial_number y el usuario por code_identity, y registra el reciclaje sobre App\\Services\\ScanService::register(). Los puntos son siempre los del material (material_types.points). Si el material está inactivo o vale 0 puntos (ej. \"other\"), el escaneo se guarda igualmente con status 0 y sin acreditar nada. `event_id` hace la llamada idempotente: reintentar con el mismo valor devuelve el escaneo original (HTTP 200, duplicate=true) sin volver a dar puntos. Se puede enviar como JSON (sin imagen) o como multipart/form-data (con imagen).",
+                "description": "Registra el reciclaje sobre App\\Services\\ScanService::register(). El contenedor es siempre el dueño del token (no se envía en el body) y el usuario se resuelve por code_identity. Los puntos son siempre los del material (material_types.points). Si el material está inactivo o vale 0 puntos (ej. \"other\"), el escaneo se guarda igualmente con status 0 y sin acreditar nada. `event_id` hace la llamada idempotente: reintentar con el mismo valor devuelve el escaneo original (HTTP 200, duplicate=true) sin volver a dar puntos. Se puede enviar como JSON (sin imagen) o como multipart/form-data (con imagen).",
                 "operationId": "041950504b7cd6214059ab98d3527c6a",
                 "requestBody": {
                     "required": true,
@@ -5083,7 +5449,6 @@
                                 "required": [
                                     "event_id",
                                     "code_identity",
-                                    "container_serial_number",
                                     "material"
                                 ],
                                 "properties": {
@@ -5097,11 +5462,6 @@
                                         "type": "string",
                                         "maxLength": 30,
                                         "example": "5760307480459"
-                                    },
-                                    "container_serial_number": {
-                                        "type": "string",
-                                        "maxLength": 255,
-                                        "example": "SN-0001"
                                     },
                                     "material": {
                                         "description": "Slug del material clasificado (material_types.slug).",
@@ -5193,7 +5553,17 @@
                         }
                     },
                     "401": {
-                        "description": "API key ausente o inválida.",
+                        "description": "Token de contenedor ausente o inválido.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El contenedor dueño del token está inactivo.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -5203,7 +5573,17 @@
                         }
                     },
                     "404": {
-                        "description": "El contenedor (container_serial_number) o el usuario (code_identity) no existen.",
+                        "description": "El code_identity no pertenece a ningún usuario.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "El event_id ya fue usado por otro contenedor.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -5213,7 +5593,7 @@
                         }
                     },
                     "422": {
-                        "description": "Error de validación (campos requeridos, event_id no es UUID, material fuera del catálogo, imagen inválida), contenedor inactivo o cuenta del usuario desactivada.",
+                        "description": "Error de validación (campos requeridos, event_id no es UUID, material fuera del catálogo, imagen inválida) o cuenta del usuario desactivada.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -5225,7 +5605,7 @@
                 },
                 "security": [
                     {
-                        "eviApiKey": []
+                        "containerToken": []
                     }
                 ]
             }
@@ -8015,6 +8395,12 @@
                 "description": "Autenticación máquina-a-máquina para el backend del asistente Evi (App\\Http\\Middleware\\EnsureValidServiceApiKey) — no es un usuario de Sanctum. Clave estática compartida, configurada en services.evi.api_key (env EVI_API_KEY).",
                 "name": "X-Api-Key",
                 "in": "header"
+            },
+            "containerToken": {
+                "type": "apiKey",
+                "description": "Autenticación de un contenedor físico por su token propio (App\\Http\\Middleware\\EnsureValidContainerToken). Cada contenedor tiene un token distinto, visible y regenerable desde el panel administrativo (Contenedores). El token solo abre POST /scans/identify y POST /scans, y el contenedor siempre opera a su propio nombre.",
+                "name": "X-Container-Token",
+                "in": "header"
             }
         }
     },
@@ -8053,7 +8439,7 @@
         },
         {
             "name": "Scans",
-            "description": "Flujo de escaneo/reciclaje. POST /scans lo llama el software del contenedor (que ya clasificó el material con su modelo de visión en el borde), autenticado por API key compartida (App\\Http\\Middleware\\EnsureValidServiceApiKey) — no un usuario logueado. Un escaneo válido acredita puntos (point_earnings), avanza el progreso mensual de insignias y la racha diaria del usuario. GET /scans y GET /material-types/catalog son de consulta administrativa (auth:sanctum + ensureUserIsActive + role:superadmin,moderador)."
+            "description": "Flujo de escaneo/reciclaje. POST /scans/identify y POST /scans los llama el software del contenedor físico, autenticado con el token propio de ese contenedor (header X-Container-Token, App\\Http\\Middleware\\EnsureValidContainerToken) — no un usuario logueado. El contenedor clasifica el material con su modelo de visión en el borde y solo reporta el resultado. Un escaneo válido acredita puntos (point_earnings), avanza el progreso mensual de insignias y la racha diaria del usuario. GET /scans y GET /material-types/catalog son de consulta administrativa (auth:sanctum + ensureUserIsActive + role:superadmin,moderador)."
         },
         {
             "name": "TypeShop",

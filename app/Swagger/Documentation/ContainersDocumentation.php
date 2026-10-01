@@ -33,9 +33,7 @@ class ContainersDocumentation
             new OA\Response(response: 403, description: 'El rol del usuario autenticado no es superadmin ni moderador.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
         ]
     )]
-    public function index()
-    {
-    }
+    public function index() {}
 
     #[OA\Post(
         path: '/containers',
@@ -70,9 +68,7 @@ class ContainersDocumentation
             new OA\Response(response: 422, description: 'Error de validación: campos requeridos o número de serie duplicado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
         ]
     )]
-    public function store()
-    {
-    }
+    public function store() {}
 
     #[OA\Put(
         path: '/containers/{id}',
@@ -108,9 +104,7 @@ class ContainersDocumentation
             new OA\Response(response: 422, description: 'Error de validación: campos requeridos o número de serie duplicado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
         ]
     )]
-    public function update()
-    {
-    }
+    public function update() {}
 
     #[OA\Delete(
         path: '/containers/{id}',
@@ -132,7 +126,55 @@ class ContainersDocumentation
             new OA\Response(response: 404, description: 'Contenedor no encontrado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
         ]
     )]
-    public function destroy()
-    {
-    }
+    public function destroy() {}
+
+    #[OA\Get(
+        path: '/containers/{id}/token',
+        tags: ['Containers'],
+        summary: 'Ver el token de API de un contenedor',
+        description: 'Devuelve en claro el token con el que el contenedor físico se autentica (header X-Container-Token) en POST /scans/identify y POST /scans. El token nunca viaja en el listado ni en las respuestas de crear/editar: solo en este endpoint y en el de regenerar, bajo demanda.',
+        security: [['sessionCookie' => []], ['bearerToken' => []]],
+        parameters: [
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Token del contenedor.',
+                content: new OA\JsonContent(
+                    allOf: [new OA\Schema(ref: '#/components/schemas/SuccessResponse')],
+                    examples: [new OA\Examples(example: 'token', summary: 'Token', value: ['success' => true, 'message' => 'Token obtenido correctamente.', 'data' => ['token' => 'ect_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'], 'errors' => null, 'code' => 200])]
+                )
+            ),
+            new OA\Response(response: 401, description: 'No autenticado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 403, description: 'El rol del usuario autenticado no es superadmin ni moderador.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 404, description: 'Contenedor no encontrado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+        ]
+    )]
+    public function token() {}
+
+    #[OA\Post(
+        path: '/containers/{id}/token/regenerate',
+        tags: ['Containers'],
+        summary: 'Regenerar el token de API de un contenedor',
+        description: 'Genera un token nuevo y lo devuelve. El anterior deja de funcionar de inmediato: el contenedor físico responderá 401 hasta que se le cargue el nuevo.',
+        security: [['sessionCookie' => []], ['bearerToken' => []]],
+        parameters: [
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Token nuevo.',
+                content: new OA\JsonContent(
+                    allOf: [new OA\Schema(ref: '#/components/schemas/SuccessResponse')],
+                    examples: [new OA\Examples(example: 'token', summary: 'Token regenerado', value: ['success' => true, 'message' => 'Token regenerado correctamente.', 'data' => ['token' => 'ect_yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy'], 'errors' => null, 'code' => 200])]
+                )
+            ),
+            new OA\Response(response: 401, description: 'No autenticado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 403, description: 'El rol del usuario autenticado no es superadmin ni moderador.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 404, description: 'Contenedor no encontrado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+        ]
+    )]
+    public function regenerateToken() {}
 }
