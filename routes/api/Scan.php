@@ -4,9 +4,13 @@ use App\Http\Controllers\MaterialTypeController;
 use App\Http\Controllers\ScanController;
 use Illuminate\Support\Facades\Route;
 
-// Registro de un reciclaje: lo llama el software del contenedor (que ya
-// clasificó el material), autenticado por API key — no un usuario logueado.
-Route::post('scans', [ScanController::class, 'store'])->middleware('service.apiKey');
+// Endpoints del contenedor físico, autenticado por su propio token (header
+// X-Container-Token) — no un usuario logueado. El token solo abre estas dos
+// rutas, y el contenedor siempre opera a su propio nombre.
+Route::prefix('scans')->middleware('container.token')->group(function () {
+    Route::post('identify', [ScanController::class, 'identify']);
+    Route::post('/', [ScanController::class, 'store']);
+});
 
 // Consulta administrativa de escaneos.
 Route::middleware(['auth:sanctum', 'ensureUserIsActive', 'role:superadmin,moderador'])->group(function () {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\ScanStatus;
 use App\Exceptions\ScanException;
 use App\Http\Controllers\OldControllers\Controller;
+use App\Http\Requests\Scans\IdentifyScanUserRequest;
 use App\Http\Requests\Scans\ListScansRequest;
 use App\Http\Requests\Scans\RegisterScanRequest;
 use App\Http\Resources\ScanResource;
@@ -28,10 +29,27 @@ class ScanController extends Controller
         return $this->apiResponse(true, 'Escaneos obtenidos correctamente.', $data, null, 200);
     }
 
+    public function identify(IdentifyScanUserRequest $request)
+    {
+        try {
+            $data = $this->scanService->identify($request->validated('code_identity'));
+
+            return $this->apiResponse(true, 'Identificación exitosa.', $data, null, 200);
+        } catch (ScanException $e) {
+            return $this->apiResponse(false, $e->getMessage(), null, $e->details, $e->status);
+        }
+    }
+
     public function store(RegisterScanRequest $request)
     {
         try {
-            $result = $this->scanService->register($request->validated(), $request->file('image'));
+            // El contenedor lo resuelve el middleware container.token a partir
+            // del token, nunca el body de la petición.
+            $result = $this->scanService->register(
+                $request->attributes->get('container'),
+                $request->validated(),
+                $request->file('image'),
+            );
         } catch (ScanException $e) {
             return $this->apiResponse(false, $e->getMessage(), null, $e->details, $e->status);
         }

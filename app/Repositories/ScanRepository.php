@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Enums\ScanStatus;
 use App\Models\Scan;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -18,6 +19,14 @@ class ScanRepository
     public function findByEventId(string $eventId): ?Scan
     {
         return Scan::where('event_id', $eventId)->first();
+    }
+
+    /** Reciclajes válidos de por vida del usuario. */
+    public function countValidByUser(int $userId): int
+    {
+        return Scan::where('user_id', $userId)
+            ->where('scan_status', ScanStatus::SUCCESS)
+            ->count();
     }
 
     public function create(array $attributes): Scan

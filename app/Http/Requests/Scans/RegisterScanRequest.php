@@ -17,7 +17,6 @@ class RegisterScanRequest extends FormRequest
         return [
             'event_id' => ['required', 'uuid'],
             'code_identity' => ['required', 'string', 'max:30'],
-            'container_serial_number' => ['required', 'string', 'max:255'],
             'material' => ['required', 'string', Rule::exists('material_types', 'slug')],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:5120'],
         ];

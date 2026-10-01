@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
-use App\Enums\ContainerStatus;
 use App\Enums\ScanStatus;
 use App\Exceptions\ScanException;
+use App\Models\Container;
 use App\Models\MaterialTypes;
 use App\Models\PointEarning;
 use App\Models\Scan;
-use App\Repositories\ContainerRepository;
+use App\Models\User;
 use App\Repositories\MaterialTypeRepository;
 use App\Repositories\PointRepository;
 use App\Repositories\ScanRepository;
@@ -21,7 +21,6 @@ class ScanService
 {
     public function __construct(
         private readonly ScanRepository $scans,
-        private readonly ContainerRepository $containers,
         private readonly UserRepository $users,
         private readonly MaterialTypeRepository $materials,
         private readonly PointRepository $points,
@@ -30,38 +29,47 @@ class ScanService
     ) {}
 
     /**
+     * Datos del usuario que se identificó en el contenedor (QR/NFC), para
+     * que el equipo pueda saludarlo y mostrarle su avance antes de reciclar.
+     */
+    public function identify(string $codeIdentity): array
+    {
+        $user = $this->resolveUser($codeIdentity);
+        [$badge, $nextBadge] = $this->badges->monthlySummary($user->id);
+
+        return [
+            'user' => [
+                'id' => $user->id,
+                'code_identity' => $user->code_identity,
+                'name' => $user->name,
+                'last_name' => $user->last_name,
+            ],
+            'total_points' => $this->users->pointsBalance($user->id),
+            'points_month' => $this->points->earnedInMonth($user->id, now()),
+            'valid_scans' => $this->scans->countValidByUser($user->id),
+            'streak' => $this->streaks->snapshot($user->id),
+            'badge' => $badge,
+            'next_badge' => $nextBadge,
+        ];
+    }
+
+    /**
      * Registra un escaneo reportado por un contenedor, que ya clasificó el
-     * material con su propio modelo. Un material que no otorga puntos queda
-     * guardado como FAILED (rastro para auditoría), sin acreditar nada.
+     * material con su propio modelo. El contenedor es siempre el dueño del
+     * token con el que se autenticó la petición. Un material que no otorga
+     * puntos queda guardado como FAILED (rastro para auditoría), sin
+     * acreditar nada.
      *
      * @return array{scan: Scan, total_points: int, points_month: int, streak: array, duplicate: bool}
      */
-    public function register(array $data, ?UploadedFile $image): array
+    public function register(Container $container, array $data, ?UploadedFile $image): array
     {
         // Un reintento del contenedor con el mismo event_id nunca vuelve a acreditar.
         if ($existing = $this->scans->findByEventId($data['event_id'])) {
-            return $this->result($existing, true);
+            return $this->duplicate($existing, $container);
         }
 
-        $container = $this->containers->findBySerialNumber($data['container_serial_number']);
-
-        if (! $container) {
-            throw new ScanException('Contenedor no encontrado.', 404);
-        }
-
-        if ($container->status !== ContainerStatus::ACTIVE) {
-            throw new ScanException('El contenedor no está activo.', 422);
-        }
-
-        $user = $this->users->findByCodeIdentity($data['code_identity'], withTrashed: true);
-
-        if (! $user) {
-            throw new ScanException('Código de identidad no válido.', 404);
-        }
-
-        if ($user->trashed()) {
-            throw new ScanException('La cuenta del usuario está desactivada.', 422);
-        }
+        $user = $this->resolveUser($data['code_identity']);
 
         $material = $this->materials->findBySlug($data['material']);
         $rejection = $this->rejectionReason($material);
@@ -100,7 +108,7 @@ class ScanService
             // Dos reintentos idénticos en carrera: el índice único de event_id
             // deja pasar solo uno, el otro responde como duplicado.
             if ($e->getCode() === '23505' && ($existing = $this->scans->findByEventId($data['event_id']))) {
-                return $this->result($existing, true);
+                return $this->duplicate($existing, $container);
             }
 
             throw $e;
@@ -111,6 +119,35 @@ class ScanService
         }
 
         return $this->result($scan, false);
+    }
+
+    private function resolveUser(string $codeIdentity): User
+    {
+        $user = $this->users->findByCodeIdentity($codeIdentity, withTrashed: true);
+
+        if (! $user) {
+            throw new ScanException('Código de identidad no válido.', 404);
+        }
+
+        if ($user->trashed()) {
+            throw new ScanException('La cuenta del usuario está desactivada.', 422);
+        }
+
+        return $user;
+    }
+
+    /**
+     * Un event_id ya usado solo se responde como duplicado al mismo
+     * contenedor que lo registró: así un contenedor no puede leer el
+     * resultado (ni el saldo del usuario) de un escaneo ajeno.
+     */
+    private function duplicate(Scan $existing, Container $container): array
+    {
+        if ($existing->container_id !== $container->id) {
+            throw new ScanException('Este identificador de evento ya fue usado por otro contenedor.', 409);
+        }
+
+        return $this->result($existing, true);
     }
 
     private function rejectionReason(MaterialTypes $material): ?string
