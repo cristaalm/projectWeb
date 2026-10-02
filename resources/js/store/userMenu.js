@@ -27,6 +27,7 @@ const useMenuStore = defineStore('menu', {
         { title: 'Alianzas', icon: 'bx-store', to: '/alianzas', roles: ['superadmin', 'moderador'] },
         { title: 'Recompensas', icon: 'bx-gift', to: '/recompensas', roles: ['superadmin', 'moderador', 'admin_merchant'] },
         { title: 'Insignias', icon: 'bx-medal', to: '/insignias', roles: ['superadmin', 'moderador'] },
+        { title: 'Logs', icon: 'bx-terminal', to: '/logs', roles: ['superadmin'] },
       ]
     },
   },

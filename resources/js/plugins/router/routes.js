@@ -59,6 +59,12 @@ export const routes = [
         meta: { title: 'Insignias', roles: ['superadmin', 'moderador'] },
         component: () => import('@/pages/Dashboard/Badges/'),
       },
+      {
+        path: 'logs',
+        name: 'system-logs',
+        meta: { title: 'Logs', roles: ['superadmin'] },
+        component: () => import('@/pages/Dashboard/SystemLogs/'),
+      },
     ],
   },
   {
