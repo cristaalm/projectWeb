@@ -195,7 +195,7 @@ class ScansDocumentation
         path: '/material-types/catalog',
         tags: ['Scans'],
         summary: 'Catálogo de tipos de material',
-        description: 'Todos los tipos de material (incluidos los inactivos), ordenados por nombre — pensado para el selector de filtros del listado de escaneos.',
+        description: 'Todos los tipos de material (incluidos los inactivos), ordenados por nombre — alimenta la vista de Materiales del panel y el selector de filtros del listado de escaneos. El contenedor reporta el material por su slug, no por su id (los ids no coinciden entre bases).',
         security: [['sessionCookie' => []], ['bearerToken' => []]],
         responses: [
             new OA\Response(
@@ -203,7 +203,7 @@ class ScansDocumentation
                 description: 'Catálogo de materiales.',
                 content: new OA\JsonContent(
                     allOf: [new OA\Schema(ref: '#/components/schemas/SuccessResponse')],
-                    examples: [new OA\Examples(example: 'catalogo', summary: 'Catálogo', value: ['success' => true, 'message' => 'Tipos de material obtenidos correctamente.', 'data' => ['material_types' => [['id' => 2, 'name' => 'Aluminio', 'slug' => 'aluminum', 'points' => 35, 'is_active' => true], ['id' => 1, 'name' => 'Plástico', 'slug' => 'plastic', 'points' => 15, 'is_active' => true]]], 'errors' => null, 'code' => 200])]
+                    examples: [new OA\Examples(example: 'catalogo', summary: 'Catálogo', value: ['success' => true, 'message' => 'Tipos de material obtenidos correctamente.', 'data' => ['material_types' => [['id' => 2, 'name' => 'Aluminio', 'slug' => 'aluminum', 'points' => 35, 'is_active' => true], ['id' => 4, 'name' => 'Cartón', 'slug' => 'cardboard', 'points' => 15, 'is_active' => true], ['id' => 3, 'name' => 'Otros', 'slug' => 'other', 'points' => 0, 'is_active' => true], ['id' => 1, 'name' => 'Plástico', 'slug' => 'plastic', 'points' => 15, 'is_active' => true], ['id' => 5, 'name' => 'Vidrio', 'slug' => 'glass', 'points' => 20, 'is_active' => true]]], 'errors' => null, 'code' => 200])]
                 )
             ),
             new OA\Response(response: 401, description: 'No autenticado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
