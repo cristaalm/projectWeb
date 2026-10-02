@@ -23,6 +23,7 @@ const useMenuStore = defineStore('menu', {
         { title: 'Usuarios', icon: 'bx-user', to: '/usuarios', roles: ['superadmin', 'moderador'] },
         { title: 'Contenedores', icon: 'bx-trash', to: '/contenedores', roles: ['superadmin', 'moderador'] },
         { title: 'Escaneos', icon: 'bx-scan', to: '/escaneos', roles: ['superadmin', 'moderador'] },
+        { title: 'Materiales', icon: 'bx-recycle', to: '/materiales', roles: ['superadmin', 'moderador'] },
         { title: 'Alianzas', icon: 'bx-store', to: '/alianzas', roles: ['superadmin', 'moderador'] },
         { title: 'Recompensas', icon: 'bx-gift', to: '/recompensas', roles: ['superadmin', 'moderador', 'admin_merchant'] },
         { title: 'Insignias', icon: 'bx-medal', to: '/insignias', roles: ['superadmin', 'moderador'] },

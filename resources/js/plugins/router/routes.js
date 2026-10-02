@@ -36,6 +36,12 @@ export const routes = [
         component: () => import('@/pages/Dashboard/Scans/'),
       },
       {
+        path: 'materiales',
+        name: 'materials',
+        meta: { title: 'Materiales', roles: ['superadmin', 'moderador'] },
+        component: () => import('@/pages/Dashboard/Materials/'),
+      },
+      {
         path: 'alianzas',
         name: 'alliances',
         meta: { title: 'Alianzas', roles: ['superadmin', 'moderador'] },
