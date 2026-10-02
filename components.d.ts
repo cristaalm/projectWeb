@@ -69,5 +69,6 @@ declare module 'vue' {
     UpgradeToPro: typeof import('./resources/js/components/UpgradeToPro.vue')['default']
     UserAvatar: typeof import('./resources/js/components/UserAvatar.vue')['default']
     VAlertDialog: typeof import('./resources/js/components/Base/VAlertDialog/VAlertDialog.vue')['default']
+    VueApexCharts: typeof import('vue3-apexcharts')['default']
   }
 }
