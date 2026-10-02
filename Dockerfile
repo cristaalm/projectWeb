@@ -58,9 +58,9 @@ FROM php:8.2-apache AS production
 
 WORKDIR /var/www/html
 
-# Instala extensiones necesarias + cron y supervisor
+# Instala extensiones necesarias + supervisor
 RUN apt-get update \
-    && apt-get install -y libpq-dev libgmp-dev zip unzip git cron supervisor \
+    && apt-get install -y libpq-dev libgmp-dev zip unzip git supervisor \
     && docker-php-ext-configure gmp \
     && docker-php-ext-install pdo pdo_pgsql bcmath gmp \
     && a2enmod rewrite headers negotiation \
@@ -89,12 +89,9 @@ RUN php artisan storage:link || true
 # Configurar permisos
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# --- CONFIGURACIÓN DE SUPERVISOR Y CRON ---
+# --- CONFIGURACIÓN DE SUPERVISOR ---
+# Apache, el worker de la cola y el scheduler de Laravel (schedule:work).
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-RUN echo "* * * * * cd /var/www/html && php artisan schedule:run >> /var/log/cron.log 2>&1" > /etc/cron.d/laravel-schedule
-RUN chmod 0644 /etc/cron.d/laravel-schedule
-RUN touch /var/log/cron.log
-RUN crontab /etc/cron.d/laravel-schedule
 
 # Expone el puerto que Render usará
 EXPOSE 8080

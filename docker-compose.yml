@@ -70,6 +70,22 @@ services:
         restart: unless-stopped
         depends_on:
             - pgsql
+
+    scheduler:
+        image: 'sail-8.2/app'
+        entrypoint: ['php', '/var/www/html/artisan', 'schedule:work']
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        environment:
+            WWWUSER: '${WWWUSER}'
+            LARAVEL_SAIL: 1
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - sail
+        restart: unless-stopped
+        depends_on:
+            - pgsql
             - mailpit
     vite:
         image: 'sail-8.2/app'
