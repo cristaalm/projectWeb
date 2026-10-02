@@ -3801,6 +3801,393 @@
                 ]
             }
         },
+        "/dashboard/superadmin": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Panel principal del superadministrador",
+                "description": "Indicadores de uso del sistema para un periodo, sobre App\\Services\\DashboardService::superadminOverview(). Los días se cortan en la zona horaria de la app. `previous` en cada indicador es el valor de la ventana inmediata anterior con el mismo número de días (period.previous_from a period.previous_to). `timeline` trae un punto por día, o por mes en los periodos anuales, con ceros donde no hubo actividad. `attention`, `kpis.containers`, `kpis.active_users.total` y `recent_scans` reflejan el estado actual y no dependen del periodo, salvo `attention.high_failure_containers` (contenedores con al menos 10 escaneos en el periodo y 50 % o más fallidos).",
+                "operationId": "f236a3060d338680547018cb03f68310",
+                "parameters": [
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "description": "Periodo a consultar. Todos terminan hoy, salvo last_month (mes calendario anterior completo). this_year y last_12_months agrupan la serie por mes.",
+                        "schema": {
+                            "type": "string",
+                            "default": "last_30_days",
+                            "enum": [
+                                "last_7_days",
+                                "last_30_days",
+                                "this_month",
+                                "last_month",
+                                "this_year",
+                                "last_12_months"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Datos del panel.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "period": {
+                                                            "properties": {
+                                                                "key": {
+                                                                    "type": "string",
+                                                                    "example": "last_30_days"
+                                                                },
+                                                                "from": {
+                                                                    "type": "string",
+                                                                    "format": "date",
+                                                                    "example": "2026-09-03"
+                                                                },
+                                                                "to": {
+                                                                    "type": "string",
+                                                                    "format": "date",
+                                                                    "example": "2026-10-02"
+                                                                },
+                                                                "previous_from": {
+                                                                    "type": "string",
+                                                                    "format": "date",
+                                                                    "example": "2026-08-04"
+                                                                },
+                                                                "previous_to": {
+                                                                    "type": "string",
+                                                                    "format": "date",
+                                                                    "example": "2026-09-02"
+                                                                },
+                                                                "granularity": {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                        "day",
+                                                                        "month"
+                                                                    ],
+                                                                    "example": "day"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "kpis": {
+                                                            "properties": {
+                                                                "valid_scans": {
+                                                                    "description": "Reciclajes válidos.",
+                                                                    "properties": {
+                                                                        "value": {
+                                                                            "type": "integer",
+                                                                            "example": 128
+                                                                        },
+                                                                        "previous": {
+                                                                            "type": "integer",
+                                                                            "example": 97
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                },
+                                                                "points_awarded": {
+                                                                    "description": "Puntos otorgados por reciclaje más insignias reclamadas. No incluye ajustes de administrador.",
+                                                                    "properties": {
+                                                                        "value": {
+                                                                            "type": "integer",
+                                                                            "example": 2450
+                                                                        },
+                                                                        "previous": {
+                                                                            "type": "integer",
+                                                                            "example": 1810
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                },
+                                                                "active_users": {
+                                                                    "description": "Usuarios con al menos un reciclaje válido en el periodo; `total` son las cuentas registradas que no están dadas de baja.",
+                                                                    "properties": {
+                                                                        "value": {
+                                                                            "type": "integer",
+                                                                            "example": 34
+                                                                        },
+                                                                        "previous": {
+                                                                            "type": "integer",
+                                                                            "example": 29
+                                                                        },
+                                                                        "total": {
+                                                                            "type": "integer",
+                                                                            "example": 210
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                },
+                                                                "containers": {
+                                                                    "properties": {
+                                                                        "active": {
+                                                                            "type": "integer",
+                                                                            "example": 6
+                                                                        },
+                                                                        "total": {
+                                                                            "type": "integer",
+                                                                            "example": 7
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "timeline": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "bucket": {
+                                                                        "description": "Día (Y-m-d) o mes (Y-m), según period.granularity.",
+                                                                        "type": "string",
+                                                                        "example": "2026-10-01"
+                                                                    },
+                                                                    "valid": {
+                                                                        "type": "integer",
+                                                                        "example": 6
+                                                                    },
+                                                                    "failed": {
+                                                                        "type": "integer",
+                                                                        "example": 4
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "materials": {
+                                                            "description": "Todos los materiales del catálogo, con su actividad en el periodo.",
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 5
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Aluminio"
+                                                                    },
+                                                                    "slug": {
+                                                                        "type": "string",
+                                                                        "example": "aluminum"
+                                                                    },
+                                                                    "valid_scans": {
+                                                                        "type": "integer",
+                                                                        "example": 3
+                                                                    },
+                                                                    "failed_scans": {
+                                                                        "type": "integer",
+                                                                        "example": 0
+                                                                    },
+                                                                    "points": {
+                                                                        "type": "integer",
+                                                                        "example": 105
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "attention": {
+                                                            "properties": {
+                                                                "pending_rewards": {
+                                                                    "description": "Recompensas pendientes de revisión.",
+                                                                    "type": "integer",
+                                                                    "example": 2
+                                                                },
+                                                                "silent_container_days": {
+                                                                    "description": "Días sin actividad a partir de los cuales un contenedor activo aparece en silent_containers.",
+                                                                    "type": "integer",
+                                                                    "example": 7
+                                                                },
+                                                                "silent_containers": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "properties": {
+                                                                            "id": {
+                                                                                "type": "integer",
+                                                                                "example": 4
+                                                                            },
+                                                                            "name": {
+                                                                                "type": "string",
+                                                                                "example": "Contenedor Plaza"
+                                                                            },
+                                                                            "serial_number": {
+                                                                                "type": "string",
+                                                                                "example": "SN-0004"
+                                                                            },
+                                                                            "last_scan_at": {
+                                                                                "description": "null si nunca ha registrado un escaneo.",
+                                                                                "type": "string",
+                                                                                "format": "date-time",
+                                                                                "nullable": true
+                                                                            }
+                                                                        },
+                                                                        "type": "object"
+                                                                    }
+                                                                },
+                                                                "high_failure_containers": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "properties": {
+                                                                            "id": {
+                                                                                "type": "integer",
+                                                                                "example": 2
+                                                                            },
+                                                                            "name": {
+                                                                                "type": "string",
+                                                                                "example": "Contenedor Parque"
+                                                                            },
+                                                                            "serial_number": {
+                                                                                "type": "string",
+                                                                                "example": "SN-0002"
+                                                                            },
+                                                                            "valid_scans": {
+                                                                                "type": "integer",
+                                                                                "example": 2
+                                                                            },
+                                                                            "failed_scans": {
+                                                                                "type": "integer",
+                                                                                "example": 14
+                                                                            }
+                                                                        },
+                                                                        "type": "object"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "top_containers": {
+                                                            "description": "Hasta 5 contenedores con más reciclajes válidos en el periodo.",
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 2
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Contenedor Parque"
+                                                                    },
+                                                                    "serial_number": {
+                                                                        "type": "string",
+                                                                        "example": "SN-0002"
+                                                                    },
+                                                                    "valid_scans": {
+                                                                        "type": "integer",
+                                                                        "example": 41
+                                                                    },
+                                                                    "points": {
+                                                                        "type": "integer",
+                                                                        "example": 835
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "top_users": {
+                                                            "description": "Hasta 5 usuarios con más puntos ganados en el periodo (reciclaje + insignias).",
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 39
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Ana"
+                                                                    },
+                                                                    "last_name": {
+                                                                        "type": "string",
+                                                                        "example": "López"
+                                                                    },
+                                                                    "avatar": {
+                                                                        "type": "string",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "valid_scans": {
+                                                                        "type": "integer",
+                                                                        "example": 12
+                                                                    },
+                                                                    "points": {
+                                                                        "type": "integer",
+                                                                        "example": 320
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "recent_scans": {
+                                                            "description": "Los 8 escaneos más recientes.",
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/Scan"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El rol del usuario autenticado no es superadmin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "El periodo no es uno de los permitidos.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
         "/points/balance": {
             "get": {
                 "tags": [
@@ -8445,6 +8832,10 @@
         {
             "name": "Containers",
             "description": "CRUD administrativo de contenedores de reciclaje. Todas las rutas están bajo /containers, protegidas por auth:sanctum + ensureUserIsActive + role:superadmin,moderador (middleware App\\Http\\Middleware\\EnsureUserHasRole). Alcance de este módulo: solo administración básica (nombre, número de serie, ubicación, coordenadas, estado activo/inactivo) — el tracking de sensores/nivel de llenado (tabla container_sensors) y el endpoint IoT de actualización de capacidad quedan fuera de alcance a propósito."
+        },
+        {
+            "name": "Dashboard",
+            "description": "Panel principal del dashboard web. Cada rol con acceso tiene su propio endpoint bajo /dashboard (auth:sanctum + ensureUserIsActive + role), porque los datos que ve cada uno son distintos; por ahora solo existe el de superadmin. Las cifras por periodo salen de las tablas de resumen diario (daily_scan_stats, daily_user_stats), que llena cada hora `php artisan dashboard:aggregate-daily` con los días ya cerrados; el día en curso, y cualquier día cerrado que el job aún no haya procesado, se calcula en vivo sobre las tablas reales con las mismas consultas (App\\Repositories\\DashboardRepository), así que el panel nunca va un día atrás."
         },
         {
             "name": "Points",
