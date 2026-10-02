@@ -6101,6 +6101,281 @@
                 ]
             }
         },
+        "/system/logs": {
+            "get": {
+                "tags": [
+                    "System"
+                ],
+                "summary": "Listar los logs consultables y su estado",
+                "description": "Devuelve cada log de la lista fija con su tamaño y fecha de última escritura en este servidor. `available: false` significa que el archivo todavía no existe o no se puede leer (por ejemplo, el log de errores de un proceso que nunca ha fallado).",
+                "operationId": "119538f94550a703ae9bc19e148b9a38",
+                "responses": {
+                    "200": {
+                        "description": "Logs disponibles.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "logs": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "source": {
+                                                                        "description": "Clave para GET /system/logs/{source}.",
+                                                                        "type": "string",
+                                                                        "example": "scheduler"
+                                                                    },
+                                                                    "label": {
+                                                                        "type": "string",
+                                                                        "example": "Tareas programadas"
+                                                                    },
+                                                                    "available": {
+                                                                        "type": "boolean",
+                                                                        "example": true
+                                                                    },
+                                                                    "size_bytes": {
+                                                                        "type": "integer",
+                                                                        "example": 18234,
+                                                                        "nullable": true
+                                                                    },
+                                                                    "modified_at": {
+                                                                        "type": "string",
+                                                                        "format": "date-time",
+                                                                        "nullable": true
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El rol del usuario autenticado no es superadmin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/system/logs/{source}": {
+            "get": {
+                "tags": [
+                    "System"
+                ],
+                "summary": "Leer las últimas líneas de un log",
+                "description": "Devuelve las últimas `lines` líneas del log, de la más antigua a la más reciente, sobre App\\Services\\SystemLogService::read(). El archivo se lee de atrás hacia adelante por bloques, sin cargarlo completo, y se recorren como máximo 2 MB desde el final (`scanned_bytes`). Con `search` solo se devuelven las líneas que contienen ese texto (sin distinguir mayúsculas), buscando hacia atrás dentro de ese mismo tope — útil en `scheduler`, donde casi todo es \"No scheduled commands are ready to run\": con search=Running quedan solo las ejecuciones reales. `reached_start: true` indica que se revisó el archivo completo y no hay nada más antiguo.",
+                "operationId": "2a200e910a94d6a3b978013d1f80d2e5",
+                "parameters": [
+                    {
+                        "name": "source",
+                        "in": "path",
+                        "description": "Clave del log.",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "laravel",
+                                "supervisor",
+                                "scheduler",
+                                "scheduler-error",
+                                "queue",
+                                "queue-error",
+                                "apache",
+                                "apache-error"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "lines",
+                        "in": "query",
+                        "description": "Cuántas líneas devolver.",
+                        "schema": {
+                            "type": "integer",
+                            "default": 200,
+                            "maximum": 1000,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Texto que deben contener las líneas.",
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 100
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Líneas del log.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "source": {
+                                                            "type": "string",
+                                                            "example": "scheduler"
+                                                        },
+                                                        "label": {
+                                                            "type": "string",
+                                                            "example": "Tareas programadas"
+                                                        },
+                                                        "size_bytes": {
+                                                            "type": "integer",
+                                                            "example": 18234
+                                                        },
+                                                        "modified_at": {
+                                                            "type": "string",
+                                                            "format": "date-time"
+                                                        },
+                                                        "search": {
+                                                            "type": "string",
+                                                            "example": "Running",
+                                                            "nullable": true
+                                                        },
+                                                        "reached_start": {
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        },
+                                                        "scanned_bytes": {
+                                                            "type": "integer",
+                                                            "example": 18234
+                                                        },
+                                                        "count": {
+                                                            "type": "integer",
+                                                            "example": 2
+                                                        },
+                                                        "lines": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string"
+                                                            },
+                                                            "example": [
+                                                                "2026-10-03 00:00:00 Running ['artisan' inspire] .............. 179.06ms DONE",
+                                                                "2026-10-03 00:00:00 Running ['artisan' dashboard:aggregate-daily]  189.07ms DONE"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El rol del usuario autenticado no es superadmin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "La clave no está en la lista de logs, o ese log todavía no existe en este servidor.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "`lines` fuera de rango o `search` demasiado largo.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Más de 60 peticiones por minuto.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
         "/type-shop/catalog": {
             "get": {
                 "tags": [
@@ -8852,6 +9127,10 @@
         {
             "name": "Scans",
             "description": "Flujo de escaneo/reciclaje. POST /scans/identify y POST /scans los llama el software del contenedor físico, autenticado con el token propio de ese contenedor (header X-Container-Token, App\\Http\\Middleware\\EnsureValidContainerToken) — no un usuario logueado. El contenedor clasifica el material con su modelo de visión en el borde y solo reporta el resultado. Un escaneo válido acredita puntos (point_earnings), avanza el progreso mensual de insignias y la racha diaria del usuario. GET /scans y GET /material-types/catalog son de consulta administrativa (auth:sanctum + ensureUserIsActive + role:superadmin,moderador)."
+        },
+        {
+            "name": "System",
+            "description": "Diagnóstico del servidor: consulta de los logs sin acceso a la consola del hosting. Rutas bajo /system, protegidas por auth:sanctum + ensureUserIsActive + role:superadmin y limitadas a 60 peticiones por minuto. Los logs pueden traer datos sensibles (correos, consultas, trazas), por eso solo los ve el superadmin. Solo se pueden leer los archivos de una lista fija (App\\Services\\SystemLogService::sources()): el endpoint recibe una clave, nunca una ruta. Los logs de supervisor (scheduler, queue, apache, supervisor) existen en la imagen de producción; en el entorno local de Sail esos servicios escriben a la salida de Docker. Los archivos viven dentro del contenedor: se reinician en cada deploy."
         },
         {
             "name": "TypeShop",
