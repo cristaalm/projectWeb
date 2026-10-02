@@ -13,9 +13,10 @@ class MaterialTypeRepository
     }
 
     /**
-     * Catálogo completo (incluidos los inactivos) para el selector de
-     * filtros del listado de escaneos — un material desactivado puede
-     * seguir teniendo escaneos históricos que filtrar.
+     * Catálogo completo (incluidos los inactivos) para la vista de
+     * Materiales y el selector de filtros del listado de escaneos — un
+     * material desactivado puede seguir teniendo escaneos históricos que
+     * filtrar.
      */
     public function catalog(): Collection
     {
