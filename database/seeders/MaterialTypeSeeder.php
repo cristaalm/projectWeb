@@ -12,6 +12,8 @@ class MaterialTypeSeeder extends Seeder
         $types = [
             ['name' => 'Plástico', 'slug' => 'plastic', 'points' => 15],
             ['name' => 'Aluminio', 'slug' => 'aluminum', 'points' => 35],
+            ['name' => 'Cartón', 'slug' => 'cardboard', 'points' => 15],
+            ['name' => 'Vidrio', 'slug' => 'glass', 'points' => 20],
             ['name' => 'Otros', 'slug' => 'other', 'points' => 0],
         ];
 
