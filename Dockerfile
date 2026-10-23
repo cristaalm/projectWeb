@@ -20,7 +20,7 @@ COPY . .
 RUN composer install --no-dev --prefer-dist --optimize-autoloader
 
 # Etapa 2: Build de assets con Node y PNPM
-FROM node:22.14 as nodebuild
+FROM node:22.23.4 as nodebuild
 
 WORKDIR /app
 
