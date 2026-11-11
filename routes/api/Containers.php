@@ -1,7 +1,13 @@
 <?php
 
 use App\Http\Controllers\ContainerController;
+use App\Http\Controllers\ContainerFillLevelController;
 use Illuminate\Support\Facades\Route;
+
+// Reporte periódico del nivel de llenado: lo llama el contenedor físico,
+// autenticado por su propio token (header X-Container-Token), no un usuario.
+Route::middleware('container.token')
+    ->post('containers/fill-levels', [ContainerFillLevelController::class, 'store']);
 
 Route::prefix('containers')
     ->middleware(['auth:sanctum', 'ensureUserIsActive', 'role:superadmin,moderador'])
