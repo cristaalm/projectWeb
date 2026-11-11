@@ -12,3 +12,7 @@ Artisan::command('inspire', function () {
 // todos los días cerrados que falten, así que si el servidor estaba dormido
 // o caído al cambiar el día se pone al corriente en la siguiente corrida.
 Schedule::command('dashboard:aggregate-daily')->hourly()->withoutOverlapping();
+
+// Purga del historial de llenado de contenedores según el plazo de retención
+// (config/containers.php). Una vez al día basta: el plazo se mide en meses.
+Schedule::command('containers:prune-fill-readings')->dailyAt('03:30')->withoutOverlapping();
