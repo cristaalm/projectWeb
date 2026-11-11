@@ -4749,6 +4749,192 @@
                 ]
             }
         },
+        "/nearby/containers": {
+            "post": {
+                "tags": [
+                    "Nearby"
+                ],
+                "summary": "Contenedores cerca de ti",
+                "description": "Contenedores activos a 5 km o menos, del más cercano al más lejano, con el último nivel de llenado de cada compartimento, sobre App\\Services\\NearbyService::containers(). Un compartimento cuenta como lleno desde 90% (is_full). Queda fuera el contenedor que tiene todos sus compartimentos llenos; si le queda alguno con espacio, sale. Un compartimento que lleva más de 6 horas sin reportar se marca is_stale, pero su nivel se usa igual. Un contenedor que todavía no reporta su llenado sale con sensors vacío. Los contenedores sin coordenadas no salen. La ubicación es obligatoria y tiene que ser válida (precisión y antigüedad): si falta o no lo es, 422.",
+                "operationId": "fa62b572c0517a5de472eeaeb4e7e670",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "latitude",
+                                    "longitude",
+                                    "accuracy",
+                                    "captured_at"
+                                ],
+                                "properties": {
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "maximum": 90,
+                                        "minimum": -90,
+                                        "example": 19.0522
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "maximum": 180,
+                                        "minimum": -180,
+                                        "example": -104.3158
+                                    },
+                                    "accuracy": {
+                                        "description": "Precisión en metros que reporta el GPS. Más de 500 → 422.",
+                                        "type": "number",
+                                        "format": "float",
+                                        "maximum": 500,
+                                        "minimum": 0,
+                                        "example": 12.5
+                                    },
+                                    "captured_at": {
+                                        "description": "Hora en que se obtuvo la ubicación (ISO-8601). Más de 10 minutos de antigüedad o más de 5 en el futuro → 422.",
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-11-08T15:30:00Z"
+                                    },
+                                    "limit": {
+                                        "description": "Cuántos contenedores devolver. 5 por defecto; mayor a 50 se topa a 50.",
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "example": 5,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "example": {
+                                "latitude": 19.0522,
+                                "longitude": -104.3158,
+                                "accuracy": 12.5,
+                                "captured_at": "2026-11-08T15:30:00Z"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Contenedores cercanos (puede ser una lista vacía).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "containers": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/NearbyContainer"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "contenedores": {
+                                        "summary": "Uno con lecturas y uno que aún no reporta",
+                                        "value": {
+                                            "success": true,
+                                            "message": "Contenedores obtenidos correctamente.",
+                                            "data": {
+                                                "containers": [
+                                                    {
+                                                        "id": 4,
+                                                        "name": "Contenedor Jardín Libertad",
+                                                        "location": "Jardín Libertad, Centro, Colima",
+                                                        "latitude": 19.2433,
+                                                        "longitude": -103.725,
+                                                        "distance_m": 640,
+                                                        "sensors": [
+                                                            {
+                                                                "sensor_key": "aluminum",
+                                                                "material": {
+                                                                    "slug": "aluminum",
+                                                                    "name": "Aluminio"
+                                                                },
+                                                                "fill_level": 18,
+                                                                "is_full": false,
+                                                                "measured_at": "2026-11-11T18:00:00.000000Z",
+                                                                "is_stale": false
+                                                            },
+                                                            {
+                                                                "sensor_key": "plastic",
+                                                                "material": {
+                                                                    "slug": "plastic",
+                                                                    "name": "Plástico"
+                                                                },
+                                                                "fill_level": 93.5,
+                                                                "is_full": true,
+                                                                "measured_at": "2026-11-11T18:00:00.000000Z",
+                                                                "is_stale": false
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "id": 7,
+                                                        "name": "Contenedor Universidad",
+                                                        "location": "Campus central",
+                                                        "latitude": 19.2501,
+                                                        "longitude": -103.7302,
+                                                        "distance_m": 1850,
+                                                        "sensors": []
+                                                    }
+                                                ]
+                                            },
+                                            "errors": null,
+                                            "code": 200
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado, o la cuenta fue dada de baja.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Falta la ubicación, tiene formato incorrecto, es poco precisa (accuracy > 500 m) o vieja/futura (captured_at), o limit menor a 1.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
         "/points/balance": {
             "get": {
                 "tags": [
@@ -9074,6 +9260,94 @@
                     "updated_at": {
                         "type": "string",
                         "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "NearbyContainer": {
+                "description": "Contenedor de \"contenedores cerca de ti\" (App\\Http\\Resources\\NearbyContainerResource), con el último nivel de llenado de cada compartimento (container_sensors). No incluye serial_number ni el token.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 4
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Contenedor Jardín Libertad"
+                    },
+                    "location": {
+                        "description": "Descripción del lugar.",
+                        "type": "string",
+                        "example": "Jardín Libertad, Centro, Colima",
+                        "nullable": true
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 19.2433
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": -103.725
+                    },
+                    "distance_m": {
+                        "description": "Distancia en metros desde la ubicación enviada.",
+                        "type": "integer",
+                        "example": 640
+                    },
+                    "sensors": {
+                        "description": "Un elemento por compartimento, ordenados por sensor_key. Vacía si el contenedor todavía no reporta su llenado.",
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "sensor_key": {
+                                    "description": "Identificador del compartimento (por defecto, el slug del material).",
+                                    "type": "string",
+                                    "example": "plastic"
+                                },
+                                "material": {
+                                    "description": "null si el material se borró del catálogo.",
+                                    "properties": {
+                                        "slug": {
+                                            "type": "string",
+                                            "example": "plastic"
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Plástico"
+                                        }
+                                    },
+                                    "type": "object",
+                                    "nullable": true
+                                },
+                                "fill_level": {
+                                    "description": "Porcentaje de llenado.",
+                                    "type": "number",
+                                    "format": "float",
+                                    "maximum": 100,
+                                    "minimum": 0,
+                                    "example": 72.5
+                                },
+                                "is_full": {
+                                    "description": "true desde 90%.",
+                                    "type": "boolean",
+                                    "example": false
+                                },
+                                "measured_at": {
+                                    "description": "Hora de la última medición.",
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "example": "2026-11-11T18:00:00.000000Z"
+                                },
+                                "is_stale": {
+                                    "description": "true si el compartimento lleva más de 6 horas sin reportar (el nivel puede no ser el actual).",
+                                    "type": "boolean",
+                                    "example": false
+                                }
+                            },
+                            "type": "object"
+                        }
                     }
                 },
                 "type": "object"

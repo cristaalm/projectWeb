@@ -108,4 +108,56 @@ class NearbyDocumentation
         ]
     )]
     public function shops() {}
+
+    #[OA\Post(
+        path: '/nearby/containers',
+        tags: ['Nearby'],
+        summary: 'Contenedores cerca de ti',
+        description: 'Contenedores activos a 5 km o menos, del más cercano al más lejano, con el último nivel de llenado de cada compartimento, sobre App\Services\NearbyService::containers(). '
+            .'Un compartimento cuenta como lleno desde 90% (is_full). Queda fuera el contenedor que tiene todos sus compartimentos llenos; si le queda alguno con espacio, sale. Un compartimento que lleva más de 6 horas sin reportar se marca is_stale, pero su nivel se usa igual. Un contenedor que todavía no reporta su llenado sale con sensors vacío. Los contenedores sin coordenadas no salen. '
+            .'La ubicación es obligatoria y tiene que ser válida (precisión y antigüedad): si falta o no lo es, 422.',
+        security: [['sessionCookie' => []], ['bearerToken' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['latitude', 'longitude', 'accuracy', 'captured_at'],
+                properties: [
+                    new OA\Property(property: 'latitude', type: 'number', format: 'float', minimum: -90, maximum: 90, example: 19.0522),
+                    new OA\Property(property: 'longitude', type: 'number', format: 'float', minimum: -180, maximum: 180, example: -104.3158),
+                    new OA\Property(property: 'accuracy', type: 'number', format: 'float', minimum: 0, maximum: 500, description: 'Precisión en metros que reporta el GPS. Más de 500 → 422.', example: 12.5),
+                    new OA\Property(property: 'captured_at', type: 'string', format: 'date-time', description: 'Hora en que se obtuvo la ubicación (ISO-8601). Más de 10 minutos de antigüedad o más de 5 en el futuro → 422.', example: '2026-11-08T15:30:00Z'),
+                    new OA\Property(property: 'limit', type: 'integer', minimum: 1, nullable: true, description: 'Cuántos contenedores devolver. 5 por defecto; mayor a 50 se topa a 50.', example: 5),
+                ],
+                example: ['latitude' => 19.0522, 'longitude' => -104.3158, 'accuracy' => 12.5, 'captured_at' => '2026-11-08T15:30:00Z']
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Contenedores cercanos (puede ser una lista vacía).',
+                content: new OA\JsonContent(
+                    allOf: [new OA\Schema(ref: '#/components/schemas/SuccessResponse')],
+                    properties: [new OA\Property(property: 'data', type: 'object', properties: [
+                        new OA\Property(property: 'containers', type: 'array', items: new OA\Items(ref: '#/components/schemas/NearbyContainer')),
+                    ])],
+                    examples: [new OA\Examples(
+                        example: 'contenedores',
+                        summary: 'Uno con lecturas y uno que aún no reporta',
+                        value: ['success' => true, 'message' => 'Contenedores obtenidos correctamente.', 'data' => [
+                            'containers' => [
+                                ['id' => 4, 'name' => 'Contenedor Jardín Libertad', 'location' => 'Jardín Libertad, Centro, Colima', 'latitude' => 19.2433, 'longitude' => -103.725, 'distance_m' => 640, 'sensors' => [
+                                    ['sensor_key' => 'aluminum', 'material' => ['slug' => 'aluminum', 'name' => 'Aluminio'], 'fill_level' => 18, 'is_full' => false, 'measured_at' => '2026-11-11T18:00:00.000000Z', 'is_stale' => false],
+                                    ['sensor_key' => 'plastic', 'material' => ['slug' => 'plastic', 'name' => 'Plástico'], 'fill_level' => 93.5, 'is_full' => true, 'measured_at' => '2026-11-11T18:00:00.000000Z', 'is_stale' => false],
+                                ]],
+                                ['id' => 7, 'name' => 'Contenedor Universidad', 'location' => 'Campus central', 'latitude' => 19.2501, 'longitude' => -103.7302, 'distance_m' => 1850, 'sensors' => []],
+                            ],
+                        ], 'errors' => null, 'code' => 200]
+                    )]
+                )
+            ),
+            new OA\Response(response: 401, description: 'No autenticado, o la cuenta fue dada de baja.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 422, description: 'Falta la ubicación, tiene formato incorrecto, es poco precisa (accuracy > 500 m) o vieja/futura (captured_at), o limit menor a 1.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+        ]
+    )]
+    public function containers() {}
 }
