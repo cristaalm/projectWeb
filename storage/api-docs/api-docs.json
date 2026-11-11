@@ -4360,6 +4360,212 @@
                 ]
             }
         },
+        "/nearby/rewards": {
+            "post": {
+                "tags": [
+                    "Nearby"
+                ],
+                "summary": "Recompensas cerca de ti",
+                "description": "Recompensas que el usuario puede canjear hoy (aprobadas, sin vencer, con stock, de comercios activos; las exclusivas solo si es miembro de esa alianza), sobre App\\Services\\NearbyService::rewards(). La ubicación es opcional. Con una ubicación válida solo cuentan los comercios a 5 km o menos; si no hay ninguno con recompensas disponibles, o la ubicación falta o es inválida por precisión/antigüedad, se elige solo por puntos (location_used = false). Una ubicación con formato incorrecto (coordenadas fuera de rango, campos sueltos) sí es 422. Orden: 1) las exclusivas de su alianza, 2) las que puede canjear —por distancia si location_used; si no, de más a menos puntos—, 3) las que menos puntos le faltan. Como mucho 2 por comercio; si con ese tope no se llena el límite, se completa con más de los mismos comercios.",
+                "operationId": "5c946bbb16b7386139dc9bffc4c66e90",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "maximum": 90,
+                                        "minimum": -90,
+                                        "example": 19.0522,
+                                        "nullable": true
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "maximum": 180,
+                                        "minimum": -180,
+                                        "example": -104.3158,
+                                        "nullable": true
+                                    },
+                                    "accuracy": {
+                                        "description": "Precisión en metros que reporta el GPS. Obligatoria si se manda la ubicación.",
+                                        "type": "number",
+                                        "format": "float",
+                                        "minimum": 0,
+                                        "example": 12.5,
+                                        "nullable": true
+                                    },
+                                    "captured_at": {
+                                        "description": "Hora en que se obtuvo la ubicación (ISO-8601). Obligatoria si se manda la ubicación.",
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-11-08T15:30:00Z",
+                                        "nullable": true
+                                    },
+                                    "limit": {
+                                        "description": "Cuántas recompensas devolver. 5 por defecto; mayor a 50 se topa a 50.",
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "example": 5,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "example": {
+                                "latitude": 19.0522,
+                                "longitude": -104.3158,
+                                "accuracy": 12.5,
+                                "captured_at": "2026-11-08T15:30:00Z"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Recompensas para el usuario (puede ser una lista vacía).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "location_used": {
+                                                            "description": "true si la lista se armó con los comercios dentro del radio.",
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        },
+                                                        "total_points": {
+                                                            "description": "Saldo actual del usuario (mismo cálculo que GET /points/balance).",
+                                                            "type": "integer",
+                                                            "example": 95
+                                                        },
+                                                        "rewards": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/NearbyReward"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "con_ubicacion": {
+                                        "summary": "Con ubicación válida y comercios cerca",
+                                        "value": {
+                                            "success": true,
+                                            "message": "Recompensas obtenidas correctamente.",
+                                            "data": {
+                                                "location_used": true,
+                                                "total_points": 95,
+                                                "rewards": [
+                                                    {
+                                                        "id": 12,
+                                                        "name": "Café americano gratis",
+                                                        "description": "Un café americano de 12 oz.",
+                                                        "image_url": null,
+                                                        "points_required": 80,
+                                                        "stock": 15,
+                                                        "expires_at": null,
+                                                        "is_exclusive": false,
+                                                        "can_redeem": true,
+                                                        "points_missing": 0,
+                                                        "shop": {
+                                                            "id": 3,
+                                                            "name": "Café Central",
+                                                            "logo_url": null,
+                                                            "address": "Calle Uno 10, Centro",
+                                                            "latitude": 19.0611,
+                                                            "longitude": -104.3158,
+                                                            "has_exclusive_rewards": false,
+                                                            "type_shop": {
+                                                                "id": 1,
+                                                                "name": "Cafetería"
+                                                            },
+                                                            "distance_m": 990
+                                                        }
+                                                    },
+                                                    {
+                                                        "id": 20,
+                                                        "name": "2x1 en pan dulce",
+                                                        "description": null,
+                                                        "image_url": null,
+                                                        "points_required": 120,
+                                                        "stock": null,
+                                                        "expires_at": "2026-12-31T23:59:59.000000Z",
+                                                        "is_exclusive": false,
+                                                        "can_redeem": false,
+                                                        "points_missing": 25,
+                                                        "shop": {
+                                                            "id": 5,
+                                                            "name": "Panadería La Espiga",
+                                                            "logo_url": null,
+                                                            "address": "Av. Dos 200",
+                                                            "latitude": 19.0702,
+                                                            "longitude": -104.3101,
+                                                            "has_exclusive_rewards": false,
+                                                            "type_shop": {
+                                                                "id": 2,
+                                                                "name": "Panadería"
+                                                            },
+                                                            "distance_m": 2080
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "errors": null,
+                                            "code": 200
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado, o la cuenta fue dada de baja.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ubicación con formato incorrecto (coordenadas fuera de rango, latitude sin longitude, falta accuracy/captured_at) o limit menor a 1.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
         "/points/balance": {
             "get": {
                 "tags": [
@@ -8689,6 +8895,82 @@
                 },
                 "type": "object"
             },
+            "NearbyReward": {
+                "description": "Recompensa de \"recompensas cerca de ti\" (App\\Http\\Resources\\NearbyRewardResource). No incluye `code`: es el código que se entrega al canjear.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Café americano gratis"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Un café americano de 12 oz.",
+                        "nullable": true
+                    },
+                    "image_url": {
+                        "description": "URL absoluta de la imagen del producto (disco public). null si no tiene.",
+                        "type": "string",
+                        "example": "https://api.ejemplo.com/storage/rewards/reward_12/image.png",
+                        "nullable": true
+                    },
+                    "points_required": {
+                        "type": "integer",
+                        "example": 80
+                    },
+                    "stock": {
+                        "description": "Unidades que quedan. null = ilimitado. Las de stock 0 no salen.",
+                        "type": "integer",
+                        "example": 15,
+                        "nullable": true
+                    },
+                    "expires_at": {
+                        "description": "null = sin vencimiento. Las vencidas no salen.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-12-31T23:59:59.000000Z",
+                        "nullable": true
+                    },
+                    "is_exclusive": {
+                        "description": "true = recompensa exclusiva para los miembros del comercio. Solo le aparecen al usuario que es miembro de esa alianza, y van al principio de la lista.",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "can_redeem": {
+                        "description": "true si el saldo del usuario alcanza los points_required.",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "points_missing": {
+                        "description": "Puntos que le faltan (0 si can_redeem).",
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "shop": {
+                        "description": "Comercio de la recompensa, en la misma forma que GET /alliances/shops, más su distancia.",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Shop"
+                            },
+                            {
+                                "properties": {
+                                    "distance_m": {
+                                        "description": "Distancia en metros desde la ubicación enviada. null si no se mandó ubicación válida o el comercio no tiene coordenadas.",
+                                        "type": "integer",
+                                        "example": 1240,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        ]
+                    }
+                },
+                "type": "object"
+            },
             "PointMovement": {
                 "description": "Movimiento del saldo de puntos del usuario autenticado (App\\Http\\Resources\\PointMovementResource sobre App\\Repositories\\PointRepository::movements()). Une 4 fuentes: reciclaje (point_earnings), insignias (badge_earnings), ajustes de admin (point_adjustments) y canjes (point_redemptions, solo REDEEMED/DELIVERED). La suma de todos los points coincide con total_points de /points/balance.",
                 "properties": {
@@ -9315,6 +9597,10 @@
         {
             "name": "Dashboard",
             "description": "Panel principal del dashboard web. Cada rol con acceso tiene su propio endpoint bajo /dashboard (auth:sanctum + ensureUserIsActive + role), porque los datos que ve cada uno son distintos; por ahora solo existe el de superadmin. Las cifras por periodo salen de las tablas de resumen diario (daily_scan_stats, daily_user_stats), que llena cada hora `php artisan dashboard:aggregate-daily` con los días ya cerrados; el día en curso, y cualquier día cerrado que el job aún no haya procesado, se calcula en vivo sobre las tablas reales con las mismas consultas (App\\Repositories\\DashboardRepository), así que el panel nunca va un día atrás."
+        },
+        {
+            "name": "Nearby",
+            "description": "\"Cerca de ti\" para la app móvil: recompensas, comercios y contenedores cercanos al usuario. Todas las rutas están bajo /nearby, son POST (la ubicación va en el cuerpo para que no quede en los logs de acceso) y solo exigen sesión/token activa (auth:sanctum + ensureUserIsActive), sin gate de rol. Reciben la ubicación como latitude/longitude/accuracy/captured_at. \"Cercano\" = 5 km o menos (Haversine). Una ubicación es inválida si accuracy > 500 m, si captured_at tiene más de 10 minutos o si está más de 5 minutos en el futuro. `limit` opcional: 5 por defecto; uno mayor a 50 no es error, se topa a 50."
         },
         {
             "name": "Points",
