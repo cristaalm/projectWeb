@@ -72,4 +72,16 @@ class Container extends Model
     {
         return $this->hasMany(Scan::class);
     }
+
+    /** Última lectura de llenado de cada compartimento. */
+    public function sensors(): HasMany
+    {
+        return $this->hasMany(ContainerSensor::class);
+    }
+
+    /** Historial completo de lecturas de llenado. */
+    public function fillReadings(): HasMany
+    {
+        return $this->hasMany(ContainerFillReading::class);
+    }
 }

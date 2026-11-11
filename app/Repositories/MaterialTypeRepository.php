@@ -13,6 +13,15 @@ class MaterialTypeRepository
     }
 
     /**
+     * @param  array<string>  $slugs
+     * @return array<string, int> slug => id
+     */
+    public function idsBySlugs(array $slugs): array
+    {
+        return MaterialTypes::whereIn('slug', array_unique($slugs))->pluck('id', 'slug')->all();
+    }
+
+    /**
      * Catálogo completo (incluidos los inactivos) para la vista de
      * Materiales y el selector de filtros del listado de escaneos — un
      * material desactivado puede seguir teniendo escaneos históricos que
