@@ -69,6 +69,30 @@ class NearbyService
         ];
     }
 
+    /**
+     * Hasta `$limit` comercios activos a `nearby.radius_m` o menos que tienen al
+     * menos una recompensa disponible para el usuario (un comercio con solo
+     * exclusivas le sale solo a sus miembros), del más cercano al más lejano.
+     *
+     * @param  array{latitude: float, longitude: float}  $location
+     * @return array{total_points: int, shops: \Illuminate\Database\Eloquent\Collection}
+     */
+    public function shops(User $user, array $location, int $limit): array
+    {
+        $balance = $this->users->pointsBalance($user->id);
+
+        return [
+            'total_points' => $balance,
+            'shops' => $this->nearby->nearbyShops(
+                $user->organizationMember?->alliance_id,
+                $location,
+                config('nearby.radius_m'),
+                $balance,
+                $limit,
+            ),
+        ];
+    }
+
     private function compareRewards(Reward $a, Reward $b, bool $byDistance): int
     {
         // Las exclusivas solo llegan aquí si son de la alianza del usuario.

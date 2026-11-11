@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Enums\AllianceStatus;
 use App\Enums\RewardStatus;
+use App\Models\Alliance;
 use App\Models\Reward;
 use App\Repositories\Concerns\QueriesByDistance;
 use Illuminate\Database\Eloquent\Builder;
@@ -29,6 +30,7 @@ class NearbyRepository
         $query = Reward::query()
             ->select('rewards.*')
             ->join('alliances', 'alliances.id', '=', 'rewards.alliance_id')
+            ->where('alliances.status', AllianceStatus::ACTIVE->value)
             ->with('alliance.typeShop:id,name');
 
         $this->whereRewardAvailable($query, $memberAllianceId);
@@ -45,12 +47,42 @@ class NearbyRepository
     }
 
     /**
-     * Filtros de "recompensa disponible para este usuario", sobre una consulta de
-     * `rewards` que ya hace join con `alliances`:
+     * Comercios activos a `$radiusM` metros o menos que tienen al menos una
+     * recompensa disponible para el usuario, del más cercano al más lejano.
+     * Cada uno trae `distance_m`, `available_rewards_count` y
+     * `redeemable_rewards_count` (las que le alcanzan con `$balance`).
+     *
+     * @param  array{latitude: float, longitude: float}  $location
+     */
+    public function nearbyShops(?int $memberAllianceId, array $location, float $radiusM, int $balance, int $limit): Collection
+    {
+        $available = fn (Builder $q) => $this->whereRewardAvailable($q, $memberAllianceId);
+
+        // Columnas listadas a propósito, igual que AllianceRepository::paginateShops():
+        // nunca exponer los datos de contacto administrativo.
+        $query = Alliance::query()
+            ->select(['alliances.id', 'alliances.type_shop_id', 'alliances.name', 'alliances.address', 'alliances.latitude', 'alliances.longitude', 'alliances.logo_url', 'alliances.has_exclusive_rewards'])
+            ->with('typeShop:id,name')
+            ->where('alliances.status', AllianceStatus::ACTIVE->value)
+            ->whereHas('rewards', $available)
+            ->withCount([
+                'rewards as available_rewards_count' => $available,
+                'rewards as redeemable_rewards_count' => fn (Builder $q) => $available($q)->where('rewards.points_required', '<=', $balance),
+            ]);
+
+        $this->selectDistance($query, 'alliances.latitude', 'alliances.longitude', $location['latitude'], $location['longitude']);
+        $this->whereWithinRadius($query, 'alliances.latitude', 'alliances.longitude', $location['latitude'], $location['longitude'], $radiusM);
+
+        return $query->orderBy('distance_m')->orderBy('alliances.id')->limit($limit)->get();
+    }
+
+    /**
+     * Filtros de "recompensa disponible para este usuario", solo sobre columnas
+     * de `rewards` (sirve también dentro de whereHas/withCount). El estado del
+     * comercio (activo) lo filtra quien consulta.
      * - aprobada (y no borrada: SoftDeletes ya lo excluye),
      * - sin vencer,
      * - con stock (null = ilimitado; stock es lo que queda),
-     * - de un comercio activo,
      * - no exclusiva, o exclusiva de la alianza de la que el usuario es miembro.
      */
     public function whereRewardAvailable(Builder $query, ?int $memberAllianceId): Builder
@@ -59,7 +91,6 @@ class NearbyRepository
             ->where('rewards.status', RewardStatus::APPROVED->value)
             ->where(fn ($q) => $q->whereNull('rewards.expires_at')->orWhere('rewards.expires_at', '>', now()))
             ->where(fn ($q) => $q->whereNull('rewards.stock')->orWhere('rewards.stock', '>', 0))
-            ->where('alliances.status', AllianceStatus::ACTIVE->value)
             ->where(function ($q) use ($memberAllianceId) {
                 $q->where('rewards.is_exclusive', false);
 

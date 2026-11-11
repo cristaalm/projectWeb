@@ -9,4 +9,5 @@ Route::prefix('nearby')
     ->middleware(['auth:sanctum', 'ensureUserIsActive'])
     ->group(function () {
         Route::post('rewards', [NearbyController::class, 'rewards']);
+        Route::post('shops', [NearbyController::class, 'shops']);
     });

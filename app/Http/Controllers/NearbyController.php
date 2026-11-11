@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\OldControllers\Controller;
 use App\Http\Requests\Nearby\NearbyRewardsRequest;
+use App\Http\Requests\Nearby\NearbyShopsRequest;
 use App\Http\Resources\NearbyRewardResource;
+use App\Http\Resources\NearbyShopResource;
 use App\Services\NearbyService;
 
 /**
@@ -25,6 +27,16 @@ class NearbyController extends Controller
             'location_used' => $result['location_used'],
             'total_points' => $result['total_points'],
             'rewards' => NearbyRewardResource::collection($result['rewards'])->resolve($request),
+        ], null, 200);
+    }
+
+    public function shops(NearbyShopsRequest $request)
+    {
+        $result = $this->nearby->shops($request->user(), $request->usableLocation(), $request->limit());
+
+        return $this->apiResponse(true, 'Comercios obtenidos correctamente.', [
+            'total_points' => $result['total_points'],
+            'shops' => NearbyShopResource::collection($result['shops'])->resolve($request),
         ], null, 200);
     }
 }

@@ -36,6 +36,18 @@ trait ValidatesUserLocation
             'longitude.required_with' => 'La longitud es obligatoria cuando se envía la ubicación.',
             'accuracy.required_with' => 'La precisión es obligatoria cuando se envía la ubicación.',
             'captured_at.required_with' => 'La hora de captura es obligatoria cuando se envía la ubicación.',
+            'limit.min' => 'El límite debe ser al menos 1.',
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'latitude' => 'latitud',
+            'longitude' => 'longitud',
+            'accuracy' => 'precisión',
+            'captured_at' => 'hora de captura',
+            'limit' => 'límite',
         ];
     }
 
