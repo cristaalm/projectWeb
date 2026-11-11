@@ -23,4 +23,9 @@ return [
     // Endpoint de recompensas: cuántas pueden salir del mismo comercio antes de
     // completar la lista con más de ese mismo comercio.
     'rewards_per_shop' => 2,
+
+    // Endpoint de contenedores: porcentaje desde el que un compartimento cuenta
+    // como lleno, y horas sin reporte tras las que su dato se marca desactualizado.
+    'container_full_level' => 90,
+    'container_stale_after_hours' => 6,
 ];

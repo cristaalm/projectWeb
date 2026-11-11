@@ -3,8 +3,10 @@
 namespace App\Repositories;
 
 use App\Enums\AllianceStatus;
+use App\Enums\ContainerStatus;
 use App\Enums\RewardStatus;
 use App\Models\Alliance;
+use App\Models\Container;
 use App\Models\Reward;
 use App\Repositories\Concerns\QueriesByDistance;
 use Illuminate\Database\Eloquent\Builder;
@@ -74,6 +76,31 @@ class NearbyRepository
         $this->whereWithinRadius($query, 'alliances.latitude', 'alliances.longitude', $location['latitude'], $location['longitude'], $radiusM);
 
         return $query->orderBy('distance_m')->orderBy('alliances.id')->limit($limit)->get();
+    }
+
+    /**
+     * Contenedores activos a `$radiusM` metros o menos, del más cercano al más
+     * lejano, con sus compartimentos (`sensors.materialType`) y `distance_m`.
+     * Queda fuera el contenedor cuyos compartimentos están todos a
+     * `$fullLevel` % o más; uno sin lecturas todavía sí sale.
+     *
+     * @param  array{latitude: float, longitude: float}  $location
+     */
+    public function nearbyContainers(array $location, float $radiusM, float $fullLevel, int $limit): Collection
+    {
+        // Columnas listadas a propósito: ni serial_number ni el token salen a la app.
+        $query = Container::query()
+            ->select(['containers.id', 'containers.name', 'containers.location', 'containers.latitude', 'containers.longitude'])
+            ->with(['sensors' => fn ($q) => $q->orderBy('sensor_key'), 'sensors.materialType:id,name,slug'])
+            ->where('containers.status', ContainerStatus::ACTIVE->value)
+            ->where(fn ($q) => $q
+                ->whereDoesntHave('sensors')
+                ->orWhereHas('sensors', fn ($s) => $s->where('fill_level', '<', $fullLevel)));
+
+        $this->selectDistance($query, 'containers.latitude', 'containers.longitude', $location['latitude'], $location['longitude']);
+        $this->whereWithinRadius($query, 'containers.latitude', 'containers.longitude', $location['latitude'], $location['longitude'], $radiusM);
+
+        return $query->orderBy('distance_m')->orderBy('containers.id')->limit($limit)->get();
     }
 
     /**

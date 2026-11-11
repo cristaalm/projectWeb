@@ -32,12 +32,6 @@ class NearbyShopsRequest extends FormRequest
 
     public function withValidator(ValidatorContract $validator): void
     {
-        $validator->after(function (ValidatorContract $validator) {
-            // Solo si el formato ya es válido: con una fecha mal escrita no hay
-            // nada que revisar.
-            if ($validator->errors()->isEmpty() && ($problem = $this->locationQualityProblem())) {
-                $validator->errors()->add(...$problem);
-            }
-        });
+        $this->rejectUnusableLocation($validator);
     }
 }

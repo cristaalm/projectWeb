@@ -93,6 +93,24 @@ class NearbyService
         ];
     }
 
+    /**
+     * Hasta `$limit` contenedores activos a `nearby.radius_m` o menos, del más
+     * cercano al más lejano, excluyendo los que tienen todos sus compartimentos
+     * llenos (`nearby.container_full_level`). Los que aún no reportan llenado
+     * salen con la lista de compartimentos vacía.
+     *
+     * @param  array{latitude: float, longitude: float}  $location
+     */
+    public function containers(array $location, int $limit): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->nearby->nearbyContainers(
+            $location,
+            config('nearby.radius_m'),
+            config('nearby.container_full_level'),
+            $limit,
+        );
+    }
+
     private function compareRewards(Reward $a, Reward $b, bool $byDistance): int
     {
         // Las exclusivas solo llegan aquí si son de la alianza del usuario.

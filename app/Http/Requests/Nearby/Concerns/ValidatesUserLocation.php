@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Nearby\Concerns;
 
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Support\Carbon;
 
 /**
@@ -79,6 +80,20 @@ trait ValidatesUserLocation
         }
 
         return null;
+    }
+
+    /**
+     * Para los endpoints donde la ubicación es obligatoria: convierte un
+     * problema de calidad en error de validación (422). Solo si el formato ya
+     * es válido: con una fecha mal escrita no hay nada que revisar.
+     */
+    protected function rejectUnusableLocation(ValidatorContract $validator): void
+    {
+        $validator->after(function (ValidatorContract $validator) {
+            if ($validator->errors()->isEmpty() && ($problem = $this->locationQualityProblem())) {
+                $validator->errors()->add(...$problem);
+            }
+        });
     }
 
     /**

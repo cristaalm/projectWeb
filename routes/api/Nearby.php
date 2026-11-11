@@ -10,4 +10,5 @@ Route::prefix('nearby')
     ->group(function () {
         Route::post('rewards', [NearbyController::class, 'rewards']);
         Route::post('shops', [NearbyController::class, 'shops']);
+        Route::post('containers', [NearbyController::class, 'containers']);
     });
