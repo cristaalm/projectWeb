@@ -6,7 +6,8 @@ use Illuminate\Support\Facades\Route;
 
 // Endpoints del contenedor físico, autenticado por su propio token (header
 // X-Container-Token) — no un usuario logueado. El token solo abre estas dos
-// rutas, y el contenedor siempre opera a su propio nombre.
+// rutas y POST /containers/fill-levels (routes/api/Containers.php), y el
+// contenedor siempre opera a su propio nombre.
 Route::prefix('scans')->middleware('container.token')->group(function () {
     Route::post('identify', [ScanController::class, 'identify']);
     Route::post('/', [ScanController::class, 'store']);

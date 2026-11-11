@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\FillReadingSource;
 use App\Enums\ScanStatus;
 use App\Exceptions\ScanException;
 use App\Models\Container;
@@ -26,6 +27,7 @@ class ScanService
         private readonly PointRepository $points,
         private readonly BadgeService $badges,
         private readonly StreakService $streaks,
+        private readonly ContainerFillLevelService $fillLevels,
     ) {}
 
     /**
@@ -118,7 +120,26 @@ class ScanService
             $this->attachImage($scan, $image);
         }
 
+        if (! empty($data['fill_levels'])) {
+            $this->recordFillLevels($container, $scan, $data['fill_levels']);
+        }
+
         return $this->result($scan, false);
+    }
+
+    /**
+     * Igual que la imagen: va después de confirmar la transacción, porque un
+     * fallo al guardar el llenado no debe tumbar un reciclaje ya acreditado,
+     * y un duplicado (mismo event_id) nunca llega aquí, así que no repite
+     * lecturas en el historial.
+     */
+    private function recordFillLevels(Container $container, Scan $scan, array $readings): void
+    {
+        try {
+            $this->fillLevels->record($container, $readings, FillReadingSource::SCAN, $scan->scanned_at, $scan->id);
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 
     private function resolveUser(string $codeIdentity): User
