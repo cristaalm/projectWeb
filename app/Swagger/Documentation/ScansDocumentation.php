@@ -106,6 +106,22 @@ class ScansDocumentation
                         new OA\Property(property: 'code_identity', type: 'string', maxLength: 30, example: '5760307480459'),
                         new OA\Property(property: 'material', type: 'string', description: 'Slug del material clasificado (material_types.slug).', example: 'plastic'),
                         new OA\Property(property: 'image', type: 'string', format: 'binary', nullable: true, description: 'Opcional. JPEG o PNG, máximo 5 MB.'),
+                        new OA\Property(
+                            property: 'fill_levels',
+                            type: 'array',
+                            nullable: true,
+                            maxItems: 20,
+                            description: 'Opcional. Nivel de llenado de los compartimentos al momento del escaneo, mismo formato que `sensors` de POST /containers/fill-levels. Se registra con la hora del escaneo y después de acreditar el reciclaje: un fallo al guardarlo no afecta al escaneo, y un reintento con el mismo event_id no lo vuelve a registrar. En multipart: fill_levels[0][material], fill_levels[0][fill_level], fill_levels[0][sensor_key].',
+                            items: new OA\Items(
+                                type: 'object',
+                                required: ['material', 'fill_level'],
+                                properties: [
+                                    new OA\Property(property: 'material', type: 'string', example: 'plastic'),
+                                    new OA\Property(property: 'fill_level', type: 'number', format: 'float', minimum: 0, maximum: 100, example: 72.5),
+                                    new OA\Property(property: 'sensor_key', type: 'string', maxLength: 50, nullable: true, example: 'comp_1'),
+                                ]
+                            )
+                        ),
                     ]
                 )
             )
@@ -145,7 +161,7 @@ class ScansDocumentation
             new OA\Response(response: 403, description: 'El contenedor dueño del token está inactivo.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
             new OA\Response(response: 404, description: 'El code_identity no pertenece a ningún usuario.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
             new OA\Response(response: 409, description: 'El event_id ya fue usado por otro contenedor.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
-            new OA\Response(response: 422, description: 'Error de validación (campos requeridos, event_id no es UUID, material fuera del catálogo, imagen inválida) o cuenta del usuario desactivada.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 422, description: 'Error de validación (campos requeridos, event_id no es UUID, material fuera del catálogo, imagen inválida, fill_levels inválido) o cuenta del usuario desactivada.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
         ]
     )]
     public function store() {}

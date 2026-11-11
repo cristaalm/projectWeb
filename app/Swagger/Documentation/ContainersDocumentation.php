@@ -4,7 +4,7 @@ namespace App\Swagger\Documentation;
 
 use OpenApi\Attributes as OA;
 
-#[OA\Tag(name: 'Containers', description: 'CRUD administrativo de contenedores de reciclaje. Todas las rutas están bajo /containers, protegidas por auth:sanctum + ensureUserIsActive + role:superadmin,moderador (middleware App\Http\Middleware\EnsureUserHasRole). Alcance de este módulo: solo administración básica (nombre, número de serie, ubicación, coordenadas, estado activo/inactivo) — el tracking de sensores/nivel de llenado (tabla container_sensors) y el endpoint IoT de actualización de capacidad quedan fuera de alcance a propósito.')]
+#[OA\Tag(name: 'Containers', description: 'CRUD administrativo de contenedores de reciclaje. Las rutas de administración están bajo /containers, protegidas por auth:sanctum + ensureUserIsActive + role:superadmin,moderador (middleware App\Http\Middleware\EnsureUserHasRole): nombre, número de serie, ubicación, coordenadas, estado activo/inactivo. La excepción es POST /containers/fill-levels, que la llama el contenedor físico con su propio token (X-Container-Token) para reportar su nivel de llenado por compartimento: la última lectura de cada compartimento queda en container_sensors y cada lectura recibida, en el historial container_fill_readings (purgado por containers:prune-fill-readings según CONTAINER_FILL_READINGS_RETENTION_MONTHS).')]
 class ContainersDocumentation
 {
     #[OA\Get(
@@ -177,4 +177,72 @@ class ContainersDocumentation
         ]
     )]
     public function regenerateToken() {}
+
+    #[OA\Post(
+        path: '/containers/fill-levels',
+        tags: ['Containers'],
+        summary: 'Reportar el nivel de llenado del contenedor',
+        description: 'Reporte periódico que manda el contenedor físico (cada cierto tiempo o cuando cambia el nivel, aunque nadie recicle), sobre App\Services\ContainerFillLevelService::record(). El contenedor es siempre el dueño del token. Cada lectura identifica su compartimento por `sensor_key`; si no se manda, el compartimento es el material (un compartimento por material). El primer reporte de un compartimento lo da de alta. Cada lectura se guarda en el historial; además pasa a ser el estado actual del compartimento salvo que ya exista una lectura con `measured_at` más reciente (en ese caso `applied` = false). El mismo formato de lecturas se puede mandar, opcional, en el campo `fill_levels` de POST /scans.',
+        security: [['containerToken' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['sensors'],
+                properties: [
+                    new OA\Property(property: 'measured_at', type: 'string', format: 'date-time', nullable: true, description: 'Hora de la medición (ISO-8601). Opcional: si falta, se usa la hora del servidor. Se rechaza si está más de 5 minutos en el futuro o tiene más de 30 días.', example: '2026-11-10T18:00:00Z'),
+                    new OA\Property(
+                        property: 'sensors',
+                        type: 'array',
+                        minItems: 1,
+                        maxItems: 20,
+                        items: new OA\Items(
+                            type: 'object',
+                            required: ['material', 'fill_level'],
+                            properties: [
+                                new OA\Property(property: 'material', type: 'string', description: 'Slug del material del compartimento (material_types.slug).', example: 'plastic'),
+                                new OA\Property(property: 'fill_level', type: 'number', format: 'float', minimum: 0, maximum: 100, description: 'Porcentaje de llenado.', example: 72.5),
+                                new OA\Property(property: 'sensor_key', type: 'string', maxLength: 50, nullable: true, description: 'Identificador del compartimento (letras, números, - y _). Solo hace falta si hay más de un compartimento del mismo material. No puede repetirse en la misma petición.', example: 'comp_1'),
+                            ]
+                        )
+                    ),
+                ],
+                example: ['measured_at' => '2026-11-10T18:00:00Z', 'sensors' => [['material' => 'plastic', 'fill_level' => 72.5], ['material' => 'aluminum', 'fill_level' => 18]]]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Lecturas registradas.',
+                content: new OA\JsonContent(
+                    allOf: [new OA\Schema(ref: '#/components/schemas/SuccessResponse')],
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            type: 'object',
+                            properties: [
+                                new OA\Property(property: 'measured_at', type: 'string', format: 'date-time', example: '2026-11-10T18:00:00.000000Z'),
+                                new OA\Property(
+                                    property: 'sensors',
+                                    type: 'array',
+                                    items: new OA\Items(
+                                        type: 'object',
+                                        properties: [
+                                            new OA\Property(property: 'sensor_key', type: 'string', example: 'plastic'),
+                                            new OA\Property(property: 'material', type: 'string', example: 'plastic'),
+                                            new OA\Property(property: 'fill_level', type: 'number', format: 'float', example: 72.5),
+                                            new OA\Property(property: 'applied', type: 'boolean', description: 'false si el compartimento ya tenía una lectura más reciente: quedó solo en el historial.', example: true),
+                                        ]
+                                    )
+                                ),
+                            ]
+                        ),
+                    ]
+                )
+            ),
+            new OA\Response(response: 401, description: 'Token de contenedor ausente o inválido.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 403, description: 'El contenedor dueño del token está inactivo.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 422, description: 'Error de validación: falta sensors, material fuera del catálogo, fill_level fuera de 0–100, compartimento repetido, o measured_at en el futuro / con más de 30 días.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+        ]
+    )]
+    public function reportFillLevels() {}
 }

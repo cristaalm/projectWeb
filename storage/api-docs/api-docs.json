@@ -3801,6 +3801,178 @@
                 ]
             }
         },
+        "/containers/fill-levels": {
+            "post": {
+                "tags": [
+                    "Containers"
+                ],
+                "summary": "Reportar el nivel de llenado del contenedor",
+                "description": "Reporte periódico que manda el contenedor físico (cada cierto tiempo o cuando cambia el nivel, aunque nadie recicle), sobre App\\Services\\ContainerFillLevelService::record(). El contenedor es siempre el dueño del token. Cada lectura identifica su compartimento por `sensor_key`; si no se manda, el compartimento es el material (un compartimento por material). El primer reporte de un compartimento lo da de alta. Cada lectura se guarda en el historial; además pasa a ser el estado actual del compartimento salvo que ya exista una lectura con `measured_at` más reciente (en ese caso `applied` = false). El mismo formato de lecturas se puede mandar, opcional, en el campo `fill_levels` de POST /scans.",
+                "operationId": "435b2fefb9412582fd184b62d841fea2",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "sensors"
+                                ],
+                                "properties": {
+                                    "measured_at": {
+                                        "description": "Hora de la medición (ISO-8601). Opcional: si falta, se usa la hora del servidor. Se rechaza si está más de 5 minutos en el futuro o tiene más de 30 días.",
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-11-10T18:00:00Z",
+                                        "nullable": true
+                                    },
+                                    "sensors": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "material",
+                                                "fill_level"
+                                            ],
+                                            "properties": {
+                                                "material": {
+                                                    "description": "Slug del material del compartimento (material_types.slug).",
+                                                    "type": "string",
+                                                    "example": "plastic"
+                                                },
+                                                "fill_level": {
+                                                    "description": "Porcentaje de llenado.",
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "maximum": 100,
+                                                    "minimum": 0,
+                                                    "example": 72.5
+                                                },
+                                                "sensor_key": {
+                                                    "description": "Identificador del compartimento (letras, números, - y _). Solo hace falta si hay más de un compartimento del mismo material. No puede repetirse en la misma petición.",
+                                                    "type": "string",
+                                                    "maxLength": 50,
+                                                    "example": "comp_1",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "maxItems": 20,
+                                        "minItems": 1
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "example": {
+                                "measured_at": "2026-11-10T18:00:00Z",
+                                "sensors": [
+                                    {
+                                        "material": "plastic",
+                                        "fill_level": 72.5
+                                    },
+                                    {
+                                        "material": "aluminum",
+                                        "fill_level": 18
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Lecturas registradas.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "measured_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2026-11-10T18:00:00.000000Z"
+                                                        },
+                                                        "sensors": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "sensor_key": {
+                                                                        "type": "string",
+                                                                        "example": "plastic"
+                                                                    },
+                                                                    "material": {
+                                                                        "type": "string",
+                                                                        "example": "plastic"
+                                                                    },
+                                                                    "fill_level": {
+                                                                        "type": "number",
+                                                                        "format": "float",
+                                                                        "example": 72.5
+                                                                    },
+                                                                    "applied": {
+                                                                        "description": "false si el compartimento ya tenía una lectura más reciente: quedó solo en el historial.",
+                                                                        "type": "boolean",
+                                                                        "example": true
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token de contenedor ausente o inválido.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "El contenedor dueño del token está inactivo.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación: falta sensors, material fuera del catálogo, fill_level fuera de 0–100, compartimento repetido, o measured_at en el futuro / con más de 30 días.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "containerToken": []
+                    }
+                ]
+            }
+        },
         "/dashboard/superadmin": {
             "get": {
                 "tags": [
@@ -5860,6 +6032,38 @@
                                         "type": "string",
                                         "format": "binary",
                                         "nullable": true
+                                    },
+                                    "fill_levels": {
+                                        "description": "Opcional. Nivel de llenado de los compartimentos al momento del escaneo, mismo formato que `sensors` de POST /containers/fill-levels. Se registra con la hora del escaneo y después de acreditar el reciclaje: un fallo al guardarlo no afecta al escaneo, y un reintento con el mismo event_id no lo vuelve a registrar. En multipart: fill_levels[0][material], fill_levels[0][fill_level], fill_levels[0][sensor_key].",
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "material",
+                                                "fill_level"
+                                            ],
+                                            "properties": {
+                                                "material": {
+                                                    "type": "string",
+                                                    "example": "plastic"
+                                                },
+                                                "fill_level": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "maximum": 100,
+                                                    "minimum": 0,
+                                                    "example": 72.5
+                                                },
+                                                "sensor_key": {
+                                                    "type": "string",
+                                                    "maxLength": 50,
+                                                    "example": "comp_1",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "maxItems": 20,
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -5980,7 +6184,7 @@
                         }
                     },
                     "422": {
-                        "description": "Error de validación (campos requeridos, event_id no es UUID, material fuera del catálogo, imagen inválida) o cuenta del usuario desactivada.",
+                        "description": "Error de validación (campos requeridos, event_id no es UUID, material fuera del catálogo, imagen inválida, fill_levels inválido) o cuenta del usuario desactivada.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -9106,7 +9310,7 @@
         },
         {
             "name": "Containers",
-            "description": "CRUD administrativo de contenedores de reciclaje. Todas las rutas están bajo /containers, protegidas por auth:sanctum + ensureUserIsActive + role:superadmin,moderador (middleware App\\Http\\Middleware\\EnsureUserHasRole). Alcance de este módulo: solo administración básica (nombre, número de serie, ubicación, coordenadas, estado activo/inactivo) — el tracking de sensores/nivel de llenado (tabla container_sensors) y el endpoint IoT de actualización de capacidad quedan fuera de alcance a propósito."
+            "description": "CRUD administrativo de contenedores de reciclaje. Las rutas de administración están bajo /containers, protegidas por auth:sanctum + ensureUserIsActive + role:superadmin,moderador (middleware App\\Http\\Middleware\\EnsureUserHasRole): nombre, número de serie, ubicación, coordenadas, estado activo/inactivo. La excepción es POST /containers/fill-levels, que la llama el contenedor físico con su propio token (X-Container-Token) para reportar su nivel de llenado por compartimento: la última lectura de cada compartimento queda en container_sensors y cada lectura recibida, en el historial container_fill_readings (purgado por containers:prune-fill-readings según CONTAINER_FILL_READINGS_RETENTION_MONTHS)."
         },
         {
             "name": "Dashboard",
