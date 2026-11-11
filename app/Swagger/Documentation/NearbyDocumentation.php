@@ -58,4 +58,54 @@ class NearbyDocumentation
         ]
     )]
     public function rewards() {}
+
+    #[OA\Post(
+        path: '/nearby/shops',
+        tags: ['Nearby'],
+        summary: 'Comercios cerca de ti',
+        description: 'Comercios activos a 5 km o menos que tienen al menos una recompensa disponible para el usuario, del más cercano al más lejano, sobre App\Services\NearbyService::shops(). "Disponible" usa los mismos filtros que POST /nearby/rewards, así que un comercio con solo recompensas exclusivas le aparece únicamente a sus miembros. Los comercios sin coordenadas no salen. '
+            .'La ubicación es obligatoria y tiene que ser válida (precisión y antigüedad): si falta o no lo es, 422. Para listar comercios sin distancia está GET /alliances/shops.',
+        security: [['sessionCookie' => []], ['bearerToken' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['latitude', 'longitude', 'accuracy', 'captured_at'],
+                properties: [
+                    new OA\Property(property: 'latitude', type: 'number', format: 'float', minimum: -90, maximum: 90, example: 19.0522),
+                    new OA\Property(property: 'longitude', type: 'number', format: 'float', minimum: -180, maximum: 180, example: -104.3158),
+                    new OA\Property(property: 'accuracy', type: 'number', format: 'float', minimum: 0, maximum: 500, description: 'Precisión en metros que reporta el GPS. Más de 500 → 422.', example: 12.5),
+                    new OA\Property(property: 'captured_at', type: 'string', format: 'date-time', description: 'Hora en que se obtuvo la ubicación (ISO-8601). Más de 10 minutos de antigüedad o más de 5 en el futuro → 422.', example: '2026-11-08T15:30:00Z'),
+                    new OA\Property(property: 'limit', type: 'integer', minimum: 1, nullable: true, description: 'Cuántos comercios devolver. 5 por defecto; mayor a 50 se topa a 50.', example: 5),
+                ],
+                example: ['latitude' => 19.0522, 'longitude' => -104.3158, 'accuracy' => 12.5, 'captured_at' => '2026-11-08T15:30:00Z']
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Comercios cercanos (puede ser una lista vacía).',
+                content: new OA\JsonContent(
+                    allOf: [new OA\Schema(ref: '#/components/schemas/SuccessResponse')],
+                    properties: [new OA\Property(property: 'data', type: 'object', properties: [
+                        new OA\Property(property: 'total_points', type: 'integer', description: 'Saldo actual del usuario (mismo cálculo que GET /points/balance).', example: 95),
+                        new OA\Property(property: 'shops', type: 'array', items: new OA\Items(ref: '#/components/schemas/NearbyShop')),
+                    ])],
+                    examples: [new OA\Examples(
+                        example: 'comercios',
+                        summary: 'Dos comercios cercanos',
+                        value: ['success' => true, 'message' => 'Comercios obtenidos correctamente.', 'data' => [
+                            'total_points' => 95,
+                            'shops' => [
+                                ['id' => 3, 'name' => 'Café Central', 'logo_url' => null, 'address' => 'Calle Uno 10, Centro', 'latitude' => 19.0611, 'longitude' => -104.3158, 'has_exclusive_rewards' => false, 'type_shop' => ['id' => 1, 'name' => 'Cafetería'], 'distance_m' => 990, 'available_rewards_count' => 3, 'redeemable_rewards_count' => 1],
+                                ['id' => 5, 'name' => 'Panadería La Espiga', 'logo_url' => null, 'address' => 'Av. Dos 200', 'latitude' => 19.0702, 'longitude' => -104.3101, 'has_exclusive_rewards' => false, 'type_shop' => ['id' => 2, 'name' => 'Panadería'], 'distance_m' => 2080, 'available_rewards_count' => 1, 'redeemable_rewards_count' => 0],
+                            ],
+                        ], 'errors' => null, 'code' => 200]
+                    )]
+                )
+            ),
+            new OA\Response(response: 401, description: 'No autenticado, o la cuenta fue dada de baja.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 422, description: 'Falta la ubicación, tiene formato incorrecto, es poco precisa (accuracy > 500 m) o vieja/futura (captured_at), o limit menor a 1.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+        ]
+    )]
+    public function shops() {}
 }

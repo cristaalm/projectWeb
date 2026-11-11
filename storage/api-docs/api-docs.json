@@ -4566,6 +4566,189 @@
                 ]
             }
         },
+        "/nearby/shops": {
+            "post": {
+                "tags": [
+                    "Nearby"
+                ],
+                "summary": "Comercios cerca de ti",
+                "description": "Comercios activos a 5 km o menos que tienen al menos una recompensa disponible para el usuario, del más cercano al más lejano, sobre App\\Services\\NearbyService::shops(). \"Disponible\" usa los mismos filtros que POST /nearby/rewards, así que un comercio con solo recompensas exclusivas le aparece únicamente a sus miembros. Los comercios sin coordenadas no salen. La ubicación es obligatoria y tiene que ser válida (precisión y antigüedad): si falta o no lo es, 422. Para listar comercios sin distancia está GET /alliances/shops.",
+                "operationId": "57fae65b6a5f22cef2e7ef75c9df5df1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "latitude",
+                                    "longitude",
+                                    "accuracy",
+                                    "captured_at"
+                                ],
+                                "properties": {
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "maximum": 90,
+                                        "minimum": -90,
+                                        "example": 19.0522
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "maximum": 180,
+                                        "minimum": -180,
+                                        "example": -104.3158
+                                    },
+                                    "accuracy": {
+                                        "description": "Precisión en metros que reporta el GPS. Más de 500 → 422.",
+                                        "type": "number",
+                                        "format": "float",
+                                        "maximum": 500,
+                                        "minimum": 0,
+                                        "example": 12.5
+                                    },
+                                    "captured_at": {
+                                        "description": "Hora en que se obtuvo la ubicación (ISO-8601). Más de 10 minutos de antigüedad o más de 5 en el futuro → 422.",
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-11-08T15:30:00Z"
+                                    },
+                                    "limit": {
+                                        "description": "Cuántos comercios devolver. 5 por defecto; mayor a 50 se topa a 50.",
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "example": 5,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "example": {
+                                "latitude": 19.0522,
+                                "longitude": -104.3158,
+                                "accuracy": 12.5,
+                                "captured_at": "2026-11-08T15:30:00Z"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Comercios cercanos (puede ser una lista vacía).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "total_points": {
+                                                            "description": "Saldo actual del usuario (mismo cálculo que GET /points/balance).",
+                                                            "type": "integer",
+                                                            "example": 95
+                                                        },
+                                                        "shops": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/NearbyShop"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "comercios": {
+                                        "summary": "Dos comercios cercanos",
+                                        "value": {
+                                            "success": true,
+                                            "message": "Comercios obtenidos correctamente.",
+                                            "data": {
+                                                "total_points": 95,
+                                                "shops": [
+                                                    {
+                                                        "id": 3,
+                                                        "name": "Café Central",
+                                                        "logo_url": null,
+                                                        "address": "Calle Uno 10, Centro",
+                                                        "latitude": 19.0611,
+                                                        "longitude": -104.3158,
+                                                        "has_exclusive_rewards": false,
+                                                        "type_shop": {
+                                                            "id": 1,
+                                                            "name": "Cafetería"
+                                                        },
+                                                        "distance_m": 990,
+                                                        "available_rewards_count": 3,
+                                                        "redeemable_rewards_count": 1
+                                                    },
+                                                    {
+                                                        "id": 5,
+                                                        "name": "Panadería La Espiga",
+                                                        "logo_url": null,
+                                                        "address": "Av. Dos 200",
+                                                        "latitude": 19.0702,
+                                                        "longitude": -104.3101,
+                                                        "has_exclusive_rewards": false,
+                                                        "type_shop": {
+                                                            "id": 2,
+                                                            "name": "Panadería"
+                                                        },
+                                                        "distance_m": 2080,
+                                                        "available_rewards_count": 1,
+                                                        "redeemable_rewards_count": 0
+                                                    }
+                                                ]
+                                            },
+                                            "errors": null,
+                                            "code": 200
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado, o la cuenta fue dada de baja.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Falta la ubicación, tiene formato incorrecto, es poco precisa (accuracy > 500 m) o vieja/futura (captured_at), o limit menor a 1.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
         "/points/balance": {
             "get": {
                 "tags": [
@@ -8970,6 +9153,34 @@
                     }
                 },
                 "type": "object"
+            },
+            "NearbyShop": {
+                "description": "Comercio de \"comercios cerca de ti\" (App\\Http\\Resources\\NearbyShopResource): la misma forma que GET /alliances/shops más su distancia y cuántas recompensas tiene para el usuario.",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Shop"
+                    },
+                    {
+                        "properties": {
+                            "distance_m": {
+                                "description": "Distancia en metros desde la ubicación enviada.",
+                                "type": "integer",
+                                "example": 990
+                            },
+                            "available_rewards_count": {
+                                "description": "Recompensas disponibles para este usuario (aprobadas, sin vencer, con stock; las exclusivas solo si es miembro). Siempre ≥ 1.",
+                                "type": "integer",
+                                "example": 3
+                            },
+                            "redeemable_rewards_count": {
+                                "description": "De ésas, cuántas le alcanzan con su saldo actual.",
+                                "type": "integer",
+                                "example": 1
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
             },
             "PointMovement": {
                 "description": "Movimiento del saldo de puntos del usuario autenticado (App\\Http\\Resources\\PointMovementResource sobre App\\Repositories\\PointRepository::movements()). Une 4 fuentes: reciclaje (point_earnings), insignias (badge_earnings), ajustes de admin (point_adjustments) y canjes (point_redemptions, solo REDEEMED/DELIVERED). La suma de todos los points coincide con total_points de /points/balance.",
