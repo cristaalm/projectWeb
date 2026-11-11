@@ -9278,8 +9278,7 @@
                     "location": {
                         "description": "Descripción del lugar.",
                         "type": "string",
-                        "example": "Jardín Libertad, Centro, Colima",
-                        "nullable": true
+                        "example": "Jardín Libertad, Centro, Colima"
                     },
                     "latitude": {
                         "type": "number",

@@ -10,7 +10,7 @@ use OpenApi\Attributes as OA;
     properties: [
         new OA\Property(property: 'id', type: 'integer', example: 4),
         new OA\Property(property: 'name', type: 'string', example: 'Contenedor Jardín Libertad'),
-        new OA\Property(property: 'location', type: 'string', nullable: true, description: 'Descripción del lugar.', example: 'Jardín Libertad, Centro, Colima'),
+        new OA\Property(property: 'location', type: 'string', description: 'Descripción del lugar.', example: 'Jardín Libertad, Centro, Colima'),
         new OA\Property(property: 'latitude', type: 'number', format: 'float', example: 19.2433),
         new OA\Property(property: 'longitude', type: 'number', format: 'float', example: -103.725),
         new OA\Property(property: 'distance_m', type: 'integer', description: 'Distancia en metros desde la ubicación enviada.', example: 640),
