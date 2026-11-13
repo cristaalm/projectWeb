@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Badges;
 
+use App\Support\BadgeIcons;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -16,7 +17,7 @@ class UpdateBadgeRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:100'],
-            'icon' => ['nullable', 'string', Rule::in(CreateBadgeRequest::CURATED_ICONS)],
+            'icon' => ['nullable', 'string', Rule::in(BadgeIcons::names())],
             'recycles_required' => ['required', 'integer', 'min:1'],
             'points_awarded' => ['required', 'integer', 'min:0'],
             'status' => ['required', 'boolean'],

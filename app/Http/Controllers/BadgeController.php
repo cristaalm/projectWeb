@@ -10,6 +10,8 @@ use App\Http\Requests\Badges\ListBadgesRequest;
 use App\Http\Requests\Badges\UpdateBadgeRequest;
 use App\Repositories\BadgeRepository;
 use App\Services\BadgeService;
+use App\Support\BadgeIcons;
+use App\Support\BadgeTiers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -83,6 +85,19 @@ class BadgeController extends Controller
     {
         return $this->apiResponse(true, 'Insignias obtenidas correctamente.', [
             'badges' => $this->badgeService->catalog(),
+        ], null, 200);
+    }
+
+    /**
+     * Catálogo cerrado de iconos y niveles visuales de las insignias — alimenta el
+     * selector del admin y la vista previa del emblema antes de guardar.
+     */
+    public function icons()
+    {
+        return $this->apiResponse(true, 'Iconos obtenidos correctamente.', [
+            'icons' => BadgeIcons::catalog(),
+            'default_icon' => BadgeIcons::DEFAULT,
+            'tiers' => BadgeTiers::TIERS,
         ], null, 200);
     }
 

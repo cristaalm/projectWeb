@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 // pensado para la futura app móvil (mismo patrón que type-shop/catalog).
 Route::middleware(['auth:sanctum', 'ensureUserIsActive'])->group(function () {
     Route::get('badges/catalog', [BadgeController::class, 'catalog']);
+    Route::get('badges/icons', [BadgeController::class, 'icons']);
     Route::get('badges/my-progress', [BadgeController::class, 'myProgress']);
     Route::get('badges/my-history', [BadgeController::class, 'myHistory']);
     Route::get('badges/pending-claims', [BadgeController::class, 'pendingClaims']);
