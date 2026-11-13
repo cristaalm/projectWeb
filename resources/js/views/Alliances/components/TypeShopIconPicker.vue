@@ -1,5 +1,5 @@
 <script setup>
-import TypeShopIcon from '@/components/TypeShopIcon.vue'
+import SvgMaskIcon from '@/components/SvgMaskIcon.vue'
 import { useTypeShopIcons } from '@/hooks/TypeShop/useTypeShopIcons'
 import { computed, onMounted, ref } from 'vue'
 
@@ -48,7 +48,7 @@ function pick(icon) {
         :title="selected ? `Icono: ${selected.label}` : 'Elegir icono'"
         aria-label="Elegir icono de la categoría"
       >
-        <TypeShopIcon
+        <SvgMaskIcon
           :url="selected?.url"
           :size="22"
         />
@@ -79,7 +79,7 @@ function pick(icon) {
           :title="icon.label"
           @click="pick(icon)"
         >
-          <TypeShopIcon
+          <SvgMaskIcon
             :url="icon.url"
             :size="22"
           />

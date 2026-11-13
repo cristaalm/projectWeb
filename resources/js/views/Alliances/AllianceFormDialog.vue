@@ -1,6 +1,6 @@
 <script setup>
 import LocationPickerDialog from '@/components/LocationPickerDialog.vue'
-import TypeShopIcon from '@/components/TypeShopIcon.vue'
+import SvgMaskIcon from '@/components/SvgMaskIcon.vue'
 import { useAllianceManagement } from '@/hooks/Alliances/useAllianceManagement'
 import { useTypeShopCatalog } from '@/hooks/TypeShop/useTypeShopCatalog'
 import { computed, ref, watch } from 'vue'
@@ -196,7 +196,7 @@ async function submit() {
                 <template #item="{ props: itemProps, item }">
                   <VListItem v-bind="itemProps">
                     <template #prepend>
-                      <TypeShopIcon
+                      <SvgMaskIcon
                         :url="item.raw.icon_url"
                         :size="20"
                         class="me-3 text-medium-emphasis"
@@ -206,7 +206,7 @@ async function submit() {
                 </template>
                 <template #selection="{ item }">
                   <div class="gap-2 d-flex align-center">
-                    <TypeShopIcon
+                    <SvgMaskIcon
                       :url="item.raw.icon_url"
                       :size="18"
                     />

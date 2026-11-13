@@ -1,7 +1,8 @@
 <script setup>
 import BadgeEmblem from '@/components/BadgeEmblem.vue'
+import SvgMaskIcon from '@/components/SvgMaskIcon.vue'
+import { useBadgeEmblemCatalog } from '@/hooks/Badges/useBadgeEmblemCatalog'
 import { useBadgeManagement } from '@/hooks/Badges/useBadgeManagement'
-import { CURATED_BADGE_ICONS, DEFAULT_BADGE_ICON } from '@/utils/badgeTier'
 import { computed, ref, watch } from 'vue'
 
 const props = defineProps({
@@ -14,18 +15,8 @@ const emit = defineEmits(['update:modelValue', 'saved'])
 
 const { loading, createBadge, updateBadge } = useBadgeManagement()
 
-const ICON_LABELS = {
-  'bx-recycle': 'Reciclaje',
-  'bx-leaf': 'Hoja',
-  'bx-bxs-tree': 'Árbol',
-  'bx-water': 'Agua',
-  'bx-world': 'Mundo',
-  'bx-medal': 'Medalla',
-  'bx-trophy': 'Trofeo',
-  'bx-award': 'Premio',
-  'bx-badge-check': 'Insignia verificada',
-  'bx-sun': 'Sol',
-}
+// Iconos y niveles salen del backend (GET /badges/icons), igual que para la app móvil.
+const { icons, fetchCatalog, iconFor } = useBadgeEmblemCatalog()
 
 const form = ref({
   name: '', icon: null, recycles_required: null, points_awarded: null, status: true,
@@ -35,7 +26,12 @@ const iconMenu = ref(false)
 
 const isEdit = computed(() => props.mode === 'edit')
 const dialogTitle = computed(() => (isEdit.value ? 'Editar insignia' : 'Crear insignia'))
-const currentIconLabel = computed(() => ICON_LABELS[form.value.icon] ?? 'Medalla (predeterminado)')
+
+const currentIconLabel = computed(() => {
+  if (!form.value.icon) return `${iconFor(null)?.label ?? 'Medalla'} (predeterminado)`
+
+  return iconFor(form.value.icon)?.label ?? form.value.icon
+})
 
 const isValid = computed(() => (
   Boolean(form.value.name.trim())
@@ -57,7 +53,11 @@ function resetForm() {
   }
 }
 
-watch(() => props.modelValue, open => { if (open) resetForm() })
+watch(() => props.modelValue, open => {
+  if (!open) return
+  resetForm()
+  fetchCatalog()
+})
 
 function selectIcon(icon) {
   form.value.icon = icon
@@ -105,7 +105,7 @@ async function submit() {
             <VCol cols="12">
               <div class="icon-summary pa-3 rounded-lg border border-gray-200 d-flex align-center justify-space-between dark:border-gray-700">
                 <div class="d-flex align-center gap-3">
-                  <BadgeEmblem :badge="{ icon: form.icon || DEFAULT_BADGE_ICON, recycles_required: form.recycles_required || 0 }" size="40" />
+                  <BadgeEmblem :badge="{ icon: form.icon, recycles_required: form.recycles_required || 0 }" size="40" />
                   <div>
                     <div class="text-body-2 font-weight-medium">Ícono de la insignia</div>
                     <div class="text-caption text-medium-emphasis">{{ currentIconLabel }}</div>
@@ -120,13 +120,13 @@ async function submit() {
                   <VCard min-width="260">
                     <VCardText class="icon-grid">
                       <VBtn
-                        v-for="icon in CURATED_BADGE_ICONS" :key="icon"
-                        icon size="small" :title="ICON_LABELS[icon]"
-                        :variant="form.icon === icon ? 'flat' : 'text'"
-                        :color="form.icon === icon ? 'primary' : 'default'"
-                        @click="selectIcon(icon)"
+                        v-for="icon in icons" :key="icon.name"
+                        icon size="small" :title="icon.label"
+                        :variant="form.icon === icon.name ? 'flat' : 'text'"
+                        :color="form.icon === icon.name ? 'primary' : 'default'"
+                        @click="selectIcon(icon.name)"
                       >
-                        <VIcon :icon="icon" />
+                        <SvgMaskIcon :url="icon.url" :size="20" />
                       </VBtn>
                     </VCardText>
                   </VCard>

@@ -1,5 +1,5 @@
 <script setup>
-import TypeShopIcon from '@/components/TypeShopIcon.vue'
+import SvgMaskIcon from '@/components/SvgMaskIcon.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
 import { allianceStatusColor, allianceStatusLabel } from '@/utils/allianceStatus'
 import { storageURL } from '@/utils/constants'
@@ -108,7 +108,7 @@ function formatDate(value) {
         v-if="item.type_shop"
         class="gap-2 d-flex align-center text-body-2"
       >
-        <TypeShopIcon
+        <SvgMaskIcon
           :url="item.type_shop.icon_url"
           :size="18"
           class="text-medium-emphasis"

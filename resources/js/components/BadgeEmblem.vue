@@ -1,26 +1,37 @@
 <script setup>
-import { badgeTierColor, badgeTierContrast, DEFAULT_BADGE_ICON } from '@/utils/badgeTier'
-import { computed } from 'vue'
+import SvgMaskIcon from '@/components/SvgMaskIcon.vue'
+import { useBadgeEmblemCatalog } from '@/hooks/Badges/useBadgeEmblemCatalog'
+import { computed, onMounted } from 'vue'
 
+// Emblema circular de una insignia: fondo con el color de su nivel y el icono encima.
+// Usa `icon_url`/`tier` tal como los manda el backend (los mismos que recibe la app
+// móvil); si faltan — vista previa de una insignia aún sin guardar — los resuelve con
+// el catálogo de GET /badges/icons, que comparte las mismas reglas.
 const props = defineProps({
-  badge: { type: Object, required: true }, // { icon, recycles_required }
+  badge: { type: Object, required: true }, // { icon, recycles_required, icon_url?, tier? }
   size: { type: [Number, String], default: 40 },
 })
 
-const bgColor = computed(() => badgeTierColor(props.badge.recycles_required))
-const iconColor = computed(() => badgeTierContrast(props.badge.recycles_required))
-const iconSize = computed(() => Number(props.size) * 0.55)
+const { fetchCatalog, iconFor, tierFor } = useBadgeEmblemCatalog()
+
+onMounted(fetchCatalog)
+
+const iconUrl = computed(() => props.badge.icon_url ?? iconFor(props.badge.icon)?.url ?? null)
+const tier = computed(() => props.badge.tier ?? tierFor(props.badge.recycles_required))
+const iconSize = computed(() => Math.round(Number(props.size) * 0.55))
 </script>
 
 <template>
   <VAvatar
     :size="size"
-    :style="{ backgroundColor: bgColor }"
+    :style="{ backgroundColor: tier?.background }"
+    :title="tier ? `Nivel ${tier.label}` : undefined"
   >
-    <VIcon
-      :icon="badge.icon || DEFAULT_BADGE_ICON"
-      :color="iconColor"
+    <SvgMaskIcon
+      :url="iconUrl"
       :size="iconSize"
+      :color="tier?.color"
+      fallback="bx-medal"
     />
   </VAvatar>
 </template>

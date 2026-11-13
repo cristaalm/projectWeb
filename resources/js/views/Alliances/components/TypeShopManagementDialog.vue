@@ -1,5 +1,5 @@
 <script setup>
-import TypeShopIcon from '@/components/TypeShopIcon.vue'
+import SvgMaskIcon from '@/components/SvgMaskIcon.vue'
 import { useTypeShopCatalog } from '@/hooks/TypeShop/useTypeShopCatalog'
 import { useTypeShopManagement } from '@/hooks/TypeShop/useTypeShopManagement'
 import { requestOrderTable } from '@/services/requests'
@@ -160,7 +160,7 @@ async function handleDelete(item) {
             :key="item.id"
           >
             <template #prepend>
-              <TypeShopIcon
+              <SvgMaskIcon
                 :url="item.icon_url"
                 :size="20"
                 class="me-3 text-medium-emphasis"
