@@ -59,7 +59,7 @@ const items = computed(() => {
 </script>
 
 <template>
-  <VCard class="border border-gray-200 rounded-lg h-100 dark:border-gray-700">
+  <VCard class="border border-gray-200 rounded-lg h-100 dark:border-gray-700 d-flex flex-column">
     <VCardText class="pb-2 pa-6">
       <div class="gap-2 d-flex align-center justify-space-between">
         <h2 class="text-h6 font-weight-semibold">

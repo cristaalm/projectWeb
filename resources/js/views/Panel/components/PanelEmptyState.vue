@@ -6,7 +6,7 @@ defineProps({
 </script>
 
 <template>
-  <div class="py-8 text-center d-flex flex-column align-center justify-center h-100">
+  <div class="py-8 text-center d-flex flex-column align-center justify-center flex-grow-1">
     <VIcon
       :icon="icon"
       size="36"
