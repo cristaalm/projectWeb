@@ -22,7 +22,7 @@ class TypeShopDocumentation
                     examples: [new OA\Examples(
                         example: 'catalogo',
                         summary: 'Catálogo',
-                        value: ['success' => true, 'message' => 'Categorías obtenidas correctamente.', 'data' => ['type_shops' => [['id' => 1, 'name' => 'Supermercado', 'is_active' => true]]], 'errors' => null, 'code' => 200]
+                        value: ['success' => true, 'message' => 'Categorías obtenidas correctamente.', 'data' => ['type_shops' => [['id' => 1, 'name' => 'Supermercado', 'icon' => 'cart', 'is_active' => true, 'icon_url' => 'https://api.ejemplo.com/icons/type-shop/cart.svg']]], 'errors' => null, 'code' => 200]
                     )]
                 )
             ),
@@ -38,7 +38,7 @@ class TypeShopDocumentation
         path: '/type-shop/active',
         tags: ['TypeShop'],
         summary: 'Categorías activas (app móvil)',
-        description: 'Solo las categorías con is_active = true, ordenadas por nombre y con la forma mínima (id + name) — pensada para pintar los filtros de la app móvil. A diferencia de /type-shop/catalog (uso admin), no lista las inactivas. El id sirve como type_shop_id en /alliances/shops.',
+        description: 'Solo las categorías con is_active = true, ordenadas por nombre y con la forma mínima (id, name, icon, icon_url) — pensada para pintar los filtros de la app móvil. Para el icono, la app puede cargar el SVG de icon_url (24x24, fill="currentColor", se puede teñir) o mapear icon a su librería de Material Design Icons. A diferencia de /type-shop/catalog (uso admin), no lista las inactivas. El id sirve como type_shop_id en /alliances/shops.',
         security: [['sessionCookie' => []], ['bearerToken' => []]],
         responses: [
             new OA\Response(
@@ -49,7 +49,7 @@ class TypeShopDocumentation
                     examples: [new OA\Examples(
                         example: 'activas',
                         summary: 'Categorías activas',
-                        value: ['success' => true, 'message' => 'Categorías obtenidas correctamente.', 'data' => ['type_shops' => [['id' => 1, 'name' => 'Cafetería'], ['id' => 2, 'name' => 'Supermercado']]], 'errors' => null, 'code' => 200]
+                        value: ['success' => true, 'message' => 'Categorías obtenidas correctamente.', 'data' => ['type_shops' => [['id' => 1, 'name' => 'Cafetería', 'icon' => 'coffee', 'icon_url' => 'https://api.ejemplo.com/icons/type-shop/coffee.svg'], ['id' => 2, 'name' => 'Supermercado', 'icon' => 'cart', 'icon_url' => 'https://api.ejemplo.com/icons/type-shop/cart.svg']]], 'errors' => null, 'code' => 200]
                     )]
                 )
             ),
@@ -57,6 +57,30 @@ class TypeShopDocumentation
         ]
     )]
     public function activeCatalog() {}
+
+    #[OA\Get(
+        path: '/type-shop/icons',
+        tags: ['TypeShop'],
+        summary: 'Catálogo de iconos para categorías',
+        description: 'Catálogo cerrado (App\\Support\\TypeShopIcons) de iconos asignables a una categoría: nombre de Material Design Icons, etiqueta en español y URL absoluta del SVG. El campo icon de una categoría siempre es uno de estos nombres.',
+        security: [['sessionCookie' => []], ['bearerToken' => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Iconos disponibles.',
+                content: new OA\JsonContent(
+                    allOf: [new OA\Schema(ref: '#/components/schemas/SuccessResponse')],
+                    examples: [new OA\Examples(
+                        example: 'iconos',
+                        summary: 'Iconos',
+                        value: ['success' => true, 'message' => 'Iconos obtenidos correctamente.', 'data' => ['icons' => [['name' => 'store', 'label' => 'Tienda', 'url' => 'https://api.ejemplo.com/icons/type-shop/store.svg'], ['name' => 'cart', 'label' => 'Supermercado', 'url' => 'https://api.ejemplo.com/icons/type-shop/cart.svg']]], 'errors' => null, 'code' => 200]
+                    )]
+                )
+            ),
+            new OA\Response(response: 401, description: 'No autenticado, o la cuenta fue dada de baja.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+        ]
+    )]
+    public function icons() {}
 
     #[OA\Get(
         path: '/type-shop',
@@ -67,7 +91,7 @@ class TypeShopDocumentation
         parameters: [
             new OA\Parameter(name: 'is_active', in: 'query', schema: new OA\Schema(type: 'integer', enum: [0, 1])),
             new OA\Parameter(name: 'query', in: 'query', description: 'Búsqueda libre por nombre (ilike).', schema: new OA\Schema(type: 'string')),
-            new OA\Parameter(name: 'key', in: 'query', description: 'Columna de orden — allowlist explícita.', schema: new OA\Schema(type: 'string', enum: ['id', 'name', 'is_active', 'created_at'])),
+            new OA\Parameter(name: 'key', in: 'query', description: 'Columna de orden — allowlist explícita.', schema: new OA\Schema(type: 'string', enum: ['id', 'name', 'icon', 'is_active', 'created_at'])),
             new OA\Parameter(name: 'order', in: 'query', schema: new OA\Schema(type: 'string', enum: ['asc', 'desc'])),
             new OA\Parameter(name: 'per_page', in: 'query', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 100, default: 15)),
         ],
@@ -93,9 +117,10 @@ class TypeShopDocumentation
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['name', 'is_active'],
+                required: ['name', 'icon', 'is_active'],
                 properties: [
                     new OA\Property(property: 'name', type: 'string', maxLength: 150, example: 'Supermercado'),
+                    new OA\Property(property: 'icon', type: 'string', example: 'cart', description: 'Uno de los nombres de GET /type-shop/icons.'),
                     new OA\Property(property: 'is_active', type: 'boolean', example: true),
                 ]
             )
@@ -108,7 +133,7 @@ class TypeShopDocumentation
             ),
             new OA\Response(response: 401, description: 'No autenticado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
             new OA\Response(response: 403, description: 'El rol del usuario autenticado no es superadmin ni moderador.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
-            new OA\Response(response: 422, description: 'Error de validación: campos requeridos o nombre duplicado (case-insensitive).', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 422, description: 'Error de validación: campos requeridos, icono fuera del catálogo o nombre duplicado (case-insensitive).', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
         ]
     )]
     public function store()
@@ -126,9 +151,10 @@ class TypeShopDocumentation
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['name', 'is_active'],
+                required: ['name', 'icon', 'is_active'],
                 properties: [
                     new OA\Property(property: 'name', type: 'string', maxLength: 150),
+                    new OA\Property(property: 'icon', type: 'string', description: 'Uno de los nombres de GET /type-shop/icons.'),
                     new OA\Property(property: 'is_active', type: 'boolean'),
                 ]
             )
@@ -142,7 +168,7 @@ class TypeShopDocumentation
             new OA\Response(response: 401, description: 'No autenticado.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
             new OA\Response(response: 403, description: 'El rol del usuario autenticado no es superadmin ni moderador.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
             new OA\Response(response: 404, description: 'Categoría no encontrada.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
-            new OA\Response(response: 422, description: 'Error de validación: campos requeridos o nombre duplicado (case-insensitive).', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+            new OA\Response(response: 422, description: 'Error de validación: campos requeridos, icono fuera del catálogo o nombre duplicado (case-insensitive).', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
         ]
     )]
     public function update()

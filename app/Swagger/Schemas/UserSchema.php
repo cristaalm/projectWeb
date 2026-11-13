@@ -32,15 +32,7 @@ use OpenApi\Attributes as OA;
                 new OA\Property(property: 'phone', type: 'string', nullable: true),
                 new OA\Property(property: 'logo', type: 'string', nullable: true),
                 new OA\Property(property: 'address', type: 'string', nullable: true),
-                new OA\Property(
-                    property: 'type_shop',
-                    type: 'object',
-                    nullable: true,
-                    properties: [
-                        new OA\Property(property: 'id', type: 'integer'),
-                        new OA\Property(property: 'name', type: 'string'),
-                    ]
-                ),
+                new OA\Property(property: 'type_shop', ref: '#/components/schemas/TypeShopSummary', nullable: true, description: 'Categoría del comercio.'),
                 new OA\Property(property: 'total_points', type: 'number', nullable: true),
                 new OA\Property(property: 'ext', type: 'string', nullable: true),
                 new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),

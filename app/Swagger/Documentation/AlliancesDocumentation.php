@@ -58,7 +58,7 @@ class AlliancesDocumentation
                     examples: [new OA\Examples(
                         example: 'pagina',
                         summary: 'Página de comercios',
-                        value: ['success' => true, 'message' => 'Comercios obtenidos correctamente.', 'data' => ['data' => [['id' => 1, 'name' => 'Café Central', 'logo_url' => 'https://api.ejemplo.com/storage/alliances/alliance_1/logo.png', 'address' => 'Calle Uno 10, Centro', 'latitude' => 19.4326, 'longitude' => -99.1332, 'has_exclusive_rewards' => false, 'type_shop' => ['id' => 3, 'name' => 'Cafetería']]], 'last_page' => 1, 'total' => 1], 'errors' => null, 'code' => 200]
+                        value: ['success' => true, 'message' => 'Comercios obtenidos correctamente.', 'data' => ['data' => [['id' => 1, 'name' => 'Café Central', 'logo_url' => 'https://api.ejemplo.com/storage/alliances/alliance_1/logo.png', 'address' => 'Calle Uno 10, Centro', 'latitude' => 19.4326, 'longitude' => -99.1332, 'has_exclusive_rewards' => false, 'type_shop' => ['id' => 3, 'name' => 'Cafetería', 'icon' => 'coffee', 'icon_url' => 'https://api.ejemplo.com/icons/type-shop/coffee.svg']]], 'last_page' => 1, 'total' => 1], 'errors' => null, 'code' => 200]
                     )]
                 )
             ),
