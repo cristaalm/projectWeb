@@ -43,7 +43,7 @@ class BadgesDocumentation
                 required: ['name', 'recycles_required', 'points_awarded', 'status'],
                 properties: [
                     new OA\Property(property: 'name', type: 'string', maxLength: 100, example: 'Reciclador del mes'),
-                    new OA\Property(property: 'icon', type: 'string', nullable: true, enum: ['bx-recycle', 'bx-leaf', 'bx-bxs-tree', 'bx-water', 'bx-world', 'bx-medal', 'bx-trophy', 'bx-award', 'bx-badge-check', 'bx-sun']),
+                    new OA\Property(property: 'icon', type: 'string', nullable: true, enum: ['bx-recycle', 'bx-leaf', 'bx-bxs-tree', 'bx-water', 'bx-world', 'bx-medal', 'bx-trophy', 'bx-award', 'bx-badge-check', 'bx-sun'], description: 'Uno de los nombres de GET /badges/icons; null = predeterminado.'),
                     new OA\Property(property: 'recycles_required', type: 'integer', minimum: 1, example: 10),
                     new OA\Property(property: 'points_awarded', type: 'integer', minimum: 0, example: 50),
                     new OA\Property(property: 'status', type: 'boolean', example: true),
@@ -77,7 +77,7 @@ class BadgesDocumentation
                 required: ['name', 'recycles_required', 'points_awarded', 'status'],
                 properties: [
                     new OA\Property(property: 'name', type: 'string', maxLength: 100),
-                    new OA\Property(property: 'icon', type: 'string', nullable: true, enum: ['bx-recycle', 'bx-leaf', 'bx-bxs-tree', 'bx-water', 'bx-world', 'bx-medal', 'bx-trophy', 'bx-award', 'bx-badge-check', 'bx-sun']),
+                    new OA\Property(property: 'icon', type: 'string', nullable: true, enum: ['bx-recycle', 'bx-leaf', 'bx-bxs-tree', 'bx-water', 'bx-world', 'bx-medal', 'bx-trophy', 'bx-award', 'bx-badge-check', 'bx-sun'], description: 'Uno de los nombres de GET /badges/icons; null = predeterminado.'),
                     new OA\Property(property: 'recycles_required', type: 'integer', minimum: 1),
                     new OA\Property(property: 'points_awarded', type: 'integer', minimum: 0),
                     new OA\Property(property: 'status', type: 'boolean'),
@@ -125,7 +125,7 @@ class BadgesDocumentation
         path: '/badges/catalog',
         tags: ['Badges'],
         summary: 'Catálogo de insignias activas',
-        description: 'Solo insignias con status=true, ordenadas por recycles_required — pensado para el catálogo de la futura app móvil.',
+        description: 'Solo insignias con status=true, ordenadas por recycles_required — pensado para el catálogo de la app móvil. Cada insignia trae icon_url (SVG) y tier (colores del emblema) para pintarla igual que la web.',
         security: [['sessionCookie' => []], ['bearerToken' => []]],
         responses: [
             new OA\Response(
@@ -137,6 +137,39 @@ class BadgesDocumentation
         ]
     )]
     public function catalog() {}
+
+    #[OA\Get(
+        path: '/badges/icons',
+        tags: ['Badges'],
+        summary: 'Catálogo de iconos y niveles de insignias',
+        description: 'Catálogo cerrado de iconos asignables a una insignia (App\\Support\\BadgeIcons: clave, etiqueta en español y URL del SVG), el icono predeterminado y los niveles visuales (App\\Support\\BadgeTiers). Toda insignia que devuelve la API ya trae su icon_url y su tier resueltos; esto sirve para selectores o vistas previas.',
+        security: [['sessionCookie' => []], ['bearerToken' => []]],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Iconos y niveles.',
+                content: new OA\JsonContent(
+                    allOf: [new OA\Schema(ref: '#/components/schemas/SuccessResponse')],
+                    examples: [new OA\Examples(
+                        example: 'iconos',
+                        summary: 'Iconos y niveles',
+                        value: ['success' => true, 'message' => 'Iconos obtenidos correctamente.', 'data' => [
+                            'icons' => [['name' => 'bx-recycle', 'label' => 'Reciclaje', 'url' => 'https://api.ejemplo.com/icons/badges/bx-recycle.svg'], ['name' => 'bx-medal', 'label' => 'Medalla', 'url' => 'https://api.ejemplo.com/icons/badges/bx-medal.svg']],
+                            'default_icon' => 'bx-medal',
+                            'tiers' => [
+                                ['key' => 'brote', 'label' => 'Brote', 'min_recycles' => 0, 'background' => '#7CB88F', 'color' => '#1B3A2B'],
+                                ['key' => 'musgo', 'label' => 'Musgo', 'min_recycles' => 10, 'background' => '#4C8C5A', 'color' => '#1B3A2B'],
+                                ['key' => 'bosque', 'label' => 'Bosque', 'min_recycles' => 25, 'background' => '#2F5F3F', 'color' => '#FFFFFF'],
+                                ['key' => 'follaje', 'label' => 'Follaje', 'min_recycles' => 50, 'background' => '#1B3A2B', 'color' => '#FFFFFF'],
+                            ],
+                        ], 'errors' => null, 'code' => 200]
+                    )]
+                )
+            ),
+            new OA\Response(response: 401, description: 'No autenticado, o la cuenta fue dada de baja.', content: new OA\JsonContent(ref: '#/components/schemas/ErrorResponse')),
+        ]
+    )]
+    public function icons() {}
 
     #[OA\Get(
         path: '/badges/my-progress',

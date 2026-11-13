@@ -2543,6 +2543,7 @@
                                         "example": "Reciclador del mes"
                                     },
                                     "icon": {
+                                        "description": "Uno de los nombres de GET /badges/icons; null = predeterminado.",
                                         "type": "string",
                                         "enum": [
                                             "bx-recycle",
@@ -2668,6 +2669,7 @@
                                         "maxLength": 100
                                     },
                                     "icon": {
+                                        "description": "Uno de los nombres de GET /badges/icons; null = predeterminado.",
                                         "type": "string",
                                         "enum": [
                                             "bx-recycle",
@@ -2854,7 +2856,7 @@
                     "Badges"
                 ],
                 "summary": "Catálogo de insignias activas",
-                "description": "Solo insignias con status=true, ordenadas por recycles_required — pensado para el catálogo de la futura app móvil.",
+                "description": "Solo insignias con status=true, ordenadas por recycles_required — pensado para el catálogo de la app móvil. Cada insignia trae icon_url (SVG) y tier (colores del emblema) para pintarla igual que la web.",
                 "operationId": "bf23f32c7203d80f5fde3d89e0d8d73e",
                 "responses": {
                     "200": {
@@ -2873,6 +2875,106 @@
                     },
                     "401": {
                         "description": "No autenticado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sessionCookie": []
+                    },
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/badges/icons": {
+            "get": {
+                "tags": [
+                    "Badges"
+                ],
+                "summary": "Catálogo de iconos y niveles de insignias",
+                "description": "Catálogo cerrado de iconos asignables a una insignia (App\\Support\\BadgeIcons: clave, etiqueta en español y URL del SVG), el icono predeterminado y los niveles visuales (App\\Support\\BadgeTiers). Toda insignia que devuelve la API ya trae su icon_url y su tier resueltos; esto sirve para selectores o vistas previas.",
+                "operationId": "9d5315ab7b52e96228c2bbe6788d96f9",
+                "responses": {
+                    "200": {
+                        "description": "Iconos y niveles.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/SuccessResponse"
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "iconos": {
+                                        "summary": "Iconos y niveles",
+                                        "value": {
+                                            "success": true,
+                                            "message": "Iconos obtenidos correctamente.",
+                                            "data": {
+                                                "icons": [
+                                                    {
+                                                        "name": "bx-recycle",
+                                                        "label": "Reciclaje",
+                                                        "url": "https://api.ejemplo.com/icons/badges/bx-recycle.svg"
+                                                    },
+                                                    {
+                                                        "name": "bx-medal",
+                                                        "label": "Medalla",
+                                                        "url": "https://api.ejemplo.com/icons/badges/bx-medal.svg"
+                                                    }
+                                                ],
+                                                "default_icon": "bx-medal",
+                                                "tiers": [
+                                                    {
+                                                        "key": "brote",
+                                                        "label": "Brote",
+                                                        "min_recycles": 0,
+                                                        "background": "#7CB88F",
+                                                        "color": "#1B3A2B"
+                                                    },
+                                                    {
+                                                        "key": "musgo",
+                                                        "label": "Musgo",
+                                                        "min_recycles": 10,
+                                                        "background": "#4C8C5A",
+                                                        "color": "#1B3A2B"
+                                                    },
+                                                    {
+                                                        "key": "bosque",
+                                                        "label": "Bosque",
+                                                        "min_recycles": 25,
+                                                        "background": "#2F5F3F",
+                                                        "color": "#FFFFFF"
+                                                    },
+                                                    {
+                                                        "key": "follaje",
+                                                        "label": "Follaje",
+                                                        "min_recycles": 50,
+                                                        "background": "#1B3A2B",
+                                                        "color": "#FFFFFF"
+                                                    }
+                                                ]
+                                            },
+                                            "errors": null,
+                                            "code": 200
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado, o la cuenta fue dada de baja.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -9181,6 +9283,7 @@
                         "example": "Reciclador del mes"
                     },
                     "icon": {
+                        "description": "Clave del catálogo cerrado (App\\Support\\BadgeIcons, ver GET /badges/icons). null = icono predeterminado (bx-medal). Son iconos de Boxicons; para pintarlos conviene usar icon_url.",
                         "type": "string",
                         "enum": [
                             "bx-recycle",
@@ -9211,6 +9314,20 @@
                         "type": "boolean",
                         "example": true
                     },
+                    "icon_url": {
+                        "description": "URL absoluta del SVG del icono (24x24, fill=\"currentColor\"); nunca null: si icon es null apunta al predeterminado. Requiere APP_URL correcto en el entorno.",
+                        "type": "string",
+                        "example": "https://api.ejemplo.com/icons/badges/bx-recycle.svg"
+                    },
+                    "tier": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/BadgeTier"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Nivel visual según recycles_required: el emblema se pinta con fondo tier.background y el icono teñido con tier.color."
+                    },
                     "created_at": {
                         "type": "string",
                         "format": "date-time"
@@ -9218,6 +9335,40 @@
                     "updated_at": {
                         "type": "string",
                         "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "BadgeTier": {
+                "description": "Nivel visual de una insignia (App\\Support\\BadgeTiers), solo presentación: aplica el último nivel cuyo min_recycles alcanza recycles_required.",
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "enum": [
+                            "brote",
+                            "musgo",
+                            "bosque",
+                            "follaje"
+                        ],
+                        "example": "musgo"
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "Musgo"
+                    },
+                    "min_recycles": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "background": {
+                        "description": "Color de fondo del emblema (hex).",
+                        "type": "string",
+                        "example": "#4C8C5A"
+                    },
+                    "color": {
+                        "description": "Color del icono sobre ese fondo (hex), elegido por contraste.",
+                        "type": "string",
+                        "example": "#1B3A2B"
                     }
                 },
                 "type": "object"
