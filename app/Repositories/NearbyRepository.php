@@ -33,7 +33,7 @@ class NearbyRepository
             ->select('rewards.*')
             ->join('alliances', 'alliances.id', '=', 'rewards.alliance_id')
             ->where('alliances.status', AllianceStatus::ACTIVE->value)
-            ->with('alliance.typeShop:id,name');
+            ->with('alliance.typeShop:id,name,icon');
 
         $this->whereRewardAvailable($query, $memberAllianceId);
 
@@ -64,7 +64,7 @@ class NearbyRepository
         // nunca exponer los datos de contacto administrativo.
         $query = Alliance::query()
             ->select(['alliances.id', 'alliances.type_shop_id', 'alliances.name', 'alliances.address', 'alliances.latitude', 'alliances.longitude', 'alliances.logo_url', 'alliances.has_exclusive_rewards'])
-            ->with('typeShop:id,name')
+            ->with('typeShop:id,name,icon')
             ->where('alliances.status', AllianceStatus::ACTIVE->value)
             ->whereHas('rewards', $available)
             ->withCount([

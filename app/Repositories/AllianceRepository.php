@@ -62,7 +62,7 @@ class AllianceRepository
     {
         $query = Alliance::query()
             ->select(['id', 'type_shop_id', 'name', 'address', 'latitude', 'longitude', 'logo_url', 'has_exclusive_rewards'])
-            ->with('typeShop:id,name')
+            ->with('typeShop:id,name,icon')
             ->where('status', AllianceStatus::ACTIVE->value);
 
         if (! empty($filters['type_shop_id'])) {

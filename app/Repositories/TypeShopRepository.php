@@ -13,7 +13,7 @@ class TypeShopRepository
      * Columnas por las que el listado de categorías puede ordenarse — allowlist
      * explícita para no aceptar el nombre de columna crudo del request.
      */
-    public const SORTABLE_COLUMNS = ['id', 'name', 'is_active', 'created_at'];
+    public const SORTABLE_COLUMNS = ['id', 'name', 'icon', 'is_active', 'created_at'];
 
     public function findById(int $id): ?TypeShop
     {
@@ -33,7 +33,7 @@ class TypeShopRepository
      */
     public function activeCatalog(): Collection
     {
-        return TypeShop::where('is_active', true)->orderBy('name')->get(['id', 'name']);
+        return TypeShop::where('is_active', true)->orderBy('name')->get(['id', 'name', 'icon']);
     }
 
     public function paginate(array $filters): LengthAwarePaginator

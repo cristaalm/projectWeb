@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\TypeShop;
+use App\Support\TypeShopIcons;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -14,6 +15,7 @@ class TypeShopFactory extends Factory
     {
         return [
             'name' => $this->faker->word(150),
+            'icon' => $this->faker->randomElement(TypeShopIcons::names()),
         ];
     }
 }

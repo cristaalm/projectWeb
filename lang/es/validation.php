@@ -206,6 +206,7 @@ return [
         'grand_prize'              => 'gran Premio',
         'group'                    => 'grupo',
         'hour'                     => 'hora',
+        'icon'                     => 'icono',
         'image'                    => 'imagen',
         'image_desktop'            => 'imagen de escritorio',
         'image_main'               => 'imagen principal',

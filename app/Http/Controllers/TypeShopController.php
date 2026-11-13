@@ -10,6 +10,7 @@ use App\Http\Requests\TypeShop\UpdateTypeShopRequest;
 use App\Models\TypeShop;
 use App\Repositories\TypeShopRepository;
 use App\Services\TypeShopService;
+use App\Support\TypeShopIcons;
 
 class TypeShopController extends Controller
 {
@@ -21,10 +22,18 @@ class TypeShopController extends Controller
 
     public function catalog()
     {
-        $typeShops = TypeShop::orderBy('name')->get(['id', 'name', 'is_active']);
+        $typeShops = TypeShop::orderBy('name')->get(['id', 'name', 'icon', 'is_active']);
 
         return $this->apiResponse(true, 'Categorías obtenidas correctamente.', [
             'type_shops' => $typeShops,
+        ], null, 200);
+    }
+
+    /** Catálogo cerrado de iconos disponibles para una categoría (selector del admin). */
+    public function icons()
+    {
+        return $this->apiResponse(true, 'Iconos obtenidos correctamente.', [
+            'icons' => TypeShopIcons::catalog(),
         ], null, 200);
     }
 

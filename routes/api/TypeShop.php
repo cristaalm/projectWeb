@@ -10,6 +10,10 @@ Route::middleware(['auth:sanctum', 'ensureUserIsActive'])
 Route::middleware(['auth:sanctum', 'ensureUserIsActive'])
     ->get('type-shop/active', [TypeShopController::class, 'activeCatalog']);
 
+// Catálogo cerrado de iconos (App\Support\TypeShopIcons) con la URL de cada SVG.
+Route::middleware(['auth:sanctum', 'ensureUserIsActive'])
+    ->get('type-shop/icons', [TypeShopController::class, 'icons']);
+
 Route::prefix('type-shop')
     ->middleware(['auth:sanctum', 'ensureUserIsActive', 'role:superadmin,moderador'])
     ->group(function () {

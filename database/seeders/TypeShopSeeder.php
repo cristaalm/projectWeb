@@ -9,23 +9,24 @@ class TypeShopSeeder extends Seeder
 {
     public function run(): void
     {
-
+        // Nombre => icono del catálogo App\Support\TypeShopIcons.
         $typeShops = [
-            'Supermercado',
-            'Farmacia',
-            'Restaurant',
-            'Tienda',
-            'Gasolinera',
-            'Bodega',
-            'Tienda de electrónica',
-            'Tienda de libros',
-            'Tienda de juguetes',
-            'Tienda de ropa',
+            'Supermercado' => 'cart',
+            'Farmacia' => 'pill',
+            'Restaurant' => 'silverware-fork-knife',
+            'Tienda' => 'store',
+            'Gasolinera' => 'gas-station',
+            'Bodega' => 'warehouse',
+            'Tienda de electrónica' => 'laptop',
+            'Tienda de libros' => 'book-open-page-variant',
+            'Tienda de juguetes' => 'teddy-bear',
+            'Tienda de ropa' => 'tshirt-crew',
         ];
 
-        foreach ($typeShops as $typeShop) {
+        foreach ($typeShops as $name => $icon) {
             TypeShop::factory()->create([
-                'name' => $typeShop,
+                'name' => $name,
+                'icon' => $icon,
             ]);
         }
     }

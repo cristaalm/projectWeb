@@ -33,10 +33,7 @@ class UserWithIdentityResource extends JsonResource
                 'phone' => $this->alliance->phone,
                 'logo' => $this->alliance->logo,
                 'address' => $this->alliance->address,
-                'type_shop' => $this->alliance->type_shop_id ? $this->whenLoaded('typeShop', [
-                    'id' => $this->alliance->typeShop->id,
-                    'name' => $this->alliance->typeShop->name,
-                ]) : null,
+                'type_shop' => $this->alliance->type_shop_id ? $this->whenLoaded('typeShop', fn () => $this->alliance->typeShop->toSummary()) : null,
                 'total_points' => $this->alliance->total_points,
                 'ext' => $this->alliance->ext,
                 'created_at' => $this->alliance->created_at,

@@ -23,10 +23,7 @@ class ShopResource extends JsonResource
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
             'has_exclusive_rewards' => $this->has_exclusive_rewards,
-            'type_shop' => $this->typeShop ? [
-                'id' => $this->typeShop->id,
-                'name' => $this->typeShop->name,
-            ] : null,
+            'type_shop' => $this->typeShop?->toSummary(),
         ];
     }
 }

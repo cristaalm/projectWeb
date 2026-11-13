@@ -37,10 +37,7 @@ class UserResource extends JsonResource
                         'address' => $alliance->address,
                         'logo_url' => $alliance->logo_url,
                         'has_exclusive_rewards' => $alliance->has_exclusive_rewards,
-                        'type_shop' => $alliance->relationLoaded('typeShop') && $alliance->typeShop ? [
-                            'id' => $alliance->typeShop->id,
-                            'name' => $alliance->typeShop->name,
-                        ] : null,
+                        'type_shop' => $alliance->relationLoaded('typeShop') ? $alliance->typeShop?->toSummary() : null,
                         'status' => $alliance->status,
                         'created_at' => $alliance->created_at,
                         'updated_at' => $alliance->updated_at,
