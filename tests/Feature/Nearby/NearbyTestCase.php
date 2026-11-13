@@ -32,7 +32,7 @@ abstract class NearbyTestCase extends TestCase
     {
         parent::setUp();
 
-        $this->typeShop = TypeShop::create(['name' => 'Cafetería', 'is_active' => true]);
+        $this->typeShop = TypeShop::create(['name' => 'Cafetería', 'icon' => 'coffee', 'is_active' => true]);
     }
 
     protected function user(int $points = 0): User

@@ -48,6 +48,8 @@ class NearbyShopsTest extends NearbyTestCase
         $this->assertSame([$cerca->id, $lejos->id], $this->ids($response));
         $this->assertEqualsWithDelta(1000, $response->json('data.shops.0.distance_m'), 10);
         $this->assertSame('Cafetería', $response->json('data.shops.0.type_shop.name'));
+        $this->assertSame('coffee', $response->json('data.shops.0.type_shop.icon'));
+        $this->assertStringEndsWith('/icons/type-shop/coffee.svg', $response->json('data.shops.0.type_shop.icon_url'));
     }
 
     public function test_comercio_con_solo_exclusivas_sale_solo_a_sus_miembros(): void
