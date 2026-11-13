@@ -1,5 +1,6 @@
 <script setup>
 import LocationPickerDialog from '@/components/LocationPickerDialog.vue'
+import TypeShopIcon from '@/components/TypeShopIcon.vue'
 import { useAllianceManagement } from '@/hooks/Alliances/useAllianceManagement'
 import { useTypeShopCatalog } from '@/hooks/TypeShop/useTypeShopCatalog'
 import { computed, ref, watch } from 'vue'
@@ -191,7 +192,28 @@ async function submit() {
                 item-value="id"
                 label="Categoría"
                 required
-              />
+              >
+                <template #item="{ props: itemProps, item }">
+                  <VListItem v-bind="itemProps">
+                    <template #prepend>
+                      <TypeShopIcon
+                        :url="item.raw.icon_url"
+                        :size="20"
+                        class="me-3 text-medium-emphasis"
+                      />
+                    </template>
+                  </VListItem>
+                </template>
+                <template #selection="{ item }">
+                  <div class="gap-2 d-flex align-center">
+                    <TypeShopIcon
+                      :url="item.raw.icon_url"
+                      :size="18"
+                    />
+                    <span>{{ item.raw.label }}</span>
+                  </div>
+                </template>
+              </VSelect>
             </VCol>
             <VCol cols="12">
               <VTextField

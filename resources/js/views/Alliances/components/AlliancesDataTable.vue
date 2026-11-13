@@ -1,4 +1,5 @@
 <script setup>
+import TypeShopIcon from '@/components/TypeShopIcon.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
 import { allianceStatusColor, allianceStatusLabel } from '@/utils/allianceStatus'
 import { storageURL } from '@/utils/constants'
@@ -103,7 +104,21 @@ function formatDate(value) {
     </template>
 
     <template #item.type_shop="{ item }">
-      <span class="text-body-2">{{ item.type_shop?.name ?? '—' }}</span>
+      <div
+        v-if="item.type_shop"
+        class="gap-2 d-flex align-center text-body-2"
+      >
+        <TypeShopIcon
+          :url="item.type_shop.icon_url"
+          :size="18"
+          class="text-medium-emphasis"
+        />
+        <span>{{ item.type_shop.name }}</span>
+      </div>
+      <span
+        v-else
+        class="text-body-2"
+      >—</span>
     </template>
 
     <template #item.has_exclusive_rewards="{ value }">

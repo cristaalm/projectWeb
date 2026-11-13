@@ -1,9 +1,11 @@
 <script setup>
+import TypeShopIcon from '@/components/TypeShopIcon.vue'
 import { useTypeShopCatalog } from '@/hooks/TypeShop/useTypeShopCatalog'
 import { useTypeShopManagement } from '@/hooks/TypeShop/useTypeShopManagement'
 import { requestOrderTable } from '@/services/requests'
 import { useDialogStore } from '@/store/useAlertDialogStorage'
 import { computed, ref, watch } from 'vue'
+import TypeShopIconPicker from './TypeShopIconPicker.vue'
 
 const props = defineProps({
   modelValue: { type: Boolean, required: true },
@@ -30,7 +32,9 @@ const {
 })
 
 const editingId = ref(null)
-const form = ref({ name: '', is_active: true })
+const DEFAULT_ICON = 'store'
+
+const form = ref({ name: '', icon: DEFAULT_ICON, is_active: true })
 const isEditing = computed(() => editingId.value !== null)
 
 watch(() => props.modelValue, open => {
@@ -42,12 +46,12 @@ watch(() => props.modelValue, open => {
 
 function resetForm() {
   editingId.value = null
-  form.value = { name: '', is_active: true }
+  form.value = { name: '', icon: DEFAULT_ICON, is_active: true }
 }
 
 function startEdit(item) {
   editingId.value = item.id
-  form.value = { name: item.name, is_active: Boolean(item.is_active) }
+  form.value = { name: item.name, icon: item.icon ?? DEFAULT_ICON, is_active: Boolean(item.is_active) }
 }
 
 async function refreshEverywhere() {
@@ -103,6 +107,7 @@ async function handleDelete(item) {
           class="gap-3 d-flex align-center mb-4"
           @submit.prevent="submit"
         >
+          <TypeShopIconPicker v-model="form.icon" />
           <VTextField
             v-model="form.name"
             label="Nombre de la categoría"
@@ -154,6 +159,13 @@ async function handleDelete(item) {
             v-for="item in data"
             :key="item.id"
           >
+            <template #prepend>
+              <TypeShopIcon
+                :url="item.icon_url"
+                :size="20"
+                class="me-3 text-medium-emphasis"
+              />
+            </template>
             <VListItemTitle>{{ item.name }}</VListItemTitle>
             <template #append>
               <VChip

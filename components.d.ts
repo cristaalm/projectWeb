@@ -66,6 +66,7 @@ declare module 'vue' {
     ThemeSwitcher: typeof import('./resources/js/@core/components/ThemeSwitcher.vue')['default']
     Title: typeof import('./resources/js/components/Base/Headless/Dialog/Title.vue')['default']
     ToastNotification: typeof import('./resources/js/components/Base/ToastNotification/ToastNotification.vue')['default']
+    TypeShopIcon: typeof import('./resources/js/components/TypeShopIcon.vue')['default']
     UpgradeToPro: typeof import('./resources/js/components/UpgradeToPro.vue')['default']
     UserAvatar: typeof import('./resources/js/components/UserAvatar.vue')['default']
     VAlertDialog: typeof import('./resources/js/components/Base/VAlertDialog/VAlertDialog.vue')['default']
