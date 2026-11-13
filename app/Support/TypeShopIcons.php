@@ -11,7 +11,7 @@ namespace App\Support;
  * icono con su librería a partir del nombre, o simplemente cargar el SVG de `url()`.
  *
  * Los SVG viven en `public/icons/type-shop/<nombre>.svg` y se generan con
- * `php artisan type-shop:build-icons` — volver a correrlo después de tocar esta lista.
+ * `php artisan icons:build` — volver a correrlo después de tocar esta lista.
  */
 final class TypeShopIcons
 {
@@ -77,6 +77,12 @@ final class TypeShopIcons
     public static function names(): array
     {
         return array_keys(self::ICONS);
+    }
+
+    /** @return array<string, string> nombre de archivo => icono Iconify (`prefijo:nombre`) */
+    public static function sources(): array
+    {
+        return array_combine(self::names(), array_map(fn (string $name) => "mdi:{$name}", self::names()));
     }
 
     public static function url(?string $icon): ?string

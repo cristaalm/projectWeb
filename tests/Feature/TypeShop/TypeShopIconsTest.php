@@ -33,7 +33,7 @@ class TypeShopIconsTest extends TestCase
         foreach (TypeShopIcons::names() as $name) {
             $path = public_path(TypeShopIcons::PUBLIC_DIR."/{$name}.svg");
 
-            $this->assertFileExists($path, "Falta el SVG de '{$name}': corre php artisan type-shop:build-icons");
+            $this->assertFileExists($path, "Falta el SVG de '{$name}': corre php artisan icons:build");
             $this->assertStringStartsWith('<svg', file_get_contents($path));
         }
 
